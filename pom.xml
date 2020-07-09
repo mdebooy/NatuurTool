@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>eu.debooy.maven</groupId>
+    <artifactId>pom</artifactId>
+    <version>2.3.1-SNAPSHOT</version>
+  </parent>
+  <groupId>eu.debooy.natuur</groupId>
+  <artifactId>natuurtools</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+  <name>Natuur Tools</name>
+  <description>Verschillende Tools voor de 'Natuur' applicaties.</description>
+  <inceptionYear>2020</inceptionYear>
+  <scm>
+    <connection>scm:git:ssh://ptah.debooy.eu/srv/git/debooy/NatuurTools.git</connection>
+    <developerConnection>scm:git:ssh://ptah.debooy.eu/srv/git/debooy/NatuurTools.git</developerConnection>
+  </scm>
+
+  <developers>
+    <developer>
+      <name>Marco de Booij</name>
+      <id>booymar</id>
+      <email>marco.developer@debooy.eu</email>
+      <organization>dOOS</organization>
+      <roles>
+        <role>Project Manager</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>eu.debooy.natuurtools.NatuurTools</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>eu.debooy.doosutils</groupId>
+      <artifactId>doosutils-core</artifactId>
+      <version>2.1.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>eu.debooy.doosutils</groupId>
+      <artifactId>doosutils-file</artifactId>
+      <version>2.1.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>eu.debooy.doosutils</groupId>
+      <artifactId>doosutils-persistence</artifactId>
+      <version>2.1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>eu.debooy.natuur</groupId>
+      <artifactId>natuur-components</artifactId>
+      <version>2.1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.openjpa</groupId>
+      <artifactId>openjpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.2.14</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>2.0.0-alpha1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>2.0.0-alpha1</version>
+    </dependency>
+  </dependencies>
+</project>
