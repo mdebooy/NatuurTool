@@ -41,7 +41,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.ResourceBundle;
-import java.util.Scanner;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
@@ -82,11 +81,11 @@ public class TaxaNamenImport {
       return;
     }
 
-    Scanner invoer    = new Scanner(System.in);
-    DoosUtils.naarScherm(resourceBundle.getString(NatuurTools.LBL_WACHTWOORD)
-                         + ": ");
-    String  password  = invoer.next();
-    invoer.close();
+    String  password  =
+        DoosUtils.getWachtwoord(MessageFormat.format(
+            resourceBundle.getString(NatuurTools.LBL_WACHTWOORD),
+            parameters.get(NatuurTools.PAR_DBUSER),
+            parameters.get(NatuurTools.PAR_DBURL).split("/")[1]));
 
     if (DoosConstants.WAAR
                      .equalsIgnoreCase(
@@ -95,6 +94,7 @@ public class TaxaNamenImport {
     } else {
       DoosUtils.naarScherm();
       DoosUtils.naarScherm(resourceBundle.getString(NatuurTools.MSG_WIJZIGEN));
+      DoosUtils.naarScherm();
     }
 
     String[]      talen       = parameters.get(NatuurTools.PAR_TALEN)
