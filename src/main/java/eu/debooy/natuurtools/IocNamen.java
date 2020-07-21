@@ -44,6 +44,8 @@ public class IocNamen extends Batchjob {
   private static final  ResourceBundle  resourceBundle  =
       ResourceBundle.getBundle("ApplicatieResources", Locale.getDefault());
 
+  private IocNamen() {}
+
   @SuppressWarnings("unchecked")
   public static void execute(String[] args) {
     CsvBestand    csvBestand;

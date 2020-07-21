@@ -55,8 +55,14 @@ public class TaxaNamenImport extends Batchjob {
   private static final  ResourceBundle  resourceBundle  =
       ResourceBundle.getBundle("ApplicatieResources", Locale.getDefault());
 
+  protected static final  String  TXT_2SPATIES = "  ";
+  protected static final  String  TXT_4SPATIES = "    ";
+  protected static final  String  TXT_6SPATIES = "      ";
+
   private static  boolean       readonly  = false;
   private static  EntityManager em;
+
+  private TaxaNamenImport() {}
 
   public static void execute(String[] args) {
     Integer       id          = null;
@@ -140,7 +146,7 @@ public class TaxaNamenImport extends Batchjob {
                   DoosUtils.nullToEmpty(taxon.getLatijnsenaam()))) {
             id  = Integer.valueOf(((JSONObject) familie).get(NatuurTools.KEY_ID)
                                                         .toString());
-            DoosUtils.naarScherm("  " + MessageFormat.format(
+            DoosUtils.naarScherm(TXT_2SPATIES + MessageFormat.format(
                 resourceBundle.getString(NatuurTools.MSG_FAMILIE),
                 familienaam, taxon.getVolgnummer(), id));
             if (!Objects.equals(taxon.getVolgnummer(), id)) {
@@ -158,7 +164,7 @@ public class TaxaNamenImport extends Batchjob {
                 id  =
                     Integer.valueOf(((JSONObject) soort).get(NatuurTools.KEY_ID)
                                                         .toString());
-                DoosUtils.naarScherm("    " + MessageFormat.format(
+                DoosUtils.naarScherm(TXT_4SPATIES + MessageFormat.format(
                     resourceBundle.getString(NatuurTools.MSG_SOORT),
                     soortnaam, taxon.getVolgnummer(), id));
                 if (!Objects.equals(taxon.getVolgnummer(), id)) {
@@ -217,7 +223,7 @@ public class TaxaNamenImport extends Batchjob {
           taxonnaamDto  = taxon.getTaxonnaam(taal);
           if (!taxonnaamDto.getNaam()
                            .equals(taxonnamen.get(taal))) {
-            DoosUtils.naarScherm("      "
+            DoosUtils.naarScherm(TXT_6SPATIES
                 + MessageFormat.format(
                       resourceBundle
                           .getString(NatuurTools.MSG_VERSCHIL),
@@ -227,7 +233,7 @@ public class TaxaNamenImport extends Batchjob {
             setTaxonnaam(taxonnaamDto);
           }
         } else {
-          DoosUtils.naarScherm("      "
+          DoosUtils.naarScherm(TXT_6SPATIES
                 + MessageFormat.format(
                       resourceBundle
                           .getString(NatuurTools.MSG_NIEUW),
@@ -242,7 +248,7 @@ public class TaxaNamenImport extends Batchjob {
     }
     for (TaxonnaamDto dto : taxon.getTaxonnamen()) {
       if (!taxonnamen.containsKey(dto.getTaal())) {
-        DoosUtils.foutNaarScherm("      "
+        DoosUtils.foutNaarScherm(TXT_6SPATIES
             + MessageFormat.format(
                   resourceBundle
                         .getString(NatuurTools.MSG_ONBEKEND),
