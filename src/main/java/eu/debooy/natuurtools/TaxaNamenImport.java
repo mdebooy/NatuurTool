@@ -18,6 +18,7 @@ package eu.debooy.natuurtools;
 
 import eu.debooy.doosutils.Arguments;
 import eu.debooy.doosutils.Banner;
+import eu.debooy.doosutils.Batchjob;
 import eu.debooy.doosutils.DoosConstants;
 import eu.debooy.doosutils.DoosUtils;
 import eu.debooy.doosutils.access.JsonBestand;
@@ -34,10 +35,8 @@ import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -52,7 +51,7 @@ import org.json.simple.JSONObject;
 /**
  * @author Marco de Booij
  */
-public class TaxaNamenImport {
+public class TaxaNamenImport extends Batchjob {
   private static final  ResourceBundle  resourceBundle  =
       ResourceBundle.getBundle("ApplicatieResources", Locale.getDefault());
 
@@ -60,24 +59,15 @@ public class TaxaNamenImport {
   private static  EntityManager em;
 
   public static void execute(String[] args) {
-    List<String>  fouten      = new ArrayList<String>();
     Integer       id          = null;
     JSONObject    json        = null;
     JsonBestand   jsonBestand = null;
-    Map<String, String>
-                  parameters        = new HashMap<String, String>();
     Properties    props       = new Properties();
     TaxonDto      taxon       = null;
 
     Banner.printDoosBanner(resourceBundle.getString("banner.taxanamenimport"));
 
-    verwerkParameters(args, parameters, fouten);
-
-    if (!fouten.isEmpty() ) {
-      help();
-      fouten.forEach(fout -> {
-        DoosUtils.foutNaarScherm(fout);
-      });
+    if (!setParameters(args)) {
       return;
     }
 
@@ -112,11 +102,11 @@ public class TaxaNamenImport {
     try {
       jsonBestand  =
           new JsonBestand.Builder()
-                         .setBestand(parameters.get(NatuurTools.PAR_INVOERDIR)
+                         .setBestand(parameters.get(PAR_INVOERDIR)
                                     + File.separator +
                                     parameters.get(NatuurTools.PAR_JSONBESTAND)
-                                    + NatuurTools.EXT_JSON)
-                         .setCharset(parameters.get(NatuurTools.PAR_CHARSETIN))
+                                    + EXT_JSON)
+                         .setCharset(parameters.get(PAR_CHARSETIN))
                          .build();
       json = jsonBestand.read();
     } catch (BestandException e) {
@@ -197,6 +187,9 @@ public class TaxaNamenImport {
     if (null != em) {
       em.close();
     }
+
+    DoosUtils.naarScherm();
+    DoosUtils.naarScherm(resourceBundle.getString(MSG_KLAAR));
   }
 
   public static void addTaxonnaam(TaxonnaamDto taxonnaam) {
@@ -274,7 +267,7 @@ public class TaxaNamenImport {
 
   public static void help() {
     DoosUtils.naarScherm("java -jar NatuurTools.jar TaxaNamenImport ["
-                          + resourceBundle.getString("label.optie")
+                          + getMelding(LBL_OPTIE)
                           + "] --jsonbestand=<"
                           + resourceBundle.getString("label.jsonbestand") + ">"
                           + " --dburl=<"
@@ -285,24 +278,24 @@ public class TaxaNamenImport {
                           + resourceBundle.getString("label.talen") + ">",
                          80);
     DoosUtils.naarScherm();
-    DoosUtils.naarScherm("  --charsetin   ",
-        MessageFormat.format(resourceBundle.getString("help.charsetin"),
+    DoosUtils.naarScherm(getParameterTekst(PAR_CHARSETIN, 12),
+        MessageFormat.format(getMelding(HLP_CHARSETIN),
                              Charset.defaultCharset().name()), 80);
-    DoosUtils.naarScherm("  --dburl       ",
+    DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_DBURL, 12),
                          resourceBundle.getString("help.dburl"), 80);
-    DoosUtils.naarScherm("  --dbuser      ",
+    DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_DBUSER, 12),
                          resourceBundle.getString("help.dbuser"), 80);
-    DoosUtils.naarScherm("  --invoerdir   ",
-                         resourceBundle.getString("help.invoerdir"), 80);
-    DoosUtils.naarScherm("  --jsonbestand ",
+    DoosUtils.naarScherm(getParameterTekst(PAR_INVOERDIR, 12),
+                         getMelding(HLP_INVOERDIR), 80);
+    DoosUtils.naarScherm(getParameterTekst(PAR_JSONBESTAND, 12),
                          resourceBundle.getString("help.jsonbestand"), 80);
-    DoosUtils.naarScherm("  --readonly    ",
+    DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_READONLY, 12),
                          resourceBundle.getString("help.readonly"), 80);
-    DoosUtils.naarScherm("  --talen       ",
-                         resourceBundle.getString("help.exclude.talen"), 80);
+    DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_TALEN, 12),
+                         resourceBundle.getString("help.include.talen"), 80);
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(
-        MessageFormat.format(resourceBundle.getString("help.paramsverplicht"),
+        MessageFormat.format(getMelding(HLP_PARAMSVERPLICHT),
                              NatuurTools.PAR_JSONBESTAND + ", "
                                  + NatuurTools.PAR_DBURL + ", "
                                  + NatuurTools.PAR_DBUSER,
@@ -312,10 +305,44 @@ public class TaxaNamenImport {
 
   protected static void printFouten(List<Message> fouten) {
     fouten.forEach(fout -> {
-      DoosUtils.foutNaarScherm(
-          MessageFormat.format(resourceBundle.getString(NatuurTools.LBL_FOUT),
-                               fout.getMessage()));
+      DoosUtils.foutNaarScherm(getMelding(LBL_FOUT, fout.getMessage()));
     });
+  }
+
+  private static boolean setParameters(String[] args) {
+    Arguments     arguments = new Arguments(args);
+    List<String>  fouten    = new ArrayList<String>();
+
+    arguments.setParameters(new String[] {PAR_CHARSETIN,
+                                          NatuurTools.PAR_DBURL,
+                                          NatuurTools.PAR_DBUSER,
+                                          PAR_INVOERDIR,
+                                          NatuurTools.PAR_JSONBESTAND,
+                                          NatuurTools.PAR_READONLY,
+                                          NatuurTools.PAR_TALEN});
+    arguments.setVerplicht(new String[] {NatuurTools.PAR_JSONBESTAND,
+                                         NatuurTools.PAR_TALEN});
+    if (!arguments.isValid()) {
+      fouten.add(getMelding(ERR_INVALIDPARAMS));
+    }
+
+    setParameter(arguments, PAR_CHARSETIN,
+                 Charset.defaultCharset().name());
+    setParameter(arguments, NatuurTools.PAR_DBURL);
+    setParameter(arguments, NatuurTools.PAR_DBUSER);
+    setDirParameter(arguments, PAR_INVOERDIR);
+    setBestandParameter(arguments, NatuurTools.PAR_JSONBESTAND, EXT_JSON);
+    setParameter(arguments, NatuurTools.PAR_READONLY, DoosConstants.ONWAAR);
+    NatuurTools.setTalenParameter(arguments, parameters);
+
+    if (parameters.get(NatuurTools.PAR_JSONBESTAND).contains(File.separator)) {
+      fouten.add(
+          MessageFormat.format(
+              resourceBundle.getString(ERR_BEVATDIRECTORY),
+                                       NatuurTools.PAR_JSONBESTAND));
+    }
+
+    return isFoutloos(fouten);
   }
 
   public static void setTaxon(TaxonDto taxon) {
@@ -351,120 +378,4 @@ public class TaxaNamenImport {
       printFouten(fouten);
     }
   }
-
-  private static void verwerkParameterCharsetin(Arguments arguments,
-                                                Map<String, String> parameters)
-  {
-    if (arguments.hasArgument(NatuurTools.PAR_CHARSETIN)) {
-      parameters.put(NatuurTools.PAR_CHARSETIN,
-                     arguments.getArgument(NatuurTools.PAR_CHARSETIN));
-    } else {
-      parameters.put(NatuurTools.PAR_CHARSETIN,
-                     Charset.defaultCharset().name());
-    }
-  }
-
-  private static void verwerkParameterDburl(Arguments arguments,
-                                            Map<String, String> parameters) {
-    if (arguments.hasArgument(NatuurTools.PAR_DBURL)) {
-      parameters.put(NatuurTools.PAR_DBURL,
-                     arguments.getArgument(NatuurTools.PAR_DBURL));
-    }
-  }
-
-  private static void verwerkParameterDbuser(Arguments arguments,
-                                             Map<String, String> parameters) {
-    if (arguments.hasArgument(NatuurTools.PAR_DBUSER)) {
-      parameters.put(NatuurTools.PAR_DBUSER,
-                     arguments.getArgument(NatuurTools.PAR_DBUSER));
-    }
-  }
-
-  private static void verwerkParameterInvoerdir(Arguments arguments,
-                                                Map<String, String> parameters)
-  {
-    String  parameter;
-    if (arguments.hasArgument(NatuurTools.PAR_INVOERDIR)) {
-      parameter = arguments.getArgument(NatuurTools.PAR_INVOERDIR);
-      if (parameter.endsWith(File.separator)) {
-        parameter   = parameter.substring(0, parameter.length()
-                                             - File.separator.length());
-      }
-      parameters.put(NatuurTools.PAR_INVOERDIR, parameter);
-    } else {
-      parameters.put(NatuurTools.PAR_INVOERDIR, ".");
-    }
-  }
-
-  private static void verwerkParameterJsonbestand(Arguments arguments,
-                                                  Map<String,
-                                                      String> parameters,
-                                                  List<String> fouten) {
-    String  parameter;
-    if (arguments.hasArgument(NatuurTools.PAR_JSONBESTAND)) {
-      parameter = arguments.getArgument(NatuurTools.PAR_JSONBESTAND);
-      if (parameter.endsWith(NatuurTools.EXT_JSON)) {
-        parameter  =
-            parameter.substring(0, parameter.length()
-                                     - NatuurTools.EXT_JSON.length());
-      }
-      parameters.put(NatuurTools.PAR_JSONBESTAND, parameter);
-      if (parameter.contains(File.separator)) {
-        fouten.add(
-          MessageFormat.format(
-              resourceBundle.getString(NatuurTools.ERR_BEVATDIRECTORY),
-                                       NatuurTools.PAR_JSONBESTAND));
-      }
-    } else {
-      parameters.put(NatuurTools.PAR_JSONBESTAND,
-                     parameters.get(NatuurTools.PAR_IOCBESTAND));
-    }
-  }
-
-  private static void verwerkParameterReadonly(Arguments arguments,
-                                               Map<String, String> parameters) {
-    if (arguments.hasArgument(NatuurTools.PAR_READONLY)) {
-      parameters.put(NatuurTools.PAR_READONLY,
-                     arguments.getArgument(NatuurTools.PAR_READONLY));
-    } else {
-      parameters.put(NatuurTools.PAR_READONLY, DoosConstants.ONWAAR);
-    }
-  }
-
-  private static void verwerkParameterTalen(Arguments arguments,
-                                            Map<String, String> parameters) {
-    if (arguments.hasArgument(NatuurTools.PAR_TALEN)) {
-      parameters.put(NatuurTools.PAR_TALEN,
-                     arguments.getArgument(NatuurTools.PAR_TALEN)
-                              .toLowerCase()
-                              .replaceAll("[^a-z,]", ""));
-    }
-  }
-
-  private static void verwerkParameters(String[] args,
-                                        Map<String, String> parameters,
-                                        List<String> fouten) {
-    Arguments     arguments = new Arguments(args);
-
-    arguments.setParameters(new String[] {NatuurTools.PAR_CHARSETIN,
-                                          NatuurTools.PAR_DBURL,
-                                          NatuurTools.PAR_DBUSER,
-                                          NatuurTools.PAR_INVOERDIR,
-                                          NatuurTools.PAR_JSONBESTAND,
-                                          NatuurTools.PAR_READONLY,
-                                          NatuurTools.PAR_TALEN});
-    arguments.setVerplicht(new String[] {NatuurTools.PAR_JSONBESTAND,
-                                         NatuurTools.PAR_TALEN});
-    if (!arguments.isValid()) {
-      fouten.add(resourceBundle.getString(NatuurTools.ERR_INVALIDPARAMS));
-    }
-
-    verwerkParameterCharsetin(arguments, parameters);
-    verwerkParameterDburl(arguments, parameters);
-    verwerkParameterDbuser(arguments, parameters);
-    verwerkParameterInvoerdir(arguments, parameters);
-    verwerkParameterJsonbestand(arguments, parameters, fouten);
-    verwerkParameterReadonly(arguments, parameters);
-    verwerkParameterTalen(arguments, parameters);
- }
 }

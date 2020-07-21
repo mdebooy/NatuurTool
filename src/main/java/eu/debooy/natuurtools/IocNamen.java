@@ -18,6 +18,7 @@ package eu.debooy.natuurtools;
 
 import eu.debooy.doosutils.Arguments;
 import eu.debooy.doosutils.Banner;
+import eu.debooy.doosutils.Batchjob;
 import eu.debooy.doosutils.DoosUtils;
 import eu.debooy.doosutils.access.CsvBestand;
 import eu.debooy.doosutils.access.JsonBestand;
@@ -26,10 +27,8 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.ResourceBundle;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -40,7 +39,7 @@ import org.json.simple.parser.ParseException;
 /**
  * @author Marco de Booij
  */
-public class IocNamen {
+public class IocNamen extends Batchjob {
   private static final  JSONParser      parser          = new JSONParser();
   private static final  ResourceBundle  resourceBundle  =
       ResourceBundle.getBundle("ApplicatieResources", Locale.getDefault());
@@ -50,7 +49,6 @@ public class IocNamen {
     CsvBestand    csvBestand;
     JSONObject    familie           = new JSONObject();
     JSONArray     families          = new JSONArray();
-    List<String>  fouten            = new ArrayList<String>();
     JsonBestand   jsonBestand       = null;
     int           lijnen            = 3;
     JSONObject    namen             = new JSONObject();
@@ -59,21 +57,13 @@ public class IocNamen {
     int           nSoorten          = 0;
     JSONObject    orde              = new JSONObject();
     JSONArray     ordes             = new JSONArray();
-    Map<String, String>
-                  parameters        = new HashMap<String, String>();
     JSONObject    soort             = new JSONObject();
     JSONArray     soorten           = new JSONArray();
     JSONObject    taxa              = new JSONObject();
 
     Banner.printDoosBanner(resourceBundle.getString("banner.iocnamen"));
 
-    verwerkParameters(args, parameters, fouten);
-
-    if (!fouten.isEmpty() ) {
-      help();
-      fouten.forEach(fout -> {
-        DoosUtils.foutNaarScherm(fout);
-      });
+    if (!setParameters(args)) {
       return;
     }
 
@@ -83,11 +73,10 @@ public class IocNamen {
     try {
       csvBestand  =
           new CsvBestand.Builder()
-                        .setBestand(parameters.get(NatuurTools.PAR_INVOERDIR)
-                                    + File.separator +
+                        .setBestand(parameters.get(PAR_INVOERDIR) +
                                     parameters.get(NatuurTools.PAR_IOCBESTAND)
-                                    + NatuurTools.EXT_CSV)
-                        .setCharset(parameters.get(NatuurTools.PAR_CHARSETIN))
+                                    + EXT_CSV)
+                        .setCharset(parameters.get(PAR_CHARSETIN))
                         .setHeader(false)
                         .build();
     } catch (BestandException e) {
@@ -155,11 +144,10 @@ public class IocNamen {
     try {
       jsonBestand  =
           new JsonBestand.Builder()
-                         .setBestand(parameters.get(NatuurTools.PAR_UITVOERDIR)
-                                    + File.separator +
+                         .setBestand(parameters.get(PAR_UITVOERDIR) +
                                     parameters.get(NatuurTools.PAR_JSONBESTAND)
-                                    + NatuurTools.EXT_JSON)
-                         .setCharset(parameters.get(NatuurTools.PAR_CHARSETUIT))
+                                    + EXT_JSON)
+                         .setCharset(parameters.get(PAR_CHARSETUIT))
                          .setLezen(false)
                          .build();
       jsonBestand.write(taxa);
@@ -187,43 +175,42 @@ public class IocNamen {
         MessageFormat.format(resourceBundle.getString(NatuurTools.MSG_SOORTEN),
                              nSoorten));
     DoosUtils.naarScherm();
-    DoosUtils.naarScherm(resourceBundle.getString(NatuurTools.MSG_KLAAR));
+    DoosUtils.naarScherm(resourceBundle.getString(MSG_KLAAR));
   }
 
-  protected static void help() {
+  public static void help() {
     DoosUtils.naarScherm("java -jar NatuurTools.jar IocNamen ["
-                          + resourceBundle.getString("label.optie")
+                          + getMelding(LBL_OPTIE)
                           + "] --iocbestand=<"
                           + resourceBundle.getString("label.iocbestand") + ">"
                           + " --talen=<"
                           + resourceBundle.getString("label.talen") + ">",
                          80);
     DoosUtils.naarScherm();
-    DoosUtils.naarScherm("  --charsetin   ",
-        MessageFormat.format(resourceBundle.getString("help.charsetin"),
+    DoosUtils.naarScherm(getParameterTekst(PAR_CHARSETIN, 12),
+        MessageFormat.format(getMelding(HLP_CHARSETIN),
                              Charset.defaultCharset().name()), 80);
-    DoosUtils.naarScherm("  --charsetuit  ",
-        MessageFormat.format(resourceBundle.getString("help.charsetuit"),
+    DoosUtils.naarScherm(getParameterTekst(PAR_CHARSETUIT, 12),
+        MessageFormat.format(getMelding(HLP_CHARSETUIT),
                              Charset.defaultCharset().name()), 80);
-    DoosUtils.naarScherm("  --invoerdir   ",
-                         resourceBundle.getString("help.invoerdir"), 80);
-    DoosUtils.naarScherm("  --iocbestand  ",
+    DoosUtils.naarScherm(getParameterTekst(PAR_INVOERDIR, 12),
+                         getMelding(HLP_INVOERDIR), 80);
+    DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_IOCBESTAND, 12),
                          resourceBundle.getString("help.iocbestand"), 80);
-    DoosUtils.naarScherm("  --jsonbestand ",
+    DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_JSONBESTAND, 12),
                          resourceBundle.getString("help.uitvoerbestand"), 80);
-    DoosUtils.naarScherm("  --talen       ",
+    DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_TALEN, 12),
                          resourceBundle.getString("help.talen"), 80);
-    DoosUtils.naarScherm("  --uitvoerdir  ",
-                         resourceBundle.getString("help.uitvoerdir"), 80);
+    DoosUtils.naarScherm(getParameterTekst(PAR_UITVOERDIR, 12),
+                         getMelding(HLP_UITVOERDIR), 80);
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(
-        MessageFormat.format(resourceBundle.getString("help.paramsverplicht"),
+        MessageFormat.format(getMelding(HLP_PARAMSVERPLICHT),
                              NatuurTools.PAR_IOCBESTAND, NatuurTools.PAR_TALEN),
         80);
     DoosUtils.naarScherm();
   }
 
-  @SuppressWarnings("unchecked")
   private static void nieuweFamilie(JSONObject soort, JSONObject namen,
                                     JSONArray soorten, JSONObject familie,
                                     JSONArray families) throws ParseException {
@@ -238,7 +225,6 @@ public class IocNamen {
     }
   }
 
-  @SuppressWarnings("unchecked")
   private static void nieuweOrde(JSONObject soort, JSONObject namen,
                                  JSONArray soorten, JSONObject familie,
                                  JSONArray families, JSONObject orde,
@@ -254,7 +240,6 @@ public class IocNamen {
     }
   }
 
-  @SuppressWarnings("unchecked")
   private static void nieuweSoort(JSONObject soort, JSONObject namen,
                                   JSONArray soorten) throws ParseException {
     if (soort.size() > 0) {
@@ -267,142 +252,48 @@ public class IocNamen {
     }
   }
 
-  private static void verwerkParameterCharsetin(Arguments arguments,
-                                                Map<String, String> parameters)
-  {
-    if (arguments.hasArgument(NatuurTools.PAR_CHARSETIN)) {
-      parameters.put(NatuurTools.PAR_CHARSETIN,
-                     arguments.getArgument(NatuurTools.PAR_CHARSETIN));
-    } else {
-      parameters.put(NatuurTools.PAR_CHARSETIN,
-                     Charset.defaultCharset().name());
-    }
-  }
-
-  private static void verwerkParameterCharsetuit(Arguments arguments,
-                                                 Map<String, String> parameters)
-  {
-    if (arguments.hasArgument(NatuurTools.PAR_CHARSETUIT)) {
-      parameters.put(NatuurTools.PAR_CHARSETUIT,
-                     arguments.getArgument(NatuurTools.PAR_CHARSETUIT));
-    } else {
-      parameters.put(NatuurTools.PAR_CHARSETUIT,
-                     Charset.defaultCharset().name());
-    }
-  }
-
-  private static void verwerkParameterInvoerdir(Arguments arguments,
-                                                Map<String, String> parameters)
-  {
-    String  parameter;
-    if (arguments.hasArgument(NatuurTools.PAR_INVOERDIR)) {
-      parameter = arguments.getArgument(NatuurTools.PAR_INVOERDIR);
-      if (parameter.endsWith(File.separator)) {
-        parameter   = parameter.substring(0, parameter.length()
-                                             - File.separator.length());
-      }
-      parameters.put(NatuurTools.PAR_INVOERDIR, parameter);
-    } else {
-      parameters.put(NatuurTools.PAR_INVOERDIR, ".");
-    }
-  }
-
-  private static void verwerkParameterIocbestand(Arguments arguments,
-                                                 Map<String, String> parameters,
-                                                 List<String> fouten) {
-    String  parameter;
-    if (arguments.hasArgument(NatuurTools.PAR_IOCBESTAND)) {
-      parameter = arguments.getArgument(NatuurTools.PAR_IOCBESTAND);
-      if (parameter.endsWith(NatuurTools.EXT_CSV)) {
-        parameter  =
-            parameter.substring(0, parameter.length()
-                                     - NatuurTools.EXT_CSV.length());
-      }
-      if (parameter.contains(File.separator)) {
-        fouten.add(
-          MessageFormat.format(
-              resourceBundle.getString(NatuurTools.ERR_BEVATDIRECTORY),
-                                       NatuurTools.PAR_IOCBESTAND));
-      }
-      parameters.put(NatuurTools.PAR_IOCBESTAND, parameter);
-    }
-  }
-
-  private static void verwerkParameterJsonbestand(Arguments arguments,
-                                                  Map<String,
-                                                      String> parameters,
-                                                  List<String> fouten) {
-    String  parameter;
-    if (arguments.hasArgument(NatuurTools.PAR_JSONBESTAND)) {
-      parameter = arguments.getArgument(NatuurTools.PAR_JSONBESTAND);
-      if (parameter.endsWith(NatuurTools.EXT_JSON)) {
-        parameter  =
-            parameter.substring(0, parameter.length()
-                                     - NatuurTools.EXT_JSON.length());
-      }
-      parameters.put(NatuurTools.PAR_JSONBESTAND, parameter);
-      if (parameter.contains(File.separator)) {
-        fouten.add(
-          MessageFormat.format(
-              resourceBundle.getString(NatuurTools.ERR_BEVATDIRECTORY),
-                                       NatuurTools.PAR_JSONBESTAND));
-      }
-    } else {
-      parameters.put(NatuurTools.PAR_JSONBESTAND,
-                     parameters.get(NatuurTools.PAR_IOCBESTAND));
-    }
-  }
-
-  private static void verwerkParameterTalen(Arguments arguments,
-                                            Map<String, String> parameters) {
-    if (arguments.hasArgument(NatuurTools.PAR_TALEN)) {
-      parameters.put(NatuurTools.PAR_TALEN,
-                     arguments.getArgument(NatuurTools.PAR_TALEN)
-                              .toLowerCase()
-                              .replaceAll("[^a-z,]", ""));
-    }
-  }
-
-  private static void verwerkParameterUitvoerdir(Arguments arguments,
-                                                 Map<String, String> parameters)
-  {
-    String  parameter;
-    if (arguments.hasArgument(NatuurTools.PAR_UITVOERDIR)) {
-      parameter = arguments.getArgument(NatuurTools.PAR_UITVOERDIR);
-      if (parameter.endsWith(File.separator)) {
-        parameter   = parameter.substring(0, parameter.length()
-                                             - File.separator.length());
-      }
-      parameters.put(NatuurTools.PAR_UITVOERDIR, parameter);
-    } else {
-      parameters.put(NatuurTools.PAR_UITVOERDIR, ".");
-    }
-  }
-
-  private static void verwerkParameters(String[] args,
-                                        Map<String, String> parameters,
-                                        List<String> fouten) {
+  private static boolean setParameters(String[] args) {
     Arguments     arguments = new Arguments(args);
-
-    arguments.setParameters(new String[] {NatuurTools.PAR_CHARSETIN,
-                                          NatuurTools.PAR_CHARSETUIT,
-                                          NatuurTools.PAR_INVOERDIR,
+    List<String>  fouten    = new ArrayList<String>();
+    arguments.setParameters(new String[] {PAR_CHARSETIN,
+                                          PAR_CHARSETUIT,
+                                          PAR_INVOERDIR,
                                           NatuurTools.PAR_IOCBESTAND,
                                           NatuurTools.PAR_JSONBESTAND,
                                           NatuurTools.PAR_TALEN,
-                                          NatuurTools.PAR_UITVOERDIR});
+                                          PAR_UITVOERDIR});
     arguments.setVerplicht(new String[] {NatuurTools.PAR_IOCBESTAND,
                                          NatuurTools.PAR_TALEN});
     if (!arguments.isValid()) {
-      fouten.add(resourceBundle.getString(NatuurTools.ERR_INVALIDPARAMS));
+      fouten.add(resourceBundle.getString(ERR_INVALIDPARAMS));
     }
 
-    verwerkParameterCharsetin(arguments, parameters);
-    verwerkParameterCharsetuit(arguments, parameters);
-    verwerkParameterInvoerdir(arguments, parameters);
-    verwerkParameterIocbestand(arguments, parameters, fouten);
-    verwerkParameterJsonbestand(arguments, parameters, fouten);
-    verwerkParameterTalen(arguments, parameters);
-    verwerkParameterUitvoerdir(arguments, parameters);
+    setParameter(arguments, PAR_CHARSETIN,
+                 Charset.defaultCharset().name());
+    setParameter(arguments, PAR_CHARSETUIT,
+                 Charset.defaultCharset().name());
+    setDirParameter(arguments, PAR_INVOERDIR);
+    setBestandParameter(arguments, NatuurTools.PAR_IOCBESTAND, EXT_CSV);
+    setBestandParameter(arguments, NatuurTools.PAR_JSONBESTAND, EXT_JSON);
+    if (!hasParameter(NatuurTools.PAR_JSONBESTAND)) {
+      setParameter(NatuurTools.PAR_JSONBESTAND,
+                   getParameter(NatuurTools.PAR_IOCBESTAND));
+    }
+    NatuurTools.setTalenParameter(arguments, parameters);
+    setDirParameter(arguments, PAR_UITVOERDIR, getParameter(PAR_INVOERDIR));
+    if (parameters.get(NatuurTools.PAR_IOCBESTAND).contains(File.separator)) {
+      fouten.add(
+          MessageFormat.format(
+              resourceBundle.getString(ERR_BEVATDIRECTORY),
+                                       NatuurTools.PAR_IOCBESTAND));
+    }
+    if (parameters.get(NatuurTools.PAR_JSONBESTAND).contains(File.separator)) {
+      fouten.add(
+          MessageFormat.format(
+              resourceBundle.getString(ERR_BEVATDIRECTORY),
+                                       NatuurTools.PAR_JSONBESTAND));
+    }
+
+    return isFoutloos(fouten);
  }
 }

@@ -16,9 +16,11 @@
  */
 package eu.debooy.natuurtools;
 
+import eu.debooy.doosutils.Arguments;
 import eu.debooy.doosutils.Banner;
 import eu.debooy.doosutils.DoosUtils;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
@@ -28,12 +30,6 @@ public class NatuurTools {
   private static final  ResourceBundle  resourceBundle  =
       ResourceBundle.getBundle("ApplicatieResources", Locale.getDefault());
 
-  protected static final  String  ERR_BEVATDIRECTORY  = "error.bevatdirectory";
-  protected static final  String  ERR_INVALIDPARAMS   = "error.invalid.params";
-
-  protected static final  String  EXT_CSV   = ".csv";
-  protected static final  String  EXT_JSON  = ".json";
-
   protected static final  String  KEY_FAMILIE   = "familie";
   protected static final  String  KEY_FAMILIES  = "families";
   protected static final  String  KEY_ID        = "ID";
@@ -42,12 +38,10 @@ public class NatuurTools {
   protected static final  String  KEY_ORDE      = "orde";
   protected static final  String  KEY_SOORTEN   = "soorten";
 
-  protected static final  String  LBL_FOUT        = "label.fout";
   protected static final  String  LBL_WACHTWOORD  = "label.wachtwoord";
 
   protected static final  String  MSG_FAMILIE   = "msg.familie";
   protected static final  String  MSG_FAMILIES  = "msg.families";
-  protected static final  String  MSG_KLAAR     = "msg.klaar";
   protected static final  String  MSG_LIJNEN    = "msg.lijnen";
   protected static final  String  MSG_NIEUW     = "msg.nieuw";
   protected static final  String  MSG_ONBEKEND  = "msg.onbekend";
@@ -59,17 +53,24 @@ public class NatuurTools {
   protected static final  String  MSG_WIJZIGEN  = "msg.wijzigen";
 
   protected static final  String  PAR_IOCBESTAND  = "iocbestand";
-  protected static final  String  PAR_CHARSETIN   = "charsetin";
-  protected static final  String  PAR_CHARSETUIT  = "charsetuit";
   protected static final  String  PAR_DBURL       = "dburl";
   protected static final  String  PAR_DBUSER      = "dbuser";
-  protected static final  String  PAR_INVOERDIR   = "invoerdir";
   protected static final  String  PAR_JSONBESTAND = "jsonbestand";
   protected static final  String  PAR_READONLY    = "readonly";
   protected static final  String  PAR_TALEN       = "talen";
-  protected static final  String  PAR_UITVOERDIR  = "uitvoerdir";
 
   private NatuurTools() {}
+
+  private static void help() {
+    DoosUtils.naarScherm("  IOCNamen        ",
+                         resourceBundle.getString("help.iocnamen"), 80);
+    DoosUtils.naarScherm("  TaxaNamenImport ",
+                         resourceBundle.getString("help.taxanamenimport"), 80);
+    DoosUtils.naarScherm();
+    IocNamen.help();
+    DoosUtils.naarScherm();
+    TaxaNamenImport.help();
+  }
 
   public static void main(String[] args) {
     if (args.length == 0) {
@@ -96,14 +97,13 @@ public class NatuurTools {
     help();
   }
 
-  private static void help() {
-    DoosUtils.naarScherm("  IOCNamen        ",
-                         resourceBundle.getString("help.iocnamen"), 80);
-    DoosUtils.naarScherm("  TaxaNamenImport ",
-                         resourceBundle.getString("help.taxanamenimport"), 80);
-    DoosUtils.naarScherm();
-    IocNamen.help();
-    DoosUtils.naarScherm();
-    TaxaNamenImport.help();
+  protected static void setTalenParameter(Arguments arguments,
+                                          Map<String, String> parameters) {
+    if (arguments.hasArgument(NatuurTools.PAR_TALEN)) {
+      parameters.put(NatuurTools.PAR_TALEN,
+                     arguments.getArgument(NatuurTools.PAR_TALEN)
+                              .toLowerCase()
+                              .replaceAll("[^a-z,]", ""));
+    }
   }
 }
