@@ -1,7 +1,7 @@
 /**
  * Copyright 2020 Marco de Booij
  *
- * Licensed under the EUPL, Version 1.1 or - as soon they will be approved by
+ * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by
  * the European Commission - subsequent versions of the EUPL (the "Licence");
  * you may not use this work except in compliance with the Licence. You may
  * obtain a copy of the Licence at:
@@ -51,7 +51,6 @@ public class IocNamen extends Batchjob {
     CsvBestand    csvBestand;
     JSONObject    familie           = new JSONObject();
     JSONArray     families          = new JSONArray();
-    JsonBestand   jsonBestand       = null;
     int           lijnen            = 3;
     JSONObject    namen             = new JSONObject();
     int           nFamilies         = 0;
@@ -143,26 +142,7 @@ public class IocNamen extends Batchjob {
       DoosUtils.foutNaarScherm("csv: " + e.getLocalizedMessage());
     }
 
-    try {
-      jsonBestand  =
-          new JsonBestand.Builder()
-                         .setBestand(parameters.get(PAR_UITVOERDIR) +
-                                    parameters.get(NatuurTools.PAR_JSONBESTAND)
-                                    + EXT_JSON)
-                         .setCharset(parameters.get(PAR_CHARSETUIT))
-                         .setLezen(false)
-                         .build();
-      jsonBestand.write(taxa);
-    } catch (BestandException e) {
-      DoosUtils.foutNaarScherm(e.getLocalizedMessage());
-    }
-    if (null != jsonBestand) {
-      try {
-        jsonBestand.close();
-      } catch (BestandException e) {
-        DoosUtils.foutNaarScherm("json: " + e.getLocalizedMessage());
-      }
-    }
+    writeJson(taxa);
 
     DoosUtils.naarScherm(
         MessageFormat.format(resourceBundle.getString(NatuurTools.MSG_LIJNEN),
@@ -177,7 +157,7 @@ public class IocNamen extends Batchjob {
         MessageFormat.format(resourceBundle.getString(NatuurTools.MSG_SOORTEN),
                              nSoorten));
     DoosUtils.naarScherm();
-    DoosUtils.naarScherm(resourceBundle.getString(MSG_KLAAR));
+    DoosUtils.naarScherm(getMelding(MSG_KLAAR));
   }
 
   public static void help() {
@@ -298,4 +278,29 @@ public class IocNamen extends Batchjob {
 
     return isFoutloos(fouten);
  }
+
+  private static void writeJson(JSONObject taxa) {
+    JsonBestand jsonBestand = null;
+    try {
+      jsonBestand  =
+          new JsonBestand.Builder()
+                         .setBestand(parameters.get(PAR_UITVOERDIR) +
+                                    parameters.get(NatuurTools.PAR_JSONBESTAND)
+                                    + EXT_JSON)
+                         .setCharset(parameters.get(PAR_CHARSETUIT))
+                         .setLezen(false)
+                         .build();
+      jsonBestand.write(taxa);
+    } catch (BestandException e) {
+      DoosUtils.foutNaarScherm(e.getLocalizedMessage());
+    } finally {
+      if (null != jsonBestand) {
+        try {
+          jsonBestand.close();
+        } catch (BestandException e) {
+          DoosUtils.foutNaarScherm("json: " + e.getLocalizedMessage());
+        }
+      }
+    }
+  }
 }
