@@ -65,7 +65,8 @@ public class TaxaNamenImport extends Batchjob {
   private TaxaNamenImport() {}
 
   public static void execute(String[] args) {
-    Properties    props       = new Properties();
+    JsonBestand jsonBestand = null;
+    Properties  props       = new Properties();
 
     Banner.printDoosBanner(resourceBundle.getString("banner.taxanamenimport"));
 
@@ -101,7 +102,27 @@ public class TaxaNamenImport extends Batchjob {
     em  = Persistence.createEntityManagerFactory("natuur", props)
                      .createEntityManager();
 
-    verwerkJson(talen);
+    try {
+      jsonBestand  =
+          new JsonBestand.Builder()
+                         .setBestand(parameters.get(PAR_INVOERDIR)
+                                    + File.separator +
+                                    parameters.get(NatuurTools.PAR_JSONBESTAND)
+                                    + EXT_JSON)
+                         .setCharset(parameters.get(PAR_CHARSETIN))
+                         .build();
+      verwerkJson(jsonBestand.read(), talen);
+    } catch (BestandException e) {
+      DoosUtils.foutNaarScherm(e.getLocalizedMessage());
+    } finally {
+      if (null != jsonBestand) {
+        try {
+          jsonBestand.close();
+        } catch (BestandException e) {
+          DoosUtils.foutNaarScherm("json: " + e.getLocalizedMessage());
+        }
+      }
+    }
 
     if (null != em) {
       em.close();
@@ -123,7 +144,7 @@ public class TaxaNamenImport extends Batchjob {
       em.persist(taxonnaam);
       em.getTransaction().commit();
     } else {
-      printFouten(fouten);
+      printMessages(fouten);
     }
   }
 
@@ -222,7 +243,7 @@ public class TaxaNamenImport extends Batchjob {
     DoosUtils.naarScherm();
   }
 
-  protected static void printFouten(List<Message> fouten) {
+  protected static void printMessages(List<Message> fouten) {
     fouten.forEach(fout -> {
       DoosUtils.foutNaarScherm(getMelding(LBL_FOUT, fout.getMessage()));
     });
@@ -254,14 +275,22 @@ public class TaxaNamenImport extends Batchjob {
     setParameter(arguments, NatuurTools.PAR_READONLY, DoosConstants.ONWAAR);
     NatuurTools.setTalenParameter(arguments, parameters);
 
-    if (parameters.get(NatuurTools.PAR_JSONBESTAND).contains(File.separator)) {
+    if (DoosUtils.nullToEmpty(parameters.get(NatuurTools.PAR_JSONBESTAND))
+                 .contains(File.separator)) {
       fouten.add(
           MessageFormat.format(
               resourceBundle.getString(ERR_BEVATDIRECTORY),
                                        NatuurTools.PAR_JSONBESTAND));
     }
 
-    return isFoutloos(fouten);
+    if (fouten.isEmpty()) {
+      return true;
+    }
+
+    help();
+    printFouten(fouten);
+
+    return false;
   }
 
   public static void setTaxon(TaxonDto taxon) {
@@ -277,7 +306,7 @@ public class TaxaNamenImport extends Batchjob {
       em.persist(updated);
       em.getTransaction().commit();
     } else {
-      printFouten(fouten);
+      printMessages(fouten);
     }
   }
 
@@ -294,29 +323,13 @@ public class TaxaNamenImport extends Batchjob {
       em.persist(updated);
       em.getTransaction().commit();
     } else {
-      printFouten(fouten);
+      printMessages(fouten);
     }
   }
 
-  private static void verwerkJson(String[] talen) {
-    Integer       id          = null;
-    JSONObject    json        = null;
-    JsonBestand   jsonBestand = null;
-    TaxonDto      taxon       = null;
-
-    try {
-      jsonBestand  =
-          new JsonBestand.Builder()
-                         .setBestand(parameters.get(PAR_INVOERDIR)
-                                    + File.separator +
-                                    parameters.get(NatuurTools.PAR_JSONBESTAND)
-                                    + EXT_JSON)
-                         .setCharset(parameters.get(PAR_CHARSETIN))
-                         .build();
-      json = jsonBestand.read();
-    } catch (BestandException e) {
-      DoosUtils.foutNaarScherm(e.getLocalizedMessage());
-    }
+  private static void verwerkJson(JSONObject json, String[] talen) {
+    Integer   id    = null;
+    TaxonDto  taxon = null;
 
     // Verwerk orde per orde
     for (Object orde : (JSONArray) json.get("taxa")) {
@@ -377,14 +390,6 @@ public class TaxaNamenImport extends Batchjob {
             }
           }
         }
-      }
-    }
-
-    if (null != jsonBestand) {
-      try {
-        jsonBestand.close();
-      } catch (BestandException e) {
-        DoosUtils.foutNaarScherm("json: " + e.getLocalizedMessage());
       }
     }
   }

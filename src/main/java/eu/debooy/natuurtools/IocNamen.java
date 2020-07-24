@@ -46,12 +46,10 @@ public class IocNamen extends Batchjob {
 
   private IocNamen() {}
 
-  @SuppressWarnings("unchecked")
   public static void execute(String[] args) {
     CsvBestand    csvBestand;
     JSONObject    familie           = new JSONObject();
     JSONArray     families          = new JSONArray();
-    int           lijnen            = 3;
     JSONObject    namen             = new JSONObject();
     int           nFamilies         = 0;
     int           nOrdes            = 0;
@@ -85,19 +83,12 @@ public class IocNamen extends Batchjob {
       return;
     }
 
-    // Skip de 3 header regels.
-    try {
-      csvBestand.next();
-      csvBestand.next();
-      csvBestand.next();
-    } catch (BestandException e) {
-      DoosUtils.foutNaarScherm(e.getLocalizedMessage());
-      return;
-    }
+    int lijnen  = skipHeader(csvBestand);
+
     while (csvBestand.hasNext()) {
       lijnen++;
       try {
-        String[] veld = csvBestand.next();
+        String[]  veld = csvBestand.next();
         // Nieuwe Orde
         if (DoosUtils.isNotBlankOrNull(veld[1])) {
           nieuweOrde(soort, namen, soorten, familie, families, orde, ordes);
@@ -247,7 +238,7 @@ public class IocNamen extends Batchjob {
     arguments.setVerplicht(new String[] {NatuurTools.PAR_IOCBESTAND,
                                          NatuurTools.PAR_TALEN});
     if (!arguments.isValid()) {
-      fouten.add(resourceBundle.getString(ERR_INVALIDPARAMS));
+      fouten.add(getMelding(ERR_INVALIDPARAMS));
     }
 
     setParameter(arguments, PAR_CHARSETIN,
@@ -263,21 +254,50 @@ public class IocNamen extends Batchjob {
     }
     NatuurTools.setTalenParameter(arguments, parameters);
     setDirParameter(arguments, PAR_UITVOERDIR, getParameter(PAR_INVOERDIR));
-    if (parameters.get(NatuurTools.PAR_IOCBESTAND).contains(File.separator)) {
+    if (DoosUtils.nullToEmpty(parameters.get(NatuurTools.PAR_IOCBESTAND))
+                 .contains(File.separator)) {
       fouten.add(
           MessageFormat.format(
               resourceBundle.getString(ERR_BEVATDIRECTORY),
                                        NatuurTools.PAR_IOCBESTAND));
     }
-    if (parameters.get(NatuurTools.PAR_JSONBESTAND).contains(File.separator)) {
+    if (DoosUtils.nullToEmpty(parameters.get(NatuurTools.PAR_JSONBESTAND))
+                 .contains(File.separator)) {
       fouten.add(
           MessageFormat.format(
               resourceBundle.getString(ERR_BEVATDIRECTORY),
                                        NatuurTools.PAR_JSONBESTAND));
     }
 
-    return isFoutloos(fouten);
+    if (fouten.isEmpty()) {
+      return true;
+    }
+
+    help();
+    printFouten(fouten);
+
+    return false;
  }
+
+  private static int skipHeader(CsvBestand csvBestand) {
+    boolean   einde   = false;
+    int       lijnen  = 0;
+    String[]  veld;
+    while (csvBestand.hasNext() && !einde) {
+      try {
+        veld  = csvBestand.next();
+        lijnen++;
+        if (DoosUtils.isNotBlankOrNull(veld[veld.length-1])) {
+          einde = true;
+        }
+      } catch (BestandException e) {
+        DoosUtils.foutNaarScherm(e.getLocalizedMessage());
+        return lijnen;
+      }
+    }
+
+    return lijnen;
+  }
 
   private static void writeJson(JSONObject taxa) {
     JsonBestand jsonBestand = null;
