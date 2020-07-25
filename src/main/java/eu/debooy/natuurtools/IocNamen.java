@@ -228,6 +228,7 @@ public class IocNamen extends Batchjob {
   private static boolean setParameters(String[] args) {
     Arguments     arguments = new Arguments(args);
     List<String>  fouten    = new ArrayList<String>();
+
     arguments.setParameters(new String[] {PAR_CHARSETIN,
                                           PAR_CHARSETUIT,
                                           PAR_INVOERDIR,
@@ -254,19 +255,18 @@ public class IocNamen extends Batchjob {
     }
     NatuurTools.setTalenParameter(arguments, parameters);
     setDirParameter(arguments, PAR_UITVOERDIR, getParameter(PAR_INVOERDIR));
+
     if (DoosUtils.nullToEmpty(parameters.get(NatuurTools.PAR_IOCBESTAND))
                  .contains(File.separator)) {
       fouten.add(
           MessageFormat.format(
-              resourceBundle.getString(ERR_BEVATDIRECTORY),
-                                       NatuurTools.PAR_IOCBESTAND));
+              getMelding(ERR_BEVATDIRECTORY), NatuurTools.PAR_IOCBESTAND));
     }
     if (DoosUtils.nullToEmpty(parameters.get(NatuurTools.PAR_JSONBESTAND))
                  .contains(File.separator)) {
       fouten.add(
           MessageFormat.format(
-              resourceBundle.getString(ERR_BEVATDIRECTORY),
-                                       NatuurTools.PAR_JSONBESTAND));
+              getMelding(ERR_BEVATDIRECTORY), NatuurTools.PAR_JSONBESTAND));
     }
 
     if (fouten.isEmpty()) {

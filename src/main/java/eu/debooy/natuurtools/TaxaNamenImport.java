@@ -279,8 +279,7 @@ public class TaxaNamenImport extends Batchjob {
                  .contains(File.separator)) {
       fouten.add(
           MessageFormat.format(
-              resourceBundle.getString(ERR_BEVATDIRECTORY),
-                                       NatuurTools.PAR_JSONBESTAND));
+              getMelding(ERR_BEVATDIRECTORY), NatuurTools.PAR_JSONBESTAND));
     }
 
     if (fouten.isEmpty()) {
