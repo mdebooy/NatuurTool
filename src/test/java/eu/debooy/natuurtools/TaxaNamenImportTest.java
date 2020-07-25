@@ -47,6 +47,6 @@ public class TaxaNamenImportTest extends BatchTest {
     VangOutEnErr.execute(TaxaNamenImport.class, "execute", args, out, err);
 
     assertEquals("Zonder parameters - helptekst", 26, out.size());
-    assertEquals("Zonder parameters - fouten", 0, 0);
+    assertEquals("Zonder parameters - fouten", 1, err.size());
   }
 }

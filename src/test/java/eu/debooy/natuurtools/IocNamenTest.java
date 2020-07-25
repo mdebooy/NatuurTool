@@ -47,6 +47,6 @@ public class IocNamenTest extends BatchTest {
     VangOutEnErr.execute(IocNamen.class, "execute", args, out, err);
 
     assertEquals("Zonder parameters - helptekst", 27, out.size());
-    assertEquals("Zonder parameters - fouten", 0, 0);
+    assertEquals("Zonder parameters - fouten", 1, err.size());
   }
 }
