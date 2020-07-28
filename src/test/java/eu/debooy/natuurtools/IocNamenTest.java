@@ -16,7 +16,6 @@
  */
 package eu.debooy.natuurtools;
 
-import eu.debooy.doosutils.exception.BestandException;
 import eu.debooy.doosutils.test.BatchTest;
 import eu.debooy.doosutils.test.VangOutEnErr;
 import java.util.Locale;
@@ -34,7 +33,7 @@ public class IocNamenTest extends BatchTest {
       IocNamenTest.class.getClassLoader();
 
   @BeforeClass
-  public static void beforeClass() throws BestandException {
+  public static void beforeClass() {
     Locale.setDefault(new Locale("nl"));
     resourceBundle  = ResourceBundle.getBundle("ApplicatieResources",
                                                Locale.getDefault());

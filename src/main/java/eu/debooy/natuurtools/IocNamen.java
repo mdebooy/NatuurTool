@@ -149,6 +149,7 @@ public class IocNamen extends Batchjob {
                              nSoorten));
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(getMelding(MSG_KLAAR));
+    DoosUtils.naarScherm();
   }
 
   public static void help() {
@@ -170,7 +171,7 @@ public class IocNamen extends Batchjob {
                          getMelding(HLP_INVOERDIR), 80);
     DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_IOCBESTAND, 12),
                          resourceBundle.getString("help.iocbestand"), 80);
-    DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_JSONBESTAND, 12),
+    DoosUtils.naarScherm(getParameterTekst(PAR_JSONBESTAND, 12),
                          resourceBundle.getString("help.uitvoerbestand"), 80);
     DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_TALEN, 12),
                          resourceBundle.getString("help.talen"), 80);
@@ -227,13 +228,13 @@ public class IocNamen extends Batchjob {
 
   private static boolean setParameters(String[] args) {
     Arguments     arguments = new Arguments(args);
-    List<String>  fouten    = new ArrayList<String>();
+    List<String>  fouten    = new ArrayList<>();
 
     arguments.setParameters(new String[] {PAR_CHARSETIN,
                                           PAR_CHARSETUIT,
                                           PAR_INVOERDIR,
                                           NatuurTools.PAR_IOCBESTAND,
-                                          NatuurTools.PAR_JSONBESTAND,
+                                          PAR_JSONBESTAND,
                                           NatuurTools.PAR_TALEN,
                                           PAR_UITVOERDIR});
     arguments.setVerplicht(new String[] {NatuurTools.PAR_IOCBESTAND,
@@ -242,16 +243,13 @@ public class IocNamen extends Batchjob {
       fouten.add(getMelding(ERR_INVALIDPARAMS));
     }
 
-    setParameter(arguments, PAR_CHARSETIN,
-                 Charset.defaultCharset().name());
-    setParameter(arguments, PAR_CHARSETUIT,
-                 Charset.defaultCharset().name());
+    setParameter(arguments, PAR_CHARSETIN, Charset.defaultCharset().name());
+    setParameter(arguments, PAR_CHARSETUIT, Charset.defaultCharset().name());
     setDirParameter(arguments, PAR_INVOERDIR);
     setBestandParameter(arguments, NatuurTools.PAR_IOCBESTAND, EXT_CSV);
-    setBestandParameter(arguments, NatuurTools.PAR_JSONBESTAND, EXT_JSON);
-    if (!hasParameter(NatuurTools.PAR_JSONBESTAND)) {
-      setParameter(NatuurTools.PAR_JSONBESTAND,
-                   getParameter(NatuurTools.PAR_IOCBESTAND));
+    setBestandParameter(arguments, PAR_JSONBESTAND, EXT_JSON);
+    if (!hasParameter(PAR_JSONBESTAND)) {
+      setParameter(PAR_JSONBESTAND, getParameter(NatuurTools.PAR_IOCBESTAND));
     }
     NatuurTools.setTalenParameter(arguments, parameters);
     setDirParameter(arguments, PAR_UITVOERDIR, getParameter(PAR_INVOERDIR));
@@ -262,11 +260,11 @@ public class IocNamen extends Batchjob {
           MessageFormat.format(
               getMelding(ERR_BEVATDIRECTORY), NatuurTools.PAR_IOCBESTAND));
     }
-    if (DoosUtils.nullToEmpty(parameters.get(NatuurTools.PAR_JSONBESTAND))
+    if (DoosUtils.nullToEmpty(parameters.get(PAR_JSONBESTAND))
                  .contains(File.separator)) {
       fouten.add(
           MessageFormat.format(
-              getMelding(ERR_BEVATDIRECTORY), NatuurTools.PAR_JSONBESTAND));
+              getMelding(ERR_BEVATDIRECTORY), PAR_JSONBESTAND));
     }
 
     if (fouten.isEmpty()) {
@@ -305,8 +303,8 @@ public class IocNamen extends Batchjob {
       jsonBestand  =
           new JsonBestand.Builder()
                          .setBestand(parameters.get(PAR_UITVOERDIR) +
-                                    parameters.get(NatuurTools.PAR_JSONBESTAND)
-                                    + EXT_JSON)
+                                     parameters.get(PAR_JSONBESTAND)
+                                     + EXT_JSON)
                          .setCharset(parameters.get(PAR_CHARSETUIT))
                          .setLezen(false)
                          .build();

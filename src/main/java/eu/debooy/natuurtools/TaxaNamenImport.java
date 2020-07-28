@@ -81,8 +81,7 @@ public class TaxaNamenImport extends Batchjob {
             parameters.get(NatuurTools.PAR_DBURL).split("/")[1]));
 
     if (DoosConstants.WAAR
-                     .equalsIgnoreCase(
-                          parameters.get(NatuurTools.PAR_READONLY))) {
+                     .equalsIgnoreCase(parameters.get(PAR_READONLY))) {
       readonly = true;
     } else {
       DoosUtils.naarScherm();
@@ -106,8 +105,7 @@ public class TaxaNamenImport extends Batchjob {
       jsonBestand  =
           new JsonBestand.Builder()
                          .setBestand(parameters.get(PAR_INVOERDIR)
-                                    + File.separator +
-                                    parameters.get(NatuurTools.PAR_JSONBESTAND)
+                                    + parameters.get(PAR_JSONBESTAND)
                                     + EXT_JSON)
                          .setCharset(parameters.get(PAR_CHARSETIN))
                          .build();
@@ -130,6 +128,7 @@ public class TaxaNamenImport extends Batchjob {
 
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(getMelding(MSG_KLAAR));
+    DoosUtils.naarScherm();
   }
 
   public static void addTaxonnaam(TaxonnaamDto taxonnaam) {
@@ -229,16 +228,16 @@ public class TaxaNamenImport extends Batchjob {
                          getMelding(HLP_INVOERDIR), 80);
     DoosUtils.naarScherm(getParameterTekst(PAR_JSONBESTAND, 12),
                          resourceBundle.getString("help.jsonbestand"), 80);
-    DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_READONLY, 12),
+    DoosUtils.naarScherm(getParameterTekst(PAR_READONLY, 12),
                          resourceBundle.getString("help.readonly"), 80);
     DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_TALEN, 12),
                          resourceBundle.getString("help.include.talen"), 80);
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(
         MessageFormat.format(getMelding(HLP_PARAMSVERPLICHT),
-                             NatuurTools.PAR_JSONBESTAND + ", "
-                                 + NatuurTools.PAR_DBURL + ", "
-                                 + NatuurTools.PAR_DBUSER,
+                             PAR_JSONBESTAND + ", "
+                              + NatuurTools.PAR_DBURL + ", "
+                              + NatuurTools.PAR_DBUSER,
                              NatuurTools.PAR_TALEN), 80);
     DoosUtils.naarScherm();
   }
@@ -251,35 +250,34 @@ public class TaxaNamenImport extends Batchjob {
 
   private static boolean setParameters(String[] args) {
     Arguments     arguments = new Arguments(args);
-    List<String>  fouten    = new ArrayList<String>();
+    List<String>  fouten    = new ArrayList<>();
 
     arguments.setParameters(new String[] {PAR_CHARSETIN,
                                           NatuurTools.PAR_DBURL,
                                           NatuurTools.PAR_DBUSER,
                                           PAR_INVOERDIR,
-                                          NatuurTools.PAR_JSONBESTAND,
-                                          NatuurTools.PAR_READONLY,
+                                          PAR_JSONBESTAND,
+                                          PAR_READONLY,
                                           NatuurTools.PAR_TALEN});
-    arguments.setVerplicht(new String[] {NatuurTools.PAR_JSONBESTAND,
+    arguments.setVerplicht(new String[] {PAR_JSONBESTAND,
                                          NatuurTools.PAR_TALEN});
     if (!arguments.isValid()) {
       fouten.add(getMelding(ERR_INVALIDPARAMS));
     }
 
-    setParameter(arguments, PAR_CHARSETIN,
-                 Charset.defaultCharset().name());
+    setParameter(arguments, PAR_CHARSETIN, Charset.defaultCharset().name());
     setParameter(arguments, NatuurTools.PAR_DBURL);
     setParameter(arguments, NatuurTools.PAR_DBUSER);
     setDirParameter(arguments, PAR_INVOERDIR);
-    setBestandParameter(arguments, NatuurTools.PAR_JSONBESTAND, EXT_JSON);
-    setParameter(arguments, NatuurTools.PAR_READONLY, DoosConstants.ONWAAR);
+    setBestandParameter(arguments, PAR_JSONBESTAND, EXT_JSON);
+    setParameter(arguments, PAR_READONLY, DoosConstants.ONWAAR);
     NatuurTools.setTalenParameter(arguments, parameters);
 
-    if (DoosUtils.nullToEmpty(parameters.get(NatuurTools.PAR_JSONBESTAND))
+    if (DoosUtils.nullToEmpty(parameters.get(PAR_JSONBESTAND))
                  .contains(File.separator)) {
       fouten.add(
           MessageFormat.format(
-              getMelding(ERR_BEVATDIRECTORY), NatuurTools.PAR_JSONBESTAND));
+              getMelding(ERR_BEVATDIRECTORY), PAR_JSONBESTAND));
     }
 
     if (fouten.isEmpty()) {
@@ -327,8 +325,8 @@ public class TaxaNamenImport extends Batchjob {
   }
 
   private static void verwerkJson(JSONObject json, String[] talen) {
-    Integer   id    = null;
-    TaxonDto  taxon = null;
+    Integer   id;
+    TaxonDto  taxon;
 
     // Verwerk orde per orde
     for (Object orde : (JSONArray) json.get("taxa")) {

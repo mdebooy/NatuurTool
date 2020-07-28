@@ -55,8 +55,6 @@ public class NatuurTools {
   protected static final  String  PAR_IOCBESTAND  = "iocbestand";
   protected static final  String  PAR_DBURL       = "dburl";
   protected static final  String  PAR_DBUSER      = "dbuser";
-  protected static final  String  PAR_JSONBESTAND = "jsonbestand";
-  protected static final  String  PAR_READONLY    = "readonly";
   protected static final  String  PAR_TALEN       = "talen";
 
   private NatuurTools() {}
