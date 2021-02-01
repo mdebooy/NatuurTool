@@ -1,5 +1,5 @@
 /**
- * Copyright 2020 Marco de Booij
+ * Copyright (c) 2020 Marco de Booij
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by
  * the European Commission - subsequent versions of the EUPL (the "Licence");
@@ -40,6 +40,7 @@ public class NatuurTools {
 
   protected static final  String  LBL_WACHTWOORD  = "label.wachtwoord";
 
+  protected static final  String  MSG_AANMAKEN  = "msg.aanmaken";
   protected static final  String  MSG_FAMILIE   = "msg.familie";
   protected static final  String  MSG_FAMILIES  = "msg.families";
   protected static final  String  MSG_LIJNEN    = "msg.lijnen";
@@ -52,6 +53,7 @@ public class NatuurTools {
   protected static final  String  MSG_VERSCHIL  = "msg.verschil";
   protected static final  String  MSG_WIJZIGEN  = "msg.wijzigen";
 
+  protected static final  String  PAR_AANMAAK     = "aanmaken";
   protected static final  String  PAR_IOCBESTAND  = "iocbestand";
   protected static final  String  PAR_DBURL       = "dburl";
   protected static final  String  PAR_DBUSER      = "dbuser";

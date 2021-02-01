@@ -1,5 +1,5 @@
 /**
- * Copyright 2020 Marco de Booij
+ * Copyright (c) 2020 Marco de Booij
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by
  * the European Commission - subsequent versions of the EUPL (the "Licence");
@@ -59,6 +59,7 @@ public class TaxaNamenImport extends Batchjob {
   protected static final  String  TXT_4SPATIES = "    ";
   protected static final  String  TXT_6SPATIES = "      ";
 
+  private static  boolean       aanmaak   = false;
   private static  boolean       readonly  = false;
   private static  EntityManager em;
 
@@ -82,10 +83,17 @@ public class TaxaNamenImport extends Batchjob {
 
     if (DoosConstants.WAAR
                      .equalsIgnoreCase(parameters.get(PAR_READONLY))) {
-      readonly = true;
+      readonly  = true;
     } else {
       DoosUtils.naarScherm();
       DoosUtils.naarScherm(resourceBundle.getString(NatuurTools.MSG_WIJZIGEN));
+      if (DoosConstants.WAAR
+                       .equalsIgnoreCase(parameters
+                                            .get(NatuurTools.PAR_AANMAAK))) {
+        aanmaak = true;
+        DoosUtils.naarScherm(resourceBundle
+                                .getString(NatuurTools.MSG_AANMAKEN));
+      }
       DoosUtils.naarScherm();
     }
 
@@ -129,6 +137,22 @@ public class TaxaNamenImport extends Batchjob {
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(getMelding(MSG_KLAAR));
     DoosUtils.naarScherm();
+  }
+
+  public static void addTaxon(TaxonDto taxon) {
+    if (readonly || !aanmaak) {
+      return;
+    }
+
+    List<Message>  fouten  = TaxonValidator.valideer(taxon);
+
+    if (fouten.isEmpty()) {
+      em.getTransaction().begin();
+      em.persist(taxon);
+      em.getTransaction().commit();
+    } else {
+      printMessages(fouten);
+    }
   }
 
   public static void addTaxonnaam(TaxonnaamDto taxonnaam) {
@@ -189,17 +213,26 @@ public class TaxaNamenImport extends Batchjob {
       }
     }
   }
-  public static TaxonDto getTaxon(String latijnsenaam) {
+
+  public static TaxonDto getTaxon(String latijnsenaam, Long parentId,
+                                  Integer volgnummer, String rang) {
     em.getTransaction().begin();
     Query query = em.createNamedQuery(QRY_LATIJNSENAAM);
+    em.getTransaction().commit();
     query.setParameter(PAR_LATIJNSENAAM, latijnsenaam);
     TaxonDto  resultaat;
     try {
       resultaat = (TaxonDto) query.getSingleResult();
     } catch (NoResultException e) {
       resultaat = new TaxonDto();
+      if (aanmaak) {
+        resultaat.setLatijnsenaam(latijnsenaam);
+        resultaat.setParentId(parentId);
+        resultaat.setRang(rang);
+        resultaat.setVolgnummer(volgnummer);
+        addTaxon(resultaat);
+      }
     }
-    em.getTransaction().commit();
 
     return resultaat;
   }
@@ -217,6 +250,8 @@ public class TaxaNamenImport extends Batchjob {
                           + resourceBundle.getString("label.talen") + ">",
                          80);
     DoosUtils.naarScherm();
+    DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_AANMAAK, 12),
+                         resourceBundle.getString("help.aanmaak"), 80);
     DoosUtils.naarScherm(getParameterTekst(PAR_CHARSETIN, 12),
         MessageFormat.format(getMelding(HLP_CHARSETIN),
                              Charset.defaultCharset().name()), 80);
@@ -252,7 +287,8 @@ public class TaxaNamenImport extends Batchjob {
     Arguments     arguments = new Arguments(args);
     List<String>  fouten    = new ArrayList<>();
 
-    arguments.setParameters(new String[] {PAR_CHARSETIN,
+    arguments.setParameters(new String[] {NatuurTools.PAR_AANMAAK,
+                                          PAR_CHARSETIN,
                                           NatuurTools.PAR_DBURL,
                                           NatuurTools.PAR_DBUSER,
                                           PAR_INVOERDIR,
@@ -265,6 +301,7 @@ public class TaxaNamenImport extends Batchjob {
       fouten.add(getMelding(ERR_INVALIDPARAMS));
     }
 
+    setParameter(arguments, NatuurTools.PAR_AANMAAK, DoosConstants.ONWAAR);
     setParameter(arguments, PAR_CHARSETIN, Charset.defaultCharset().name());
     setParameter(arguments, NatuurTools.PAR_DBURL);
     setParameter(arguments, NatuurTools.PAR_DBUSER);
@@ -326,7 +363,12 @@ public class TaxaNamenImport extends Batchjob {
 
   private static void verwerkJson(JSONObject json, String[] talen) {
     Integer   id;
+    Long      familieId;
+    Long      ordeId;
     TaxonDto  taxon;
+    Long      vogelId;
+
+    vogelId = getTaxon("Aves", 0L, 0, "kl").getTaxonId();
 
     // Verwerk orde per orde
     for (Object orde : (JSONArray) json.get("taxa")) {
@@ -334,10 +376,11 @@ public class TaxaNamenImport extends Batchjob {
           StringUtils.capitalize(((JSONObject) orde).get(NatuurTools.KEY_ORDE)
                                                     .toString()
                                                     .toLowerCase());
-      taxon = getTaxon(ordenaam);
+      id  = Integer.valueOf(((JSONObject) orde).get(NatuurTools.KEY_ID)
+                                               .toString());
+      taxon   = getTaxon(ordenaam, vogelId, id, "or");
+      ordeId  = taxon.getTaxonId();
       if (ordenaam.equals(DoosUtils.nullToEmpty(taxon.getLatijnsenaam()))) {
-        id  = Integer.valueOf(((JSONObject) orde).get(NatuurTools.KEY_ID)
-                                                 .toString());
         DoosUtils.naarScherm(MessageFormat.format(
             resourceBundle.getString(NatuurTools.MSG_ORDE),
             ordenaam, taxon.getVolgnummer(), id));
@@ -350,11 +393,12 @@ public class TaxaNamenImport extends Batchjob {
           String  familienaam =
                   ((JSONObject) familie).get(NatuurTools.KEY_FAMILIE)
                                         .toString();
-          taxon = getTaxon(familienaam);
+          id  = Integer.valueOf(((JSONObject) familie).get(NatuurTools.KEY_ID)
+                                                      .toString());
+          taxon     = getTaxon(familienaam, ordeId, id, "fa");
+          familieId = taxon.getTaxonId();
           if (familienaam.equals(
                   DoosUtils.nullToEmpty(taxon.getLatijnsenaam()))) {
-            id  = Integer.valueOf(((JSONObject) familie).get(NatuurTools.KEY_ID)
-                                                        .toString());
             DoosUtils.naarScherm(TXT_2SPATIES + MessageFormat.format(
                 resourceBundle.getString(NatuurTools.MSG_FAMILIE),
                 familienaam, taxon.getVolgnummer(), id));
@@ -367,12 +411,11 @@ public class TaxaNamenImport extends Batchjob {
             for (Object soort : (JSONArray) soorten) {
               String  soortnaam =
                   ((JSONObject) soort).get(NatuurTools.KEY_LATIJN).toString();
-              taxon = getTaxon(soortnaam);
+              id  = Integer.valueOf(((JSONObject) soort).get(NatuurTools.KEY_ID)
+                                                        .toString());
+              taxon = getTaxon(soortnaam, familieId, id, "so");
               if (soortnaam.equals(
                       DoosUtils.nullToEmpty(taxon.getLatijnsenaam()))) {
-                id  =
-                    Integer.valueOf(((JSONObject) soort).get(NatuurTools.KEY_ID)
-                                                        .toString());
                 DoosUtils.naarScherm(TXT_4SPATIES + MessageFormat.format(
                     resourceBundle.getString(NatuurTools.MSG_SOORT),
                     soortnaam, taxon.getVolgnummer(), id));
