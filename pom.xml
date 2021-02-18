@@ -14,8 +14,8 @@
   <description>Verschillende Tools voor de 'Natuur' applicaties.</description>
   <inceptionYear>2020</inceptionYear>
   <scm>
-    <connection>scm:git:ssh://ptah.debooy.eu/srv/git/debooy/NatuurTools.git</connection>
-    <developerConnection>scm:git:ssh://ptah.debooy.eu/srv/git/debooy/NatuurTools.git</developerConnection>
+    <connection>scm:git:ssh://ptah.debooy.eu/srv/local/devops/git/debooy/NatuurTools.git</connection>
+    <developerConnection>scm:git:ssh://ptah.debooy.eu/srv/local/devops/git/debooy/NatuurTools.git</developerConnection>
   </scm>
 
   <developers>
