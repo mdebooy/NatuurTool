@@ -1,5 +1,5 @@
 /**
- * Copyright 2020 Marco de Booij
+ * Copyright (c) 2020 Marco de Booij
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by
  * the European Commission - subsequent versions of the EUPL (the "Licence");
@@ -47,9 +47,10 @@ public class IocNamen extends Batchjob {
   private IocNamen() {}
 
   public static void execute(String[] args) {
-    CsvBestand    csvBestand;
+    CsvBestand    csvBestand        = null;
     JSONObject    familie           = new JSONObject();
     JSONArray     families          = new JSONArray();
+    int           lijnen            = -1;
     JSONObject    namen             = new JSONObject();
     int           nFamilies         = 0;
     int           nOrdes            = 0;
@@ -78,59 +79,53 @@ public class IocNamen extends Batchjob {
                         .setCharset(parameters.get(PAR_CHARSETIN))
                         .setHeader(false)
                         .build();
-    } catch (BestandException e) {
-      DoosUtils.foutNaarScherm(e.getLocalizedMessage());
-      return;
-    }
 
-    int lijnen  = skipHeader(csvBestand);
+      lijnen  = skipHeader(csvBestand);
 
-    while (csvBestand.hasNext()) {
-      lijnen++;
-      try {
-        String[]  veld = csvBestand.next();
-        // Nieuwe Orde
-        if (DoosUtils.isNotBlankOrNull(veld[1])) {
-          nieuweOrde(soort, namen, soorten, familie, families, orde, ordes);
-          nOrdes++;
-          orde.put(NatuurTools.KEY_ID, nOrdes);
-          orde.put(NatuurTools.KEY_ORDE, veld[1]);
-        }
-        // Nieuwe familie
-        if (DoosUtils.isNotBlankOrNull(veld[2])) {
-          nieuweFamilie(soort, namen, soorten, familie, families);
-          nFamilies++;
-          familie.put(NatuurTools.KEY_ID, nFamilies);
-          familie.put(NatuurTools.KEY_FAMILIE, veld[2]);
-        }
-        // Nieuw soort
-        if (DoosUtils.isNotBlankOrNull(veld[3])) {
-          nieuweSoort(soort, namen, soorten);
-          nSoorten++;
-          soort.put(NatuurTools.KEY_ID, nSoorten);
-          soort.put(NatuurTools.KEY_LATIJN, veld[3]);
-        }
-        for (int i = 0; i < taal.length; i++) {
-          if (DoosUtils.isNotBlankOrNull(veld[i+4])) {
-            namen.put(taal[i], veld[i+4]);
+      while (csvBestand.hasNext()) {
+        lijnen++;
+          String[]  veld = csvBestand.next();
+          // Nieuwe Orde
+          if (DoosUtils.isNotBlankOrNull(veld[1])) {
+            nieuweOrde(soort, namen, soorten, familie, families, orde, ordes);
+            nOrdes++;
+            orde.put(NatuurTools.KEY_ID, nOrdes);
+            orde.put(NatuurTools.KEY_ORDE, veld[1]);
           }
-        }
-      } catch (BestandException | ParseException e) {
-        DoosUtils.foutNaarScherm(e.getLocalizedMessage());
+          // Nieuwe familie
+          if (DoosUtils.isNotBlankOrNull(veld[2])) {
+            nieuweFamilie(soort, namen, soorten, familie, families);
+            nFamilies++;
+            familie.put(NatuurTools.KEY_ID, nFamilies);
+            familie.put(NatuurTools.KEY_FAMILIE, veld[2]);
+          }
+          // Nieuw soort
+          if (DoosUtils.isNotBlankOrNull(veld[3])) {
+            nieuweSoort(soort, namen, soorten);
+            nSoorten++;
+            soort.put(NatuurTools.KEY_ID, nSoorten);
+            soort.put(NatuurTools.KEY_LATIJN, veld[3]);
+          }
+          for (int i = 0; i < taal.length; i++) {
+            if (DoosUtils.isNotBlankOrNull(veld[i+4])) {
+              namen.put(taal[i], veld[i+4]);
+            }
+          }
       }
-    }
 
-    try {
       nieuweOrde(soort, namen, soorten, familie, families, orde, ordes);
       taxa.put("taxa", ordes);
-    } catch (ParseException e) {
-      DoosUtils.foutNaarScherm(e.getLocalizedMessage());
-    }
 
-    try {
-      csvBestand.close();
-    } catch (BestandException e) {
+    } catch (BestandException | ParseException e) {
       DoosUtils.foutNaarScherm("csv: " + e.getLocalizedMessage());
+    } finally {
+      if (null != csvBestand) {
+        try {
+          csvBestand.close();
+        } catch (BestandException e) {
+          DoosUtils.foutNaarScherm("csv close: " + e.getLocalizedMessage());
+        }
+      }
     }
 
     writeJson(taxa);
@@ -189,8 +184,8 @@ public class IocNamen extends Batchjob {
                                     JSONArray soorten, JSONObject familie,
                                     JSONArray families) throws ParseException {
     nieuweSoort(soort, namen, soorten);
-    if (familie.size() > 0) {
-      if (soorten.size() > 0) {
+    if (!familie.isEmpty()) {
+      if (!soorten.isEmpty()) {
         familie.put(NatuurTools.KEY_SOORTEN, parser.parse(soorten.toString()));
         soorten.clear();
       }
@@ -204,8 +199,8 @@ public class IocNamen extends Batchjob {
                                  JSONArray families, JSONObject orde,
                                  JSONArray ordes) throws ParseException {
     nieuweFamilie(soort, namen, soorten, familie, families);
-    if (orde.size() > 0) {
-      if (families.size() > 0) {
+    if (!orde.isEmpty()) {
+      if (!families.isEmpty()) {
         orde.put(NatuurTools.KEY_FAMILIES, parser.parse(families.toString()));
         families.clear();
       }
