@@ -44,8 +44,8 @@ public class IocNamenTest extends BatchTest {
 
   @AfterClass
   public static void afterClass() {
-//    verwijderBestanden(TEMP + File.separator,
-//                       new String[] {BST_CSV, BST_JSON});
+    verwijderBestanden(TEMP + File.separator,
+                       new String[] {BST_CSV, BST_JSON});
   }
 
   @BeforeClass
