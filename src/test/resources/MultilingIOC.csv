@@ -1,0 +1,33 @@
+Seq,Order,Family,Scientific Name IOC_11.1,,,,Chinese,,,,Danish,,,,French,,,,Indonesian,,,,Lithuanian,,,,Portuguese,,,,Spanish,,,
+1,,,,English,,,,Chinese (Traditional),,,,Dutch,,,,German,,,,Italian,,,,Northern Sami,,,,Russian,,,,Swedish,,
+2,,,,,Afrikaans,,,,Croatian,,,,Estonian,,,,Hungarian,,,,Japanese,,,,Norwegian,,,,Slovak,,,,Thai,
+3,,,,,,Catalan,,,,Czech,,,,Finnish,,,,Icelandic,,,,Latvian,,,,Polish,,,,Slovenian,,,,Ukrainian
+4,STRUTHIONIFORMES,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+5,,Struthionidae,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+6,,,Struthio camelus,,,,非洲鸵鸟,,,,Struds,,,,Autruche d’Afrique,,,,,,,,strutis,,,,avestruz,,,,Avestruz común,,,
+7,,,,Common Ostrich,,,,鴕鳥,,,,Struisvogel,,,,Strauß,,,,Struzzo,,,,Struhcca,,,,Африканский страус,,,,struts,,
+8,,,,,Volstruis,,,,noj,,,,jaanalind,,,,strucc,,,,ダチョウ,,,,Slettestruts,,,,pštros dvojprstý,,,,,
+9,,,,,,estruç comú,,,,pštros dvouprstý,,,,strutsi,,,,Strútur,,,,Āfrikas strauss,,,,struś czerwonoskóry,,,,noj,,,,страус африканський
+10,,,Struthio molybdophanes,,,,索马里鸵鸟,,,,Somalistruds,,,,Autruche de Somalie,,,,,,,,,,,,avestruz-somali,,,,Avestruz somalí,,,
+11,,,,Somali Ostrich,,,,索馬利亞鴕鳥,,,,Somalische Struisvogel,,,,Somalistrauß,,,,Struzzo somalo,,,,,,,,Сомалийский страус,,,,somaliastruts,,
+12,,,,,,,,,somalijski noj,,,,somaali jaanalind,,,,szomáliai strucc,,,,ソマリアダチョウ,,,,Somalistruts,,,,pštros sivonohý,,,,,
+13,,,,,,estruç de Somàlia,,,,,,,,somalianstrutsi,,,,,,,,,,,,struś szaroskóry,,,,,,,,страус сомалійський
+250,ANSERIFORMES,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+251,,Anhimidae,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+252,,,Anhima cornuta,,,,角叫鸭,,,,Anhima,,,,Kamichi cornu,,,,,,,,raguotoji pelamedėja,,,,anhuma,,,,Chajá añuma,,,
+253,,,,Horned Screamer,,,,角叫鴨,,,,Anioema,,,,Hornwehrvogel,,,,Kaimichi cornuto,,,,,,,,Рогатая паламедея,,,,hornvärnfågel,,
+254,,,,,,,,,rogati pastiraš,,,,sarvik-ogatiib (sarvik-tšahha),,,,egyszarvú csája,,,,ツノサケビドリ,,,,Horngjeterfugl,,,,anhima rohatá,,,,,
+255,,,,,,txajà banyut,,,,kamiš růžkatý,,,,sarviromisko,,,,,,,,,,,,skrzydłoszpon rogaty,,,,,,,,паламедея
+256,,,Chauna chavaria,,,,黑颈叫鸭,,,,Toppet Chaja,,,,Kamichi chavaria,,,,,,,,juodakaklė pelamedėja,,,,tachã-do-norte ,,,,Chajá chicagüire,,,
+257,,,,Northern Screamer,,,,黑頸叫鴨〔北方叫鴨〕,,,,Witwanghoenderkoet,,,,Weißwangen-Wehrvogel,,,,Kaimichi settentrionale,,,,,,,,Черношейная паламедея,,,,svarthalsad värnfågel,,
+258,,,,,,,,,crnovrati pastiraš,,,,tutt-ogatiib (tutt-tšahha),,,,fehérarcú csája,,,,クロエリサケビドリ,,,,Svarthalsgjeterfugl,,,,čaja chochlatá,,,,,
+259,,,,,,txajà collnegre,,,,čája bělolící,,,,kolumbianromisko,,,,,,,,,,,,skrzydłoszpon czarnoszyi,,,,,,,,чайя колумбійська
+260,,,Chauna torquata,,,,冠叫鸭,,,,Sorthalset Chaja,,,,Kamichi à collier,,,,,,,,kuoduotoji pelamedėja,,,,tachã,,,,Chajá común,,,
+261,,,,Southern Screamer,,,,冠叫鴨〔南方叫鴨〕,,,,Kuifhoenderkoet,,,,Halsband-Wehrvogel,,,,Kaimichi meridionale,,,,,,,,Хохлатая паламедея,,,,tofsvärnfågel,,
+262,,,,,,,,,ogrličasti pastiraš,,,,kaelus-ogatiib (kaelustšahha),,,,örvös csája,,,,カンムリサケビドリ,,,,Kragegjeterfugl,,,,čaja obojková,,,,,
+263,,,,,,txajà emplomallat,,,,čája obojková,,,,töyhtöromisko,,,,,,,,,,,,skrzydłoszpon obrożny,,,,,,,,чайя аргентинська
+264,,Anseranatidae,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+265,,,Anseranas semipalmata,,,,鹊雁,,,,Skadegås,,,,Canaroie semipalmée,,,,Boha wasur,,,,ančiažąsė,,,,ganso-alvinegro,,,,Ganso urraca,,,
+266,,,,Magpie Goose,,,,鵲鵝,,,,Ekstergans,,,,Spaltfußgans,,,,Oca gazza,,,,,,,,Полулапчатый гусь,,,,skatgås,,
+267,,,,,,,,,dugonoga guska,,,,harakhani,,,,ujjas lúd,,,,カササギガン,,,,Skjæregås,,,,husiarka strakatá,,,,,
+268,,,,,,oca garsera,,,,husovec strakatý,,,,puuhanhi,,,,,,,,,,,,bezpłetwiec,,,,,,,,урако
