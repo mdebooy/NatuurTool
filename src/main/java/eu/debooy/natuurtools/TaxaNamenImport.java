@@ -59,8 +59,9 @@ public class TaxaNamenImport extends Batchjob {
   protected static final  String  TXT_4SPATIES = "    ";
   protected static final  String  TXT_6SPATIES = "      ";
 
-  private static  boolean       aanmaak   = false;
-  private static  boolean       readonly  = false;
+  private static  boolean       aanmaak     = false;
+  private static  Integer       geslachtSeq = 0;
+  private static  boolean       readonly    = false;
   private static  EntityManager em;
 
   private TaxaNamenImport() {}
@@ -421,18 +422,33 @@ public class TaxaNamenImport extends Batchjob {
 
   private static void verwerkSoorten(JSONArray soorten, Long familieId,
                                      String[] talen) {
-    soorten.forEach(soort -> {
+    String  vorigGeslacht = "";
+    Long    geslachtId    = 0L;
+    for (Object soort : soorten) {
       String  soortnaam =
               ((JSONObject) soort).get(NatuurTools.KEY_LATIJN).toString();
+      String  geslacht  = soortnaam.split(" ")[0];
+      if (!geslacht.equals(vorigGeslacht)) {
+        geslachtSeq++;
+        TaxonDto  taxon = getTaxon(geslacht, familieId, geslachtSeq, "ge");
+        geslachtId      = taxon.getTaxonId();
+        if (geslachtSeq.equals(taxon.getVolgnummer())) {
+          taxon.setVolgnummer(geslachtSeq);
+          setTaxon(taxon);
+        }
+        vorigGeslacht   = geslacht;
+      }
       Integer id  = Integer.valueOf(((JSONObject) soort).get(NatuurTools.KEY_ID)
               .toString());
-      TaxonDto  taxon = getTaxon(soortnaam, familieId, id, "so");
+      TaxonDto  taxon = getTaxon(soortnaam, geslachtId, id, "so");
       if (soortnaam.equals(
               DoosUtils.nullToEmpty(taxon.getLatijnsenaam()))) {
         DoosUtils.naarScherm(TXT_4SPATIES + MessageFormat.format(
                 resourceBundle.getString(NatuurTools.MSG_SOORT),
                 soortnaam, taxon.getVolgnummer(), id));
-        if (!Objects.equals(taxon.getVolgnummer(), id)) {
+        if (!Objects.equals(taxon.getVolgnummer(), id)
+            || !Objects.equals(taxon.getParentId(), geslachtId)) {
+          taxon.setParentId(geslachtId);
           taxon.setVolgnummer(id);
           setTaxon(taxon);
         }
@@ -440,6 +456,6 @@ public class TaxaNamenImport extends Batchjob {
                 ((JSONObject) soort).get(NatuurTools.KEY_NAMEN);
         controleerTaxonnamen(taxon, (JSONObject) jObject, talen);
       }
-    });
+    }
   }
 }
