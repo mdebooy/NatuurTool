@@ -27,6 +27,7 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -237,6 +238,8 @@ public class IocNamen extends Batchjob {
     if (!arguments.isValid()) {
       fouten.add(getMelding(ERR_INVALIDPARAMS));
     }
+
+    parameters  = new HashMap<>();
 
     setParameter(arguments, PAR_CHARSETIN, Charset.defaultCharset().name());
     setParameter(arguments, PAR_CHARSETUIT, Charset.defaultCharset().name());

@@ -35,6 +35,7 @@ import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -296,10 +297,14 @@ public class TaxaNamenImport extends Batchjob {
                                           PAR_READONLY,
                                           NatuurTools.PAR_TALEN});
     arguments.setVerplicht(new String[] {PAR_JSONBESTAND,
+                                         NatuurTools.PAR_DBURL,
+                                         NatuurTools.PAR_DBUSER,
                                          NatuurTools.PAR_TALEN});
     if (!arguments.isValid()) {
       fouten.add(getMelding(ERR_INVALIDPARAMS));
     }
+
+    parameters  = new HashMap<>();
 
     setParameter(arguments, NatuurTools.PAR_AANMAAK, DoosConstants.ONWAAR);
     setParameter(arguments, PAR_CHARSETIN, Charset.defaultCharset().name());
