@@ -39,8 +39,10 @@ public class IocNamenTest extends BatchTest {
   protected static final  ClassLoader CLASSLOADER =
       IocNamenTest.class.getClassLoader();
 
-  private static final  String  BST_CSV   = "MultilingIOC.csv";
-  private static final  String  BST_JSON  = "MultilingIOC.json";
+  private static final  String  BST_CSV         = "MultilingIOC.csv";
+  private static final  String  BST_JSON        = "MultilingIOC.json";
+  private static final  String  PAR_JSONBESTAND = "jsonbestand";
+
 
   @AfterClass
   public static void afterClass() {
@@ -85,6 +87,36 @@ public class IocNamenTest extends BatchTest {
                                       + BST_JSON),
             Bestand.openInvoerBestand(IocNamenTest.class.getClassLoader(),
                                       BST_JSON)));
+  }
+
+  @Test
+  public void testIocBestandMetDirectory() {
+    String[]  args      = new String[] {"--" + NatuurTools.PAR_IOCBESTAND
+                                         + "=" + TEMP + File.separator
+                                         + BST_CSV,
+                                        "--" + NatuurTools.PAR_TALEN + "=en",
+                                        "--invoerdir=" + TEMP};
+
+    VangOutEnErr.execute(IocNamen.class, "execute", args, out, err);
+
+    assertEquals("Zonder parameters - helptekst", 27, out.size());
+    assertEquals("Zonder parameters - fouten", 2, err.size());
+  }
+
+  @Test
+  public void testJsonBestandMetDirectory() {
+    String[]  args      = new String[] {"--" + NatuurTools.PAR_IOCBESTAND
+                                         + "=" + BST_CSV,
+                                        "--" + PAR_JSONBESTAND
+                                         + "=" + TEMP + File.separator
+                                         + BST_JSON,
+                                        "--" + NatuurTools.PAR_TALEN + "=en",
+                                        "--invoerdir=" + TEMP};
+
+    VangOutEnErr.execute(IocNamen.class, "execute", args, out, err);
+
+    assertEquals("Zonder parameters - helptekst", 27, out.size());
+    assertEquals("Zonder parameters - fouten", 1, err.size());
   }
 
   @Test

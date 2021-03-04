@@ -18,6 +18,7 @@ package eu.debooy.natuurtools;
 
 import eu.debooy.doosutils.test.BatchTest;
 import eu.debooy.doosutils.test.VangOutEnErr;
+import java.io.File;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import static org.junit.Assert.assertEquals;
@@ -32,11 +33,30 @@ public class TaxaNamenImportTest extends BatchTest {
   protected static final  ClassLoader CLASSLOADER =
       TaxaNamenImportTest.class.getClassLoader();
 
+  private static final  String  BST_JSON        = "MultilingIOC.json";
+  private static final  String  PAR_JSONBESTAND = "jsonbestand";
+
   @BeforeClass
   public static void beforeClass() {
     Locale.setDefault(new Locale("nl"));
     resourceBundle  = ResourceBundle.getBundle("ApplicatieResources",
                                                Locale.getDefault());
+  }
+
+  @Test
+  public void testBestandMetDirectory() {
+    String[]  args      = new String[] {"--" + PAR_JSONBESTAND
+                                         + "=" + TEMP + File.separator
+                                         + BST_JSON,
+                                        "--" + NatuurTools.PAR_TALEN + "=en",
+                                        "--dburl=localhost:5432/db",
+                                        "--dbuser=dbuser",
+                                        "--invoerdir=" + TEMP};
+
+    VangOutEnErr.execute(TaxaNamenImport.class, "execute", args, out, err);
+
+    assertEquals("Zonder parameters - helptekst", 27, out.size());
+    assertEquals("Zonder parameters - fouten", 1, err.size());
   }
 
   @Test
