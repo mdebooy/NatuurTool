@@ -18,15 +18,17 @@ package eu.debooy.natuurtools;
 
 import eu.debooy.doosutils.Arguments;
 import eu.debooy.doosutils.Banner;
+import eu.debooy.doosutils.Batchjob;
 import eu.debooy.doosutils.DoosUtils;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+
 /**
  * @author Marco de Booij
  */
-public class NatuurTools {
+public class NatuurTools extends Batchjob {
   private static final  ResourceBundle  resourceBundle  =
       ResourceBundle.getBundle("ApplicatieResources", Locale.getDefault());
 
@@ -61,7 +63,7 @@ public class NatuurTools {
 
   private NatuurTools() {}
 
-  private static void help() {
+  public static void help() {
     DoosUtils.naarScherm("  IOCNamen        ",
                          resourceBundle.getString("help.iocnamen"), 80);
     DoosUtils.naarScherm("  TaxaNamenImport ",
@@ -95,6 +97,7 @@ public class NatuurTools {
 
     Banner.printDoosBanner("Natuur Tools");
     help();
+    DoosUtils.foutNaarScherm(getMelding(ERR_TOOLONBEKEND));
   }
 
   protected static void setTalenParameter(Arguments arguments,
