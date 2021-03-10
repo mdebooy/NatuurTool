@@ -161,16 +161,17 @@ public class IocNamen extends Batchjob {
 
     DoosUtils.naarScherm(
         MessageFormat.format(resourceBundle.getString(NatuurTools.MSG_LIJNEN),
-                             lijnen));
+                             String.format("%,6d", lijnen)));
     DoosUtils.naarScherm(
         MessageFormat.format(resourceBundle.getString(NatuurTools.MSG_ORDES),
-                             nOrdes));
+                             String.format("%,6d", nOrdes)));
     DoosUtils.naarScherm(
         MessageFormat.format(resourceBundle.getString(NatuurTools.MSG_FAMILIES),
-                             nFamilies));
+                             String.format("%,6d", nFamilies)));
     DoosUtils.naarScherm(
         MessageFormat.format(
-            resourceBundle.getString(NatuurTools.MSG_GESLACHTEN), nGeslachten));
+            resourceBundle.getString(NatuurTools.MSG_GESLACHTEN),
+            String.format("%,6d", nGeslachten)));
     DoosUtils.naarScherm(
         MessageFormat.format(resourceBundle.getString(NatuurTools.MSG_SOORTEN),
                              nSoorten));

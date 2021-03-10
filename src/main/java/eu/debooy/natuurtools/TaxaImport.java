@@ -50,6 +50,7 @@ import javax.persistence.Query;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+
 /**
  * @author Marco de Booij
  */
@@ -263,8 +264,8 @@ public class TaxaImport extends Batchjob {
     ranglijst.forEach(rang -> {
       prefix.put(rang.getRang(),
                  String.format("%" + rang.getNiveau() + "s", " "));
-      totalen.put(rang.getRang(), 0);
       rangen.add(rang.getRang());
+      totalen.put(rang.getRang(), 0);
     });
   }
 
@@ -348,9 +349,8 @@ public class TaxaImport extends Batchjob {
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(
         MessageFormat.format(getMelding(HLP_PARAMSVERPLICHT),
-                             PAR_JSONBESTAND + ", "
-                              + NatuurTools.PAR_DBURL + ", "
-                              + NatuurTools.PAR_DBUSER,
+                             PAR_JSONBESTAND + ", " + NatuurTools.PAR_DBURL
+                              + ", " + NatuurTools.PAR_DBUSER,
                              NatuurTools.PAR_TAXAROOT), 80);
     DoosUtils.naarScherm();
   }

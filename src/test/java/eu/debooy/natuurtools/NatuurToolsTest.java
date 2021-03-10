@@ -31,9 +31,19 @@ public class NatuurToolsTest extends BatchTest {
     String[]  args      = new String[] {};
 
     VangOutEnErr.execute(NatuurTools.class, "main", args, out, err);
+debug();
+    assertEquals("Geen tool - helptekst", 73, out.size());
+    assertEquals("Geen tool - fouten", 0, err.size());
+  }
 
-    assertEquals("Zonder parameters - helptekst", 70, out.size());
-    assertEquals("Zonder parameters - fouten", 0, err.size());
+  @Test
+  public void testCsvNaarJson() {
+    String[]  args      = new String[] {"CsvNaarJson"};
+
+    VangOutEnErr.execute(NatuurTools.class, "main", args, out, err);
+
+    assertEquals("CsvNaarJson - helptekst", 30, out.size());
+    assertEquals("CsvNaarJson - fouten", 1, err.size());
   }
 
   @Test
@@ -52,7 +62,7 @@ public class NatuurToolsTest extends BatchTest {
 
     VangOutEnErr.execute(NatuurTools.class, "main", args, out, err);
 
-    assertEquals("onbestaand - helptekst", 70, out.size());
+    assertEquals("onbestaand - helptekst", 73, out.size());
     assertEquals("onbestaand - fouten", 1, err.size());
   }
 

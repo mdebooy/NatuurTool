@@ -33,9 +33,10 @@ public class NatuurTools extends Batchjob {
       ResourceBundle.getBundle("ApplicatieResources", Locale.getDefault());
 
   protected static final  String  HLP_AANMAAK       = "help.aanmaak";
-  protected static final  String  HLP_ENKELNAMEN    = "help.enkelnamen";
+  protected static final  String  HLP_CSVBESTAND    = "help.csvbestand";
   protected static final  String  HLP_DBURL         = "help.dburl";
   protected static final  String  HLP_DBUSER        = "help.dbuser";
+  protected static final  String  HLP_ENKELNAMEN    = "help.enkelnamen";
   protected static final  String  HLP_HERNUMMER     = "help.hernummer";
   protected static final  String  HLP_INCLUDETALEN  = "help.include.talen";
   protected static final  String  HLP_IOCBESTAND    = "help.iocbestand";
@@ -43,6 +44,7 @@ public class NatuurTools extends Batchjob {
   protected static final  String  HLP_JSONBESTAND   = "help.jsonbestand";
   protected static final  String  HLP_SKIPSTRUCTUUR = "help.skipstructuur";
   protected static final  String  HLP_READONLY      = "help.readonly";
+  protected static final  String  HLP_TAAL          = "help.taal";
   protected static final  String  HLP_TALEN         = "help.talen";
   protected static final  String  HLP_TAXAROOT      = "help.taxaroot";
 
@@ -52,11 +54,12 @@ public class NatuurTools extends Batchjob {
   protected static final  String  KEY_SEQ       = "seq";
   protected static final  String  KEY_SUBRANGEN = "subrangen";
 
-  protected static final  String  LBL_JSONBESTAND = "label.jsonbestand";
+  protected static final  String  LBL_CSVBESTAND  = "label.csvbestand";
   protected static final  String  LBL_DBURL       = "label.dburl";
   protected static final  String  LBL_DBUSER      = "label.dbuser";
   protected static final  String  LBL_ENKELNAMEN  = "label.enkelnamen";
   protected static final  String  LBL_IOCBESTAND  = "label.iocbestand";
+  protected static final  String  LBL_JSONBESTAND = "label.jsonbestand";
   protected static final  String  LBL_TALEN       = "label.talen";
   protected static final  String  LBL_TAXAROOT    = "label.taxaroot";
   protected static final  String  LBL_WACHTWOORD  = "label.wachtwoord";
@@ -88,17 +91,16 @@ public class NatuurTools extends Batchjob {
   private NatuurTools() {}
 
   public static void help() {
-    DoosUtils.naarScherm("  IOCNamen       ",
+    DoosUtils.naarScherm("  CsvNaarJson ",
+                         resourceBundle.getString("help.csvnaarjson"), 80);
+    DoosUtils.naarScherm("  IOCNamen    ",
                          resourceBundle.getString("help.iocnamen"), 80);
-    DoosUtils.naarScherm("  ImporteerLijst ",
-                         resourceBundle.getString("help.importeerlijst"), 80);
-    DoosUtils.naarScherm("  TaxaImport     ",
-                         resourceBundle.getString("help.taxaimport"),
-                         80);
+    DoosUtils.naarScherm("  TaxaImport  ",
+                         resourceBundle.getString("help.taxaimport"), 80);
+    DoosUtils.naarScherm();
+    CsvNaarJson.help();
     DoosUtils.naarScherm();
     IocNamen.help();
-    DoosUtils.naarScherm();
-    ImporteerLijst.help();
     DoosUtils.naarScherm();
     TaxaImport.help();
   }
@@ -119,8 +121,8 @@ public class NatuurTools extends Batchjob {
       IocNamen.execute(commandoArgs);
       return;
     }
-    if ("importeerlijst".equalsIgnoreCase(commando)) {
-      ImporteerLijst.execute(commandoArgs);
+    if ("csvnaarjson".equalsIgnoreCase(commando)) {
+      CsvNaarJson.execute(commandoArgs);
       return;
     }
     if ("taxaimport".equalsIgnoreCase(commando)) {
