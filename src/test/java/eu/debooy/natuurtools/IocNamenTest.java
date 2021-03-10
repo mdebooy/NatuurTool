@@ -66,7 +66,7 @@ public class IocNamenTest extends BatchTest {
   }
 
   @Test
-  public void testCsv() throws BestandException {
+  public void testCsv() throws BestandException, IOException {
     String[]  args      = new String[] {
       "--" + NatuurTools.PAR_IOCBESTAND + "=" + BST_CSV,
       "--" + NatuurTools.PAR_TALEN + "=en,af,ca,zh,z,hr,cs,da,nl,et,fi,fr,de,hu,is,id,it,ja,lv,lt,se,no,pl,pt,ru,sk,sl,es,sv,th,uk",
@@ -75,12 +75,13 @@ public class IocNamenTest extends BatchTest {
     VangOutEnErr.execute(IocNamen.class,
                          DoosUtilsTestConstants.CMD_EXECUTE, args, out, err);
 
-    assertEquals("CSV - helptekst", 18, out.size());
+    assertEquals("CSV - helptekst", 19, out.size());
     assertEquals("CSV - fouten", 0, err.size());
     assertEquals("CSV - 12", "33", out.get(11).split(":")[1].trim());
     assertEquals("CSV - 13", "2",  out.get(12).split(":")[1].trim());
     assertEquals("CSV - 14", "3",  out.get(13).split(":")[1].trim());
-    assertEquals("CSV - 15", "6",  out.get(14).split(":")[1].trim());
+    assertEquals("CSV - 15", "4",  out.get(14).split(":")[1].trim());
+    assertEquals("CSV - 16", "6",  out.get(15).split(":")[1].trim());
     assertTrue("CSV - equals",
         Bestand.equals(
             Bestand.openInvoerBestand(TEMP + File.separator

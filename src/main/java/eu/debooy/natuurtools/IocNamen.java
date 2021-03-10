@@ -51,9 +51,12 @@ public class IocNamen extends Batchjob {
     CsvBestand    csvBestand        = null;
     JSONObject    familie           = new JSONObject();
     JSONArray     families          = new JSONArray();
+    JSONObject    geslacht          = new JSONObject();
+    JSONArray     geslachten        = new JSONArray();
     int           lijnen            = -1;
     JSONObject    namen             = new JSONObject();
     int           nFamilies         = 0;
+    int           nGeslachten       = 0;
     int           nOrdes            = 0;
     int           nSoorten          = 0;
     JSONObject    orde              = new JSONObject();
@@ -61,6 +64,7 @@ public class IocNamen extends Batchjob {
     JSONObject    soort             = new JSONObject();
     JSONArray     soorten           = new JSONArray();
     JSONObject    taxa              = new JSONObject();
+    String        vorigGeslacht     = "";
 
     Banner.printDoosBanner(resourceBundle.getString("banner.iocnamen"));
 
@@ -68,8 +72,7 @@ public class IocNamen extends Batchjob {
       return;
     }
 
-    String[]      taal              = parameters.get(NatuurTools.PAR_TALEN)
-                                                .split(",");
+    String[]  taal  = parameters.get(NatuurTools.PAR_TALEN).split(",");
 
     try {
       csvBestand  =
@@ -85,36 +88,61 @@ public class IocNamen extends Batchjob {
 
       while (csvBestand.hasNext()) {
         lijnen++;
-          String[]  veld = csvBestand.next();
-          // Nieuwe Orde
-          if (DoosUtils.isNotBlankOrNull(veld[1])) {
-            nieuweOrde(soort, namen, soorten, familie, families, orde, ordes);
-            nOrdes++;
-            orde.put(NatuurTools.KEY_ID, nOrdes);
-            orde.put(NatuurTools.KEY_ORDE, veld[1]);
+        String[]  veld = csvBestand.next();
+        // Nieuwe Orde
+        if (DoosUtils.isNotBlankOrNull(veld[1])) {
+          nieuweOrde(soort, namen, soorten, geslacht, geslachten,
+                     familie, families, orde, ordes);
+          nOrdes++;
+          orde.put(NatuurTools.KEY_SEQ, nOrdes);
+          orde.put(NatuurTools.KEY_RANG, "or");
+          orde.put(NatuurTools.KEY_LATIJN,
+                   veld[1].substring(0, 1).toUpperCase()
+                   + veld[1].substring(1).toLowerCase());
+        }
+        // Nieuwe familie
+        if (DoosUtils.isNotBlankOrNull(veld[2])) {
+          nieuweFamilie(soort, namen, soorten, geslacht, geslachten,
+                        familie, families);
+          nFamilies++;
+          familie.put(NatuurTools.KEY_SEQ, nFamilies);
+          familie.put(NatuurTools.KEY_RANG, "fa");
+          familie.put(NatuurTools.KEY_LATIJN,
+                   veld[2].substring(0, 1).toUpperCase()
+                   + veld[2].substring(1).toLowerCase());
+        }
+
+        // Nieuw soort
+        if (DoosUtils.isNotBlankOrNull(veld[3])) {
+          String  naam  = veld[3].split(" ")[0];
+          // Nieuw geslacht?
+          if (!naam.equals(vorigGeslacht)) {
+            nieuwGeslacht(soort, namen, soorten, geslacht, geslachten);
+            nGeslachten++;
+            geslacht.put(NatuurTools.KEY_SEQ, nGeslachten);
+            geslacht.put(NatuurTools.KEY_RANG, "ge");
+            geslacht.put(NatuurTools.KEY_LATIJN,
+                     naam.substring(0, 1).toUpperCase()
+                     + naam.substring(1).toLowerCase());
+            vorigGeslacht = naam;
           }
-          // Nieuwe familie
-          if (DoosUtils.isNotBlankOrNull(veld[2])) {
-            nieuweFamilie(soort, namen, soorten, familie, families);
-            nFamilies++;
-            familie.put(NatuurTools.KEY_ID, nFamilies);
-            familie.put(NatuurTools.KEY_FAMILIE, veld[2]);
+          nieuweSoort(soort, namen, soorten);
+          nSoorten++;
+          soort.put(NatuurTools.KEY_SEQ, nSoorten);
+          soort.put(NatuurTools.KEY_RANG, "so");
+          soort.put(NatuurTools.KEY_LATIJN,
+                   veld[3].substring(0, 1).toUpperCase()
+                   + veld[3].substring(1).toLowerCase());
+        }
+        for (int i = 0; i < taal.length; i++) {
+          if (DoosUtils.isNotBlankOrNull(veld[i+4])) {
+            namen.put(taal[i], veld[i+4]);
           }
-          // Nieuw soort
-          if (DoosUtils.isNotBlankOrNull(veld[3])) {
-            nieuweSoort(soort, namen, soorten);
-            nSoorten++;
-            soort.put(NatuurTools.KEY_ID, nSoorten);
-            soort.put(NatuurTools.KEY_LATIJN, veld[3]);
-          }
-          for (int i = 0; i < taal.length; i++) {
-            if (DoosUtils.isNotBlankOrNull(veld[i+4])) {
-              namen.put(taal[i], veld[i+4]);
-            }
-          }
+        }
       }
 
-      nieuweOrde(soort, namen, soorten, familie, families, orde, ordes);
+      nieuweOrde(soort, namen, soorten, geslacht, geslachten,
+                 familie, families, orde, ordes);
       taxa.put("taxa", ordes);
 
     } catch (BestandException | ParseException e) {
@@ -141,6 +169,9 @@ public class IocNamen extends Batchjob {
         MessageFormat.format(resourceBundle.getString(NatuurTools.MSG_FAMILIES),
                              nFamilies));
     DoosUtils.naarScherm(
+        MessageFormat.format(
+            resourceBundle.getString(NatuurTools.MSG_GESLACHTEN), nGeslachten));
+    DoosUtils.naarScherm(
         MessageFormat.format(resourceBundle.getString(NatuurTools.MSG_SOORTEN),
                              nSoorten));
     DoosUtils.naarScherm();
@@ -149,13 +180,16 @@ public class IocNamen extends Batchjob {
   }
 
   public static void help() {
-    DoosUtils.naarScherm("java -jar NatuurTools.jar IocNamen ["
-                          + getMelding(LBL_OPTIE)
-                          + "] --iocbestand=<"
-                          + resourceBundle.getString("label.iocbestand") + ">"
-                          + " --talen=<"
-                          + resourceBundle.getString("label.talen") + ">",
-                         80);
+    DoosUtils.naarScherm("java -jar NatuurTools.jar IocNamen "
+        + getMelding(LBL_OPTIE) + " "
+        + MessageFormat.format(
+              getMelding(LBL_PARAM),
+              NatuurTools.PAR_IOCBESTAND,
+              resourceBundle.getString(NatuurTools.LBL_IOCBESTAND)) + " "
+        + MessageFormat.format(
+              getMelding(LBL_PARAM),
+              NatuurTools.PAR_TALEN,
+              resourceBundle.getString(NatuurTools.LBL_TALEN)), 80);
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(getParameterTekst(PAR_CHARSETIN, 12),
         MessageFormat.format(getMelding(HLP_CHARSETIN),
@@ -166,11 +200,13 @@ public class IocNamen extends Batchjob {
     DoosUtils.naarScherm(getParameterTekst(PAR_INVOERDIR, 12),
                          getMelding(HLP_INVOERDIR), 80);
     DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_IOCBESTAND, 12),
-                         resourceBundle.getString("help.iocbestand"), 80);
+                         resourceBundle.getString(NatuurTools.HLP_IOCBESTAND),
+                         80);
     DoosUtils.naarScherm(getParameterTekst(PAR_JSONBESTAND, 12),
-                         resourceBundle.getString("help.uitvoerbestand"), 80);
+                         resourceBundle.getString(NatuurTools.HLP_IOCJSON),
+                         80);
     DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_TALEN, 12),
-                         resourceBundle.getString("help.talen"), 80);
+                         resourceBundle.getString(NatuurTools.HLP_TALEN), 80);
     DoosUtils.naarScherm(getParameterTekst(PAR_UITVOERDIR, 12),
                          getMelding(HLP_UITVOERDIR), 80);
     DoosUtils.naarScherm();
@@ -182,13 +218,15 @@ public class IocNamen extends Batchjob {
   }
 
   private static void nieuweFamilie(JSONObject soort, JSONObject namen,
-                                    JSONArray soorten, JSONObject familie,
+                                    JSONArray soorten, JSONObject geslacht,
+                                    JSONArray geslachten, JSONObject familie,
                                     JSONArray families) throws ParseException {
-    nieuweSoort(soort, namen, soorten);
+    nieuwGeslacht(soort, namen, soorten, geslacht, geslachten);
     if (!familie.isEmpty()) {
-      if (!soorten.isEmpty()) {
-        familie.put(NatuurTools.KEY_SOORTEN, parser.parse(soorten.toString()));
-        soorten.clear();
+      if (!geslachten.isEmpty()) {
+        familie.put(NatuurTools.KEY_SUBRANGEN,
+                    parser.parse(geslachten.toString()));
+        geslachten.clear();
       }
       families.add(parser.parse(familie.toString()));
       familie.clear();
@@ -196,13 +234,15 @@ public class IocNamen extends Batchjob {
   }
 
   private static void nieuweOrde(JSONObject soort, JSONObject namen,
-                                 JSONArray soorten, JSONObject familie,
+                                 JSONArray soorten, JSONObject geslacht,
+                                 JSONArray geslachten, JSONObject familie,
                                  JSONArray families, JSONObject orde,
                                  JSONArray ordes) throws ParseException {
-    nieuweFamilie(soort, namen, soorten, familie, families);
+    nieuweFamilie(soort, namen, soorten, geslacht, geslachten,
+                  familie, families);
     if (!orde.isEmpty()) {
       if (!families.isEmpty()) {
-        orde.put(NatuurTools.KEY_FAMILIES, parser.parse(families.toString()));
+        orde.put(NatuurTools.KEY_SUBRANGEN, parser.parse(families.toString()));
         families.clear();
       }
       ordes.add(parser.parse(orde.toString()));
@@ -212,14 +252,31 @@ public class IocNamen extends Batchjob {
 
   private static void nieuweSoort(JSONObject soort, JSONObject namen,
                                   JSONArray soorten) throws ParseException {
-    if (soort.size() > 0) {
-      if (namen.size() > 0) {
+    if (!soort.isEmpty()) {
+      if (!namen.isEmpty()) {
         soort.put(NatuurTools.KEY_NAMEN, parser.parse(namen.toString()));
         namen.clear();
       }
       soorten.add(parser.parse(soort.toString()));
       soort.clear();
     }
+  }
+
+  private static void nieuwGeslacht(JSONObject soort, JSONObject namen,
+                                    JSONArray soorten, JSONObject geslacht,
+                                    JSONArray geslachten)
+      throws ParseException {
+    nieuweSoort(soort, namen, soorten);
+    if (!geslacht.isEmpty()) {
+      if (!soorten.isEmpty()) {
+        geslacht.put(NatuurTools.KEY_SUBRANGEN,
+                     parser.parse(soorten.toString()));
+        soorten.clear();
+      }
+      geslachten.add(parser.parse(geslacht.toString()));
+      geslacht.clear();
+    }
+
   }
 
   private static boolean setParameters(String[] args) {

@@ -32,7 +32,7 @@ public class NatuurToolsTest extends BatchTest {
 
     VangOutEnErr.execute(NatuurTools.class, "main", args, out, err);
 
-    assertEquals("Zonder parameters - helptekst", 49, out.size());
+    assertEquals("Zonder parameters - helptekst", 70, out.size());
     assertEquals("Zonder parameters - fouten", 0, err.size());
   }
 
@@ -42,8 +42,8 @@ public class NatuurToolsTest extends BatchTest {
 
     VangOutEnErr.execute(NatuurTools.class, "main", args, out, err);
 
-    assertEquals("Zonder parameters - helptekst", 27, out.size());
-    assertEquals("Zonder parameters - fouten", 1, err.size());
+    assertEquals("IocNamen - helptekst", 27, out.size());
+    assertEquals("IocNamen - fouten", 1, err.size());
   }
 
   @Test
@@ -52,17 +52,17 @@ public class NatuurToolsTest extends BatchTest {
 
     VangOutEnErr.execute(NatuurTools.class, "main", args, out, err);
 
-    assertEquals("Zonder parameters - helptekst", 49, out.size());
-    assertEquals("Zonder parameters - fouten", 1, err.size());
+    assertEquals("onbestaand - helptekst", 70, out.size());
+    assertEquals("onbestaand - fouten", 1, err.size());
   }
 
   @Test
   public void testTaxaNamenImport() {
-    String[]  args      = new String[] {"TaxaNamenImport"};
+    String[]  args      = new String[] {"TaxaImport"};
 
     VangOutEnErr.execute(NatuurTools.class, "main", args, out, err);
 
-    assertEquals("Zonder parameters - helptekst", 27, out.size());
-    assertEquals("Zonder parameters - fouten", 1, err.size());
+    assertEquals("TaxaImport - helptekst", 30, out.size());
+    assertEquals("TaxaImport - fouten", 1, err.size());
   }
 }

@@ -32,46 +32,75 @@ public class NatuurTools extends Batchjob {
   private static final  ResourceBundle  resourceBundle  =
       ResourceBundle.getBundle("ApplicatieResources", Locale.getDefault());
 
-  protected static final  String  KEY_FAMILIE   = "familie";
-  protected static final  String  KEY_FAMILIES  = "families";
-  protected static final  String  KEY_ID        = "ID";
+  protected static final  String  HLP_AANMAAK       = "help.aanmaak";
+  protected static final  String  HLP_ENKELNAMEN    = "help.enkelnamen";
+  protected static final  String  HLP_DBURL         = "help.dburl";
+  protected static final  String  HLP_DBUSER        = "help.dbuser";
+  protected static final  String  HLP_HERNUMMER     = "help.hernummer";
+  protected static final  String  HLP_INCLUDETALEN  = "help.include.talen";
+  protected static final  String  HLP_IOCBESTAND    = "help.iocbestand";
+  protected static final  String  HLP_IOCJSON       = "help.iocjson";
+  protected static final  String  HLP_JSONBESTAND   = "help.jsonbestand";
+  protected static final  String  HLP_SKIPSTRUCTUUR = "help.skipstructuur";
+  protected static final  String  HLP_READONLY      = "help.readonly";
+  protected static final  String  HLP_TALEN         = "help.talen";
+  protected static final  String  HLP_TAXAROOT      = "help.taxaroot";
+
   protected static final  String  KEY_LATIJN    = "latijn";
   protected static final  String  KEY_NAMEN     = "namen";
-  protected static final  String  KEY_ORDE      = "orde";
-  protected static final  String  KEY_SOORTEN   = "soorten";
+  protected static final  String  KEY_RANG      = "rang";
+  protected static final  String  KEY_SEQ       = "seq";
+  protected static final  String  KEY_SUBRANGEN = "subrangen";
 
+  protected static final  String  LBL_JSONBESTAND = "label.jsonbestand";
+  protected static final  String  LBL_DBURL       = "label.dburl";
+  protected static final  String  LBL_DBUSER      = "label.dbuser";
+  protected static final  String  LBL_ENKELNAMEN  = "label.enkelnamen";
+  protected static final  String  LBL_IOCBESTAND  = "label.iocbestand";
+  protected static final  String  LBL_TALEN       = "label.talen";
+  protected static final  String  LBL_TAXAROOT    = "label.taxaroot";
   protected static final  String  LBL_WACHTWOORD  = "label.wachtwoord";
 
-  protected static final  String  MSG_AANMAKEN  = "msg.aanmaken";
-  protected static final  String  MSG_FAMILIE   = "msg.familie";
-  protected static final  String  MSG_FAMILIES  = "msg.families";
-  protected static final  String  MSG_LIJNEN    = "msg.lijnen";
-  protected static final  String  MSG_NIEUW     = "msg.nieuw";
-  protected static final  String  MSG_ONBEKEND  = "msg.onbekend";
-  protected static final  String  MSG_ORDE      = "msg.orde";
-  protected static final  String  MSG_ORDES     = "msg.ordes";
-  protected static final  String  MSG_SOORT     = "msg.soort";
-  protected static final  String  MSG_SOORTEN   = "msg.soorten";
-  protected static final  String  MSG_VERSCHIL  = "msg.verschil";
-  protected static final  String  MSG_WIJZIGEN  = "msg.wijzigen";
+  protected static final  String  MSG_AANMAKEN    = "msg.aanmaken";
+  protected static final  String  MSG_FAMILIES    = "msg.families";
+  protected static final  String  MSG_GESLACHTEN  = "msg.geslachten";
+  protected static final  String  MSG_HERNUMMER   = "msg.hernummer";
+  protected static final  String  MSG_HIERARCHIE  = "msg.hierarchie";
+  protected static final  String  MSG_LIJNEN      = "msg.lijnen";
+  protected static final  String  MSG_NIEUW       = "msg.nieuw";
+  protected static final  String  MSG_ONBEKEND    = "msg.onbekend";
+  protected static final  String  MSG_ORDES       = "msg.ordes";
+  protected static final  String  MSG_SOORTEN     = "msg.soorten";
+  protected static final  String  MSG_VERSCHIL    = "msg.verschil";
+  protected static final  String  MSG_WIJZIGEN    = "msg.wijzigen";
+  protected static final  String  MSG_WIJZIGING   = "msg.wijziging";
 
-  protected static final  String  PAR_AANMAAK     = "aanmaken";
-  protected static final  String  PAR_IOCBESTAND  = "iocbestand";
-  protected static final  String  PAR_DBURL       = "dburl";
-  protected static final  String  PAR_DBUSER      = "dbuser";
-  protected static final  String  PAR_TALEN       = "talen";
+  protected static final  String  PAR_AANMAAK       = "aanmaken";
+  protected static final  String  PAR_IOCBESTAND    = "iocbestand";
+  protected static final  String  PAR_DBURL         = "dburl";
+  protected static final  String  PAR_DBUSER        = "dbuser";
+  protected static final  String  PAR_ENKELNAMEN    = "enkelnamen";
+  protected static final  String  PAR_HERNUMMER     = "hernummer";
+  protected static final  String  PAR_SKIPSTRUCTUUR = "skipstructuur";
+  protected static final  String  PAR_TALEN         = "talen";
+  protected static final  String  PAR_TAXAROOT      = "taxaroot";
 
   private NatuurTools() {}
 
   public static void help() {
-    DoosUtils.naarScherm("  IOCNamen        ",
+    DoosUtils.naarScherm("  IOCNamen       ",
                          resourceBundle.getString("help.iocnamen"), 80);
-    DoosUtils.naarScherm("  TaxaNamenImport ",
-                         resourceBundle.getString("help.taxanamenimport"), 80);
+    DoosUtils.naarScherm("  ImporteerLijst ",
+                         resourceBundle.getString("help.importeerlijst"), 80);
+    DoosUtils.naarScherm("  TaxaImport     ",
+                         resourceBundle.getString("help.taxaimport"),
+                         80);
     DoosUtils.naarScherm();
     IocNamen.help();
     DoosUtils.naarScherm();
-    TaxaNamenImport.help();
+    ImporteerLijst.help();
+    DoosUtils.naarScherm();
+    TaxaImport.help();
   }
 
   public static void main(String[] args) {
@@ -90,8 +119,12 @@ public class NatuurTools extends Batchjob {
       IocNamen.execute(commandoArgs);
       return;
     }
-    if ("taxanamenimport".equalsIgnoreCase(commando)) {
-      TaxaNamenImport.execute(commandoArgs);
+    if ("importeerlijst".equalsIgnoreCase(commando)) {
+      ImporteerLijst.execute(commandoArgs);
+      return;
+    }
+    if ("taxaimport".equalsIgnoreCase(commando)) {
+      TaxaImport.execute(commandoArgs);
       return;
     }
 
