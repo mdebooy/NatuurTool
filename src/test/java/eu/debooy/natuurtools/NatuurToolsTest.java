@@ -31,7 +31,7 @@ public class NatuurToolsTest extends BatchTest {
     String[]  args      = new String[] {};
 
     VangOutEnErr.execute(NatuurTools.class, "main", args, out, err);
-debug();
+
     assertEquals("Geen tool - helptekst", 73, out.size());
     assertEquals("Geen tool - fouten", 0, err.size());
   }
