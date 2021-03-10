@@ -6,6 +6,7 @@
   <persistence-unit name="natuur">
     <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
 
+    <class>eu.debooy.natuur.domain.RangDto</class>
     <class>eu.debooy.natuur.domain.TaxonDto</class>
     <class>eu.debooy.natuur.domain.TaxonnaamDto</class>
 
