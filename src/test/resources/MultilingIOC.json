@@ -1,1 +1,259 @@
-{"taxa":[{"latijn":"Struthioniformes","rang":"or","subrangen":[{"latijn":"Struthionidae","rang":"fa","subrangen":[{"latijn":"Struthio","rang":"ge","subrangen":[{"latijn":"Struthio camelus","namen":{"de":"Strauß","no":"Slettestruts","ru":"Африканский страус","fi":"strutsi","pt":"avestruz","lt":"strutis","hr":"noj","lv":"Āfrikas strauss","fr":"Autruche d\u2019Afrique","hu":"strucc","se":"Struhcca","uk":"страус африканський","sk":"pštros dvojprstý","sl":"noj","ca":"estruç comú","sv":"struts","af":"Volstruis","en":"Common Ostrich","is":"Strútur","it":"Struzzo","zh":"非洲鸵鸟","es":"Avestruz común","et":"jaanalind","cs":"pštros dvouprstý","ja":"ダチョウ","z":"鴕鳥","pl":"struś czerwonoskóry","da":"Struds","nl":"Struisvogel"},"rang":"so","seq":1},{"latijn":"Struthio molybdophanes","namen":{"de":"Somalistrauß","no":"Somalistruts","ru":"Сомалийский страус","fi":"somalianstrutsi","sv":"somaliastruts","pt":"avestruz-somali","en":"Somali Ostrich","hr":"somalijski noj","it":"Struzzo somalo","fr":"Autruche de Somalie","hu":"szomáliai strucc","zh":"索马里鸵鸟","es":"Avestruz somalí","et":"somaali jaanalind","uk":"страус сомалійський","ja":"ソマリアダチョウ","sk":"pštros sivonohý","z":"索馬利亞鴕鳥","pl":"struś szaroskóry","da":"Somalistruds","ca":"estruç de Somàlia","nl":"Somalische Struisvogel"},"rang":"so","seq":2}],"seq":1}],"seq":1}],"seq":1},{"latijn":"Anseriformes","rang":"or","subrangen":[{"latijn":"Anhimidae","rang":"fa","subrangen":[{"latijn":"Anhima","rang":"ge","subrangen":[{"latijn":"Anhima cornuta","namen":{"de":"Hornwehrvogel","no":"Horngjeterfugl","ru":"Рогатая паламедея","fi":"sarviromisko","sv":"hornvärnfågel","pt":"anhuma","lt":"raguotoji pelamedėja","en":"Horned Screamer","hr":"rogati pastiraš","it":"Kaimichi cornuto","fr":"Kamichi cornu","hu":"egyszarvú csája","zh":"角叫鸭","es":"Chajá añuma","et":"sarvik-ogatiib (sarvik-tšahha)","cs":"kamiš růžkatý","uk":"паламедея","ja":"ツノサケビドリ","sk":"anhima rohatá","z":"角叫鴨","pl":"skrzydłoszpon rogaty","da":"Anhima","ca":"txajà banyut","nl":"Anioema"},"rang":"so","seq":3}],"seq":2},{"latijn":"Chauna","rang":"ge","subrangen":[{"latijn":"Chauna chavaria","namen":{"de":"Weißwangen-Wehrvogel","no":"Svarthalsgjeterfugl","ru":"Черношейная паламедея","fi":"kolumbianromisko","sv":"svarthalsad värnfågel","pt":"tachã-do-norte ","lt":"juodakaklė pelamedėja","en":"Northern Screamer","hr":"crnovrati pastiraš","it":"Kaimichi settentrionale","fr":"Kamichi chavaria","hu":"fehérarcú csája","zh":"黑颈叫鸭","es":"Chajá chicagüire","et":"tutt-ogatiib (tutt-tšahha)","cs":"čája bělolící","uk":"чайя колумбійська","ja":"クロエリサケビドリ","sk":"čaja chochlatá","z":"黑頸叫鴨〔北方叫鴨〕","pl":"skrzydłoszpon czarnoszyi","da":"Toppet Chaja","ca":"txajà collnegre","nl":"Witwanghoenderkoet"},"rang":"so","seq":4},{"latijn":"Chauna torquata","namen":{"de":"Halsband-Wehrvogel","no":"Kragegjeterfugl","ru":"Хохлатая паламедея","fi":"töyhtöromisko","sv":"tofsvärnfågel","pt":"tachã","lt":"kuoduotoji pelamedėja","en":"Southern Screamer","hr":"ogrličasti pastiraš","it":"Kaimichi meridionale","fr":"Kamichi à collier","hu":"örvös csája","zh":"冠叫鸭","es":"Chajá común","et":"kaelus-ogatiib (kaelustšahha)","cs":"čája obojková","uk":"чайя аргентинська","ja":"カンムリサケビドリ","sk":"čaja obojková","z":"冠叫鴨〔南方叫鴨〕","pl":"skrzydłoszpon obrożny","da":"Sorthalset Chaja","ca":"txajà emplomallat","nl":"Kuifhoenderkoet"},"rang":"so","seq":5}],"seq":3}],"seq":2},{"latijn":"Anseranatidae","rang":"fa","subrangen":[{"latijn":"Anseranas","rang":"ge","subrangen":[{"latijn":"Anseranas semipalmata","namen":{"de":"Spaltfußgans","no":"Skjæregås","ru":"Полулапчатый гусь","fi":"puuhanhi","pt":"ganso-alvinegro","lt":"ančiažąsė","hr":"dugonoga guska","fr":"Canaroie semipalmée","hu":"ujjas lúd","uk":"урако","sk":"husiarka strakatá","id":"Boha wasur","ca":"oca garsera","sv":"skatgås","en":"Magpie Goose","it":"Oca gazza","zh":"鹊雁","es":"Ganso urraca","et":"harakhani","cs":"husovec strakatý","ja":"カササギガン","z":"鵲鵝","pl":"bezpłetwiec","da":"Skadegås","nl":"Ekstergans"},"rang":"so","seq":6}],"seq":4}],"seq":3}],"seq":2}]}
+{
+  "latijn": "Aves",
+  "rang": "kl",
+  "subrangen": [
+    {
+      "latijn": "Struthioniformes",
+      "rang": "or",
+      "subrangen": [
+        {
+          "latijn": "Struthionidae",
+          "rang": "fa",
+          "subrangen": [
+            {
+              "latijn": "Struthio",
+              "rang": "ge",
+              "subrangen": [
+                {
+                  "latijn": "Struthio camelus",
+                  "namen": {
+                    "de": "Strauß",
+                    "no": "Slettestruts",
+                    "ru": "Африканский страус",
+                    "fi": "strutsi",
+                    "pt": "avestruz",
+                    "lt": "strutis",
+                    "hr": "noj",
+                    "lv": "Āfrikas strauss",
+                    "fr": "Autruche d\u2019Afrique",
+                    "hu": "strucc",
+                    "se": "Struhcca",
+                    "uk": "страус африканський",
+                    "sk": "pštros dvojprstý",
+                    "sl": "noj",
+                    "ca": "estruç comú",
+                    "sv": "struts",
+                    "af": "Volstruis",
+                    "en": "Common Ostrich",
+                    "is": "Strútur",
+                    "it": "Struzzo",
+                    "zh": "非洲鸵鸟",
+                    "es": "Avestruz común",
+                    "et": "jaanalind",
+                    "cs": "pštros dvouprstý",
+                    "ja": "ダチョウ",
+                    "z": "鴕鳥",
+                    "pl": "struś czerwonoskóry",
+                    "da": "Struds",
+                    "nl": "Struisvogel"
+                  },
+                  "rang": "so",
+                  "seq": 1
+                },
+                {
+                  "latijn": "Struthio molybdophanes",
+                  "namen": {
+                    "de": "Somalistrauß",
+                    "no": "Somalistruts",
+                    "ru": "Сомалийский страус",
+                    "fi": "somalianstrutsi",
+                    "sv": "somaliastruts",
+                    "pt": "avestruz-somali",
+                    "en": "Somali Ostrich",
+                    "hr": "somalijski noj",
+                    "it": "Struzzo somalo",
+                    "fr": "Autruche de Somalie",
+                    "hu": "szomáliai strucc",
+                    "zh": "索马里鸵鸟",
+                    "es": "Avestruz somalí",
+                    "et": "somaali jaanalind",
+                    "uk": "страус сомалійський",
+                    "ja": "ソマリアダチョウ",
+                    "sk": "pštros sivonohý",
+                    "z": "索馬利亞鴕鳥",
+                    "pl": "struś szaroskóry",
+                    "da": "Somalistruds",
+                    "ca": "estruç de Somàlia",
+                    "nl": "Somalische Struisvogel"
+                  },
+                  "rang": "so",
+                  "seq": 2
+                }
+              ],
+              "seq": 1
+            }
+          ],
+          "seq": 1
+        }
+      ],
+      "seq": 1
+    },
+    {
+      "latijn": "Anseriformes",
+      "rang": "or",
+      "subrangen": [
+        {
+          "latijn": "Anhimidae",
+          "rang": "fa",
+          "subrangen": [
+            {
+              "latijn": "Anhima",
+              "rang": "ge",
+              "subrangen": [
+                {
+                  "latijn": "Anhima cornuta",
+                  "namen": {
+                    "de": "Hornwehrvogel",
+                    "no": "Horngjeterfugl",
+                    "ru": "Рогатая паламедея",
+                    "fi": "sarviromisko",
+                    "sv": "hornvärnfågel",
+                    "pt": "anhuma",
+                    "lt": "raguotoji pelamedėja",
+                    "en": "Horned Screamer",
+                    "hr": "rogati pastiraš",
+                    "it": "Kaimichi cornuto",
+                    "fr": "Kamichi cornu",
+                    "hu": "egyszarvú csája",
+                    "zh": "角叫鸭",
+                    "es": "Chajá añuma",
+                    "et": "sarvik-ogatiib (sarvik-tšahha)",
+                    "cs": "kamiš růžkatý",
+                    "uk": "паламедея",
+                    "ja": "ツノサケビドリ",
+                    "sk": "anhima rohatá",
+                    "z": "角叫鴨",
+                    "pl": "skrzydłoszpon rogaty",
+                    "da": "Anhima",
+                    "ca": "txajà banyut",
+                    "nl": "Anioema"
+                  },
+                  "rang": "so",
+                  "seq": 3
+                }
+              ],
+              "seq": 2
+            },
+            {
+              "latijn": "Chauna",
+              "rang": "ge",
+              "subrangen": [
+                {
+                  "latijn": "Chauna chavaria",
+                  "namen": {
+                    "de": "Weißwangen-Wehrvogel",
+                    "no": "Svarthalsgjeterfugl",
+                    "ru": "Черношейная паламедея",
+                    "fi": "kolumbianromisko",
+                    "sv": "svarthalsad värnfågel",
+                    "pt": "tachã-do-norte ",
+                    "lt": "juodakaklė pelamedėja",
+                    "en": "Northern Screamer",
+                    "hr": "crnovrati pastiraš",
+                    "it": "Kaimichi settentrionale",
+                    "fr": "Kamichi chavaria",
+                    "hu": "fehérarcú csája",
+                    "zh": "黑颈叫鸭",
+                    "es": "Chajá chicagüire",
+                    "et": "tutt-ogatiib (tutt-tšahha)",
+                    "cs": "čája bělolící",
+                    "uk": "чайя колумбійська",
+                    "ja": "クロエリサケビドリ",
+                    "sk": "čaja chochlatá",
+                    "z": "黑頸叫鴨〔北方叫鴨〕",
+                    "pl": "skrzydłoszpon czarnoszyi",
+                    "da": "Toppet Chaja",
+                    "ca": "txajà collnegre",
+                    "nl": "Witwanghoenderkoet"
+                  },
+                  "rang": "so",
+                  "seq": 4
+                },
+                {
+                  "latijn": "Chauna torquata",
+                  "namen": {
+                    "de": "Halsband-Wehrvogel",
+                    "no": "Kragegjeterfugl",
+                    "ru": "Хохлатая паламедея",
+                    "fi": "töyhtöromisko",
+                    "sv": "tofsvärnfågel",
+                    "pt": "tachã",
+                    "lt": "kuoduotoji pelamedėja",
+                    "en": "Southern Screamer",
+                    "hr": "ogrličasti pastiraš",
+                    "it": "Kaimichi meridionale",
+                    "fr": "Kamichi à collier",
+                    "hu": "örvös csája",
+                    "zh": "冠叫鸭",
+                    "es": "Chajá común",
+                    "et": "kaelus-ogatiib (kaelustšahha)",
+                    "cs": "čája obojková",
+                    "uk": "чайя аргентинська",
+                    "ja": "カンムリサケビドリ",
+                    "sk": "čaja obojková",
+                    "z": "冠叫鴨〔南方叫鴨〕",
+                    "pl": "skrzydłoszpon obrożny",
+                    "da": "Sorthalset Chaja",
+                    "ca": "txajà emplomallat",
+                    "nl": "Kuifhoenderkoet"
+                  },
+                  "rang": "so",
+                  "seq": 5
+                }
+              ],
+              "seq": 3
+            }
+          ],
+          "seq": 2
+        },
+        {
+          "latijn": "Anseranatidae",
+          "rang": "fa",
+          "subrangen": [
+            {
+              "latijn": "Anseranas",
+              "rang": "ge",
+              "subrangen": [
+                {
+                  "latijn": "Anseranas semipalmata",
+                  "namen": {
+                    "de": "Spaltfußgans",
+                    "no": "Skjæregås",
+                    "ru": "Полулапчатый гусь",
+                    "fi": "puuhanhi",
+                    "pt": "ganso-alvinegro",
+                    "lt": "ančiažąsė",
+                    "hr": "dugonoga guska",
+                    "fr": "Canaroie semipalmée",
+                    "hu": "ujjas lúd",
+                    "uk": "урако",
+                    "sk": "husiarka strakatá",
+                    "id": "Boha wasur",
+                    "ca": "oca garsera",
+                    "sv": "skatgås",
+                    "en": "Magpie Goose",
+                    "it": "Oca gazza",
+                    "zh": "鹊雁",
+                    "es": "Ganso urraca",
+                    "et": "harakhani",
+                    "cs": "husovec strakatý",
+                    "ja": "カササギガン",
+                    "z": "鵲鵝",
+                    "pl": "bezpłetwiec",
+                    "da": "Skadegås",
+                    "nl": "Ekstergans"
+                  },
+                  "rang": "so",
+                  "seq": 6
+                }
+              ],
+              "seq": 4
+            }
+          ],
+          "seq": 3
+        }
+      ],
+      "seq": 2
+    }
+  ]
+}

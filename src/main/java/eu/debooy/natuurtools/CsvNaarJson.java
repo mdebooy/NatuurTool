@@ -26,6 +26,9 @@ import eu.debooy.doosutils.access.CsvBestand;
 import eu.debooy.doosutils.components.Message;
 import eu.debooy.doosutils.exception.BestandException;
 import eu.debooy.natuur.domain.RangDto;
+import eu.debooy.natuur.domain.TaxonDto;
+import static eu.debooy.natuur.domain.TaxonDto.PAR_LATIJNSENAAM;
+import static eu.debooy.natuur.domain.TaxonDto.QRY_LATIJNSENAAM;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
@@ -34,10 +37,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 import java.util.ResourceBundle;
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -59,18 +62,35 @@ public class CsvNaarJson extends Batchjob {
 
   private CsvNaarJson() {}
 
-  public static void execute(String[] args) {
-    CsvBestand  csvBestand  = null;
+  private static void addTaxon(String rang, JSONObject taxon) {
+    jsonRangen.get(rang).add(taxon);
+  }
 
+  public static void execute(String[] args) {
     Banner.printDoosBanner(resourceBundle.getString("banner.csvnaarjson"));
 
     if (!setParameters(args)) {
       return;
     }
 
-    em  = getEntityManager();
+    em  = NatuurTools.getEntityManager(parameters.get(NatuurTools.PAR_DBUSER),
+                                       parameters.get(NatuurTools.PAR_DBURL));
 
+    String[]    taxoninfo   = parameters.get(NatuurTools.PAR_TAXAROOT)
+                                        .split(",");
     getRangen();
+
+    CsvBestand  csvBestand  = null;
+    JSONObject  namen       = new JSONObject();
+    TaxonDto    parent      = getTaxon(taxoninfo[1]);
+    JSONObject  taxa        = new JSONObject();
+
+    taxa.put(NatuurTools.KEY_LATIJN, parent.getLatijnsenaam());
+    taxa.put(NatuurTools.KEY_RANG, parent.getRang());
+    taxa.put(NatuurTools.KEY_SEQ, parent.getVolgnummer());
+    parent.getTaxonnamen().forEach(naam -> namen.put(naam.getTaal(),
+                                                     naam.getNaam()));
+    taxa.put(NatuurTools.KEY_NAMEN, namen);
 
     try {
       csvBestand =
@@ -95,6 +115,13 @@ public class CsvNaarJson extends Batchjob {
       }
     }
 
+    taxa.put(NatuurTools.KEY_SUBRANGEN, jsonRangen.get("so"));
+    NatuurTools.writeJson(parameters.get(PAR_UITVOERDIR)
+                           + parameters.get(PAR_JSONBESTAND) + EXT_JSON, taxa,
+                          parameters.get(PAR_CHARSETUIT));
+    System.out.println(parameters.get(PAR_UITVOERDIR)
+                           + parameters.get(PAR_JSONBESTAND) + EXT_JSON);
+
     DoosUtils.naarScherm();
     rangen.forEach(rang -> {
       Integer volgnummer  = totalen.get(rang);
@@ -107,23 +134,6 @@ public class CsvNaarJson extends Batchjob {
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(getMelding(MSG_KLAAR));
     DoosUtils.naarScherm();
-  }
-
-  private static EntityManager getEntityManager() {
-    String      password  =
-        DoosUtils.getWachtwoord(MessageFormat.format(
-            resourceBundle.getString(NatuurTools.LBL_WACHTWOORD),
-            parameters.get(NatuurTools.PAR_DBUSER),
-            parameters.get(NatuurTools.PAR_DBURL).split("/")[1]));
-    Properties  props     = new Properties();
-
-    props.put("openjpa.ConnectionURL",
-              "jdbc:postgresql://" + parameters.get(NatuurTools.PAR_DBURL));
-    props.put("openjpa.ConnectionUserName",
-              parameters.get(NatuurTools.PAR_DBUSER));
-    props.put("openjpa.ConnectionPassword", password);
-    return Persistence.createEntityManagerFactory("natuur", props)
-                      .createEntityManager();
   }
 
   private static void getRangen() {
@@ -141,6 +151,21 @@ public class CsvNaarJson extends Batchjob {
     });
   }
 
+  private static TaxonDto getTaxon(String latijnsenaam) {
+    em.getTransaction().begin();
+    Query query = em.createNamedQuery(QRY_LATIJNSENAAM);
+    em.getTransaction().commit();
+    query.setParameter(PAR_LATIJNSENAAM, latijnsenaam);
+    TaxonDto  resultaat;
+    try {
+      resultaat = (TaxonDto) query.getSingleResult();
+    } catch (NoResultException e) {
+      resultaat = new TaxonDto();
+    }
+
+    return resultaat;
+  }
+
   private static Integer getVolgnummer(String rang) {
     Integer volgnummer  = totalen.get(rang) + 1;
 
@@ -153,20 +178,16 @@ public class CsvNaarJson extends Batchjob {
     DoosUtils.naarScherm("java -jar NatuurTools.jar CsvNaarJson "
         + getMelding(LBL_OPTIE) + " "
         + MessageFormat.format(
-              getMelding(LBL_PARAM),
-              NatuurTools.PAR_CSVBESTAND,
+              getMelding(LBL_PARAM), PAR_CSVBESTAND,
               resourceBundle.getString(NatuurTools.LBL_CSVBESTAND)) + " "
         + MessageFormat.format(
-              getMelding(LBL_PARAM),
-              NatuurTools.PAR_DBURL,
+              getMelding(LBL_PARAM), NatuurTools.PAR_DBURL,
               resourceBundle.getString(NatuurTools.LBL_DBURL)) + " "
         + MessageFormat.format(
-              getMelding(LBL_PARAM),
-              NatuurTools.PAR_DBUSER,
+              getMelding(LBL_PARAM), NatuurTools.PAR_DBUSER,
               resourceBundle.getString(NatuurTools.LBL_DBUSER)) + " "
         + MessageFormat.format(
-              getMelding(LBL_PARAM),
-              NatuurTools.PAR_TAXAROOT,
+              getMelding(LBL_PARAM), NatuurTools.PAR_TAXAROOT,
               resourceBundle.getString(NatuurTools.LBL_TAXAROOT)), 80);
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(getParameterTekst(PAR_CHARSETIN, 12),
@@ -187,7 +208,7 @@ public class CsvNaarJson extends Batchjob {
     DoosUtils.naarScherm(getParameterTekst(PAR_JSONBESTAND, 12),
                          resourceBundle.getString(NatuurTools.HLP_IOCJSON),
                          80);
-    DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_TAAL, 12),
+    DoosUtils.naarScherm(getParameterTekst(PAR_TAAL, 12),
         MessageFormat.format(resourceBundle.getString(NatuurTools.HLP_TAAL),
                              Locale.getDefault().getLanguage()), 80);
     DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_TAXAROOT, 12),
@@ -199,8 +220,8 @@ public class CsvNaarJson extends Batchjob {
     DoosUtils.naarScherm(
         MessageFormat.format(getMelding(HLP_PARAMSVERPLICHT),
                              PAR_CSVBESTAND + ", " + NatuurTools.PAR_DBURL
-                              + ", " + NatuurTools.PAR_DBUSER),
-                             NatuurTools.PAR_TAXAROOT,
+                              + ", " + NatuurTools.PAR_DBUSER,
+                             NatuurTools.PAR_TAXAROOT),
                              80);
     DoosUtils.naarScherm();
   }
@@ -242,7 +263,7 @@ public class CsvNaarJson extends Batchjob {
     setDirParameter(arguments, PAR_INVOERDIR);
     setBestandParameter(arguments, PAR_JSONBESTAND, EXT_JSON);
     if (!hasParameter(PAR_JSONBESTAND)) {
-      setParameter(PAR_JSONBESTAND, getParameter(NatuurTools.PAR_IOCBESTAND));
+      setParameter(PAR_JSONBESTAND, getParameter(NatuurTools.PAR_CSVBESTAND));
     }
     setParameter(arguments, PAR_TAAL, Locale.getDefault().getLanguage());
     setParameter(arguments, NatuurTools.PAR_TAXAROOT);
@@ -279,6 +300,23 @@ public class CsvNaarJson extends Batchjob {
       String    rang          = veld[0];
       String    latijnsenaam  = veld[1];
       String    naam          = veld[2];
+
+      verwerkTaxon(rang, latijnsenaam, naam, taal);
     }
+  }
+
+  private static void verwerkTaxon(String rang, String latijnsenaam,
+                                   String naam, String taal) {
+    JSONObject  namen       = new JSONObject();
+    JSONObject  taxon       = new JSONObject();
+    Integer     volgnummer  = getVolgnummer(rang);
+
+    namen.put(taal, naam);
+    taxon.put(NatuurTools.KEY_LATIJN, latijnsenaam);
+    taxon.put(NatuurTools.KEY_NAMEN, namen);
+    taxon.put(NatuurTools.KEY_RANG, rang);
+    taxon.put(NatuurTools.KEY_SEQ, volgnummer);
+
+    addTaxon(rang, taxon);
   }
 }
