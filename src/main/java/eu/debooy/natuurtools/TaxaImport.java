@@ -89,8 +89,16 @@ public class TaxaImport extends Batchjob {
       Collections.sort(talen);
     }
 
-    em  = NatuurTools.getEntityManager(parameters.get(NatuurTools.PAR_DBUSER),
-                                       parameters.get(NatuurTools.PAR_DBURL));
+    if (parameters.containsKey(NatuurTools.PAR_WACHTWOORD)) {
+      em  = NatuurTools.getEntityManager(
+                parameters.get(NatuurTools.PAR_DBUSER),
+                parameters.get(NatuurTools.PAR_DBURL),
+                parameters.get(NatuurTools.PAR_WACHTWOORD));
+    } else {
+      em  = NatuurTools.getEntityManager(
+                parameters.get(NatuurTools.PAR_DBUSER),
+                parameters.get(NatuurTools.PAR_DBURL));
+    }
 
     getRangen();
 
@@ -209,7 +217,8 @@ public class TaxaImport extends Batchjob {
                                            JSONObject taxonnamen) {
     for (Object key : taxonnamen.keySet()) {
       String  taal  = key.toString();
-      if (isTaalValid(taal)) {
+      if (isTaalValid(taal)
+          && DoosUtils.isNotBlankOrNull(taxonnamen.get(taal))) {
         TaxonnaamDto  taxonnaamDto;
         if (taxon.hasTaxonnaam(taal)) {
           taxonnaamDto  = taxon.getTaxonnaam(taal);
@@ -329,6 +338,9 @@ public class TaxaImport extends Batchjob {
     DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_TALEN, 14),
                          resourceBundle.getString(NatuurTools.HLP_INCLUDETALEN),
                          80);
+    DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_WACHTWOORD, 12),
+                         resourceBundle.getString(NatuurTools.HLP_WACHTWOORD),
+                         80);
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(
         MessageFormat.format(getMelding(HLP_PARAMSVERPLICHT),
@@ -359,7 +371,8 @@ public class TaxaImport extends Batchjob {
                                           PAR_JSONBESTAND,
                                           PAR_READONLY,
                                           NatuurTools.PAR_SKIPSTRUCTUUR,
-                                          NatuurTools.PAR_TALEN});
+                                          NatuurTools.PAR_TALEN,
+                                          NatuurTools.PAR_WACHTWOORD});
     arguments.setVerplicht(new String[] {PAR_JSONBESTAND,
                                          NatuurTools.PAR_DBURL,
                                          NatuurTools.PAR_DBUSER});
@@ -380,6 +393,7 @@ public class TaxaImport extends Batchjob {
     setParameter(arguments, NatuurTools.PAR_SKIPSTRUCTUUR,
                  DoosConstants.ONWAAR);
     NatuurTools.setTalenParameter(arguments, parameters);
+    setParameter(arguments, NatuurTools.PAR_WACHTWOORD);
 
     if (DoosUtils.nullToEmpty(parameters.get(PAR_JSONBESTAND))
                  .contains(File.separator)) {

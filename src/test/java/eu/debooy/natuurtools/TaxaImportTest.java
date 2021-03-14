@@ -55,7 +55,7 @@ public class TaxaImportTest extends BatchTest {
 
     VangOutEnErr.execute(TaxaImport.class, "execute", args, out, err);
 
-    assertEquals("Bestand met directory - helptekst", 30, out.size());
+    assertEquals("Bestand met directory - helptekst", 31, out.size());
     assertEquals("Bestand met directory - fouten", 2, err.size());
   }
 
@@ -65,7 +65,7 @@ public class TaxaImportTest extends BatchTest {
 
     VangOutEnErr.execute(TaxaImport.class, "execute", args, out, err);
 
-    assertEquals("Zonder parameters - helptekst", 30, out.size());
+    assertEquals("Zonder parameters - helptekst", 31, out.size());
     assertEquals("Zonder parameters - fouten", 1, err.size());
   }
 }
