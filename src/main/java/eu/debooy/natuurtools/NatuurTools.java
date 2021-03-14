@@ -53,6 +53,7 @@ public class NatuurTools extends Batchjob {
   protected static final  String  HLP_TAAL          = "help.taal";
   protected static final  String  HLP_TALEN         = "help.talen";
   protected static final  String  HLP_TAXAROOT      = "help.taxaroot";
+  protected static final  String  HLP_WACHTWOORD    = "help.wachtwoord";
 
   protected static final  String  KEY_LATIJN    = "latijn";
   protected static final  String  KEY_NAMEN     = "namen";
@@ -92,19 +93,25 @@ public class NatuurTools extends Batchjob {
   protected static final  String  PAR_SKIPSTRUCTUUR = "skipstructuur";
   protected static final  String  PAR_TALEN         = "talen";
   protected static final  String  PAR_TAXAROOT      = "taxaroot";
+  protected static final  String  PAR_WACHTWOORD    = "wachtwoord";
 
   private NatuurTools() {}
 
   protected static EntityManager getEntityManager(String dbuser, String dburl) {
-    String      password  =
+    String  wachtwoord  =
         DoosUtils.getWachtwoord(MessageFormat.format(
             resourceBundle.getString(NatuurTools.LBL_WACHTWOORD),
             dbuser, dburl.split("/")[1]));
+    return getEntityManager(dbuser, dburl, wachtwoord);
+  }
+
+  protected static EntityManager getEntityManager(String dbuser, String dburl,
+                                                  String wachtwoord) {
     Properties  props     = new Properties();
 
     props.put("openjpa.ConnectionURL",      "jdbc:postgresql://" + dburl);
     props.put("openjpa.ConnectionUserName", dbuser);
-    props.put("openjpa.ConnectionPassword", password);
+    props.put("openjpa.ConnectionPassword", wachtwoord);
 
     return Persistence.createEntityManagerFactory("natuur", props)
                       .createEntityManager();

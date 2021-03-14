@@ -35,7 +35,7 @@ public class CsvNaarJsonTest extends BatchTest {
 
     VangOutEnErr.execute(CsvNaarJson.class, "execute", args, out, err);
 
-    assertEquals("Zonder parameters - helptekst", 30, out.size());
+    assertEquals("Zonder parameters - helptekst", 31, out.size());
     assertEquals("Zonder parameters - fouten", 1, err.size());
   }
 }

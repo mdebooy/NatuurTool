@@ -43,6 +43,8 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 
 /**
@@ -52,18 +54,43 @@ public class CsvNaarJson extends Batchjob {
   private static final  ResourceBundle  resourceBundle  =
       ResourceBundle.getBundle("ApplicatieResources", Locale.getDefault());
 
+  private static final  String  RANG_GESLACHT   = "ge";
+  private static final  String  RANG_ONDERSOORT = "oso";
+  private static final  String  RANG_SOORT      = "so";
+
   private static final  Map<String, JSONObject> jsonRang    = new HashMap<>();
   private static final  Map<String, JSONArray>  jsonRangen  = new HashMap<>();
+  private static final  JSONParser              parser      = new JSONParser();
   private static final  List<String>            rangen      = new ArrayList<>();
   private static final  Map<String, Integer>    totalen     = new HashMap<>();
 
   private static  EntityManager em;
-  private static  Integer       lijnen  = 0;
+  private static  Integer       lijnen      = 0;
+  private static  String        root        = "";
+  private static  String        taal        = "";
+  private static  String        vorigeRang  = "";
 
   private CsvNaarJson() {}
 
-  private static void addTaxon(String rang, JSONObject taxon) {
-    jsonRangen.get(rang).add(taxon);
+  private static void controleerHierarchie(String rang, String latijnsenaam)
+      throws ParseException {
+    // Genereer het geslacht als deze niet in het bestand staat.
+    if (rang.equals(RANG_SOORT)) {
+      genereerRang(RANG_GESLACHT, latijnsenaam.split(" ")[0]);
+    }
+
+    // Genereer het soort als deze niet in het bestand staat.
+    if (rang.equals(RANG_ONDERSOORT)) {
+      String[]  woorden = latijnsenaam.split(" ");
+      genereerRang(RANG_SOORT, woorden[0] + " " + woorden[1]);
+    }
+
+    if (!rang.equals(vorigeRang)) {
+      if (rangen.indexOf(vorigeRang) > rangen.indexOf(rang)) {
+        samenvoegen(rang);
+      }
+      vorigeRang  = rang;
+    }
   }
 
   public static void execute(String[] args) {
@@ -73,8 +100,18 @@ public class CsvNaarJson extends Batchjob {
       return;
     }
 
-    em  = NatuurTools.getEntityManager(parameters.get(NatuurTools.PAR_DBUSER),
-                                       parameters.get(NatuurTools.PAR_DBURL));
+    if (parameters.containsKey(NatuurTools.PAR_WACHTWOORD)) {
+      em  = NatuurTools.getEntityManager(
+                parameters.get(NatuurTools.PAR_DBUSER),
+                parameters.get(NatuurTools.PAR_DBURL),
+                parameters.get(NatuurTools.PAR_WACHTWOORD));
+    } else {
+      em  = NatuurTools.getEntityManager(
+                parameters.get(NatuurTools.PAR_DBUSER),
+                parameters.get(NatuurTools.PAR_DBURL));
+    }
+
+    taal  = parameters.get(PAR_TAAL);
 
     String[]    taxoninfo   = parameters.get(NatuurTools.PAR_TAXAROOT)
                                         .split(",");
@@ -83,14 +120,16 @@ public class CsvNaarJson extends Batchjob {
     CsvBestand  csvBestand  = null;
     JSONObject  namen       = new JSONObject();
     TaxonDto    parent      = getTaxon(taxoninfo[1]);
-    JSONObject  taxa        = new JSONObject();
 
-    taxa.put(NatuurTools.KEY_LATIJN, parent.getLatijnsenaam());
-    taxa.put(NatuurTools.KEY_RANG, parent.getRang());
-    taxa.put(NatuurTools.KEY_SEQ, parent.getVolgnummer());
+    root        = parent.getRang();
+    vorigeRang  = root;
+
+    jsonRang.get(root).put(NatuurTools.KEY_LATIJN, parent.getLatijnsenaam());
+    jsonRang.get(root).put(NatuurTools.KEY_RANG, root);
+    jsonRang.get(root).put(NatuurTools.KEY_SEQ, parent.getVolgnummer());
     parent.getTaxonnamen().forEach(naam -> namen.put(naam.getTaal(),
                                                      naam.getNaam()));
-    taxa.put(NatuurTools.KEY_NAMEN, namen);
+    jsonRang.get(root).put(NatuurTools.KEY_NAMEN, namen);
 
     try {
       csvBestand =
@@ -102,8 +141,8 @@ public class CsvNaarJson extends Batchjob {
                         .setHeader(false)
                         .build();
 
-      verwerkCsv(csvBestand, parameters.get(PAR_TAAL));
-    } catch (BestandException e) {
+      verwerkCsv(csvBestand);
+    } catch (BestandException | ParseException e) {
       DoosUtils.foutNaarScherm(e.getLocalizedMessage());
     } finally {
       if (null != csvBestand) {
@@ -115,12 +154,16 @@ public class CsvNaarJson extends Batchjob {
       }
     }
 
-    taxa.put(NatuurTools.KEY_SUBRANGEN, jsonRangen.get("so"));
-    NatuurTools.writeJson(parameters.get(PAR_UITVOERDIR)
-                           + parameters.get(PAR_JSONBESTAND) + EXT_JSON, taxa,
-                          parameters.get(PAR_CHARSETUIT));
-    System.out.println(parameters.get(PAR_UITVOERDIR)
-                           + parameters.get(PAR_JSONBESTAND) + EXT_JSON);
+    try {
+      samenvoegen(root);
+
+      NatuurTools.writeJson(parameters.get(PAR_UITVOERDIR)
+                             + parameters.get(PAR_JSONBESTAND) + EXT_JSON,
+                            jsonRang.get(root),
+                            parameters.get(PAR_CHARSETUIT));
+    } catch (ParseException e) {
+      DoosUtils.foutNaarScherm("json: " + e.getLocalizedMessage());
+    }
 
     DoosUtils.naarScherm();
     rangen.forEach(rang -> {
@@ -134,6 +177,18 @@ public class CsvNaarJson extends Batchjob {
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(getMelding(MSG_KLAAR));
     DoosUtils.naarScherm();
+  }
+
+  private static void genereerRang(String rang, String latijnsenaam)
+      throws ParseException {
+    if (!jsonRang.get(rang).isEmpty()) {
+      if (!jsonRang.get(rang).get(NatuurTools.KEY_LATIJN)
+                  .equals(latijnsenaam)) {
+        verwerkTaxon(rang, latijnsenaam, "");
+      }
+    } else {
+      verwerkTaxon(rang, latijnsenaam, "");
+    }
   }
 
   private static void getRangen() {
@@ -216,6 +271,9 @@ public class CsvNaarJson extends Batchjob {
                          80);
     DoosUtils.naarScherm(getParameterTekst(PAR_UITVOERDIR, 12),
                          getMelding(HLP_UITVOERDIR), 80);
+    DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_WACHTWOORD, 12),
+                         resourceBundle.getString(NatuurTools.HLP_WACHTWOORD),
+                         80);
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(
         MessageFormat.format(getMelding(HLP_PARAMSVERPLICHT),
@@ -231,6 +289,45 @@ public class CsvNaarJson extends Batchjob {
       DoosUtils.foutNaarScherm(getMelding(LBL_FOUT, fout.toString())));
   }
 
+  private static void samenvoegen(String root) throws ParseException {
+    Integer iRoot   = rangen.indexOf(root);
+    String  laatste = rangen.get(rangen.size()-1);
+
+    // Laagste rang kan geen subrangen hebben.
+    if (!jsonRang.get(laatste).isEmpty()) {
+      jsonRangen.get(laatste).add(parser.parse(jsonRang.get(laatste)
+                                                       .toString()));
+      jsonRang.get(laatste).clear();
+    }
+
+    for (int i = rangen.size()-2; i > iRoot; i--) {
+      String  rang    = rangen.get(i);
+      if (!jsonRang.get(rang).isEmpty()) {
+        if (!jsonRangen.get(laatste).isEmpty()) {
+          jsonRang.get(rang).put(NatuurTools.KEY_SUBRANGEN,
+                                 parser.parse(jsonRangen.get(laatste)
+                                                        .toString()));
+          jsonRangen.get(laatste).clear();
+        }
+        jsonRangen.get(rang).add(parser.parse(jsonRang.get(rang)
+                                                      .toString()));
+        jsonRang.get(rang).clear();
+        laatste = rang;
+      } else {
+        if (!jsonRangen.get(rang).isEmpty()) {
+          jsonRangen.get(rang).add(parser.parse(jsonRangen.get(laatste)
+                                                          .toString()));
+          jsonRang.get(laatste).clear();
+          laatste = rang;
+        }
+      }
+    }
+
+    jsonRang.get(root).put(NatuurTools.KEY_SUBRANGEN,
+                            parser.parse(jsonRangen.get(laatste).toString()));
+    jsonRangen.get(laatste).clear();
+  }
+
   private static boolean setParameters(String[] args) {
     Arguments     arguments = new Arguments(args);
     List<String>  fouten    = new ArrayList<>();
@@ -244,7 +341,8 @@ public class CsvNaarJson extends Batchjob {
                                           PAR_JSONBESTAND,
                                           PAR_TAAL,
                                           NatuurTools.PAR_TAXAROOT,
-                                          PAR_UITVOERDIR});
+                                          PAR_UITVOERDIR,
+                                          NatuurTools.PAR_WACHTWOORD});
     arguments.setVerplicht(new String[] {PAR_CSVBESTAND,
                                          NatuurTools.PAR_DBURL,
                                          NatuurTools.PAR_DBUSER,
@@ -263,11 +361,12 @@ public class CsvNaarJson extends Batchjob {
     setDirParameter(arguments, PAR_INVOERDIR);
     setBestandParameter(arguments, PAR_JSONBESTAND, EXT_JSON);
     if (!hasParameter(PAR_JSONBESTAND)) {
-      setParameter(PAR_JSONBESTAND, getParameter(NatuurTools.PAR_CSVBESTAND));
+      setParameter(PAR_JSONBESTAND, getParameter(PAR_CSVBESTAND));
     }
     setParameter(arguments, PAR_TAAL, Locale.getDefault().getLanguage());
     setParameter(arguments, NatuurTools.PAR_TAXAROOT);
     setDirParameter(arguments, PAR_UITVOERDIR, getParameter(PAR_INVOERDIR));
+    setParameter(arguments, NatuurTools.PAR_WACHTWOORD);
 
     if (DoosUtils.nullToEmpty(parameters.get(PAR_CSVBESTAND))
                  .contains(File.separator)) {
@@ -292,8 +391,8 @@ public class CsvNaarJson extends Batchjob {
     return false;
   }
 
-  private static void verwerkCsv(CsvBestand csvBestand, String taal)
-      throws BestandException {
+  private static void verwerkCsv(CsvBestand csvBestand)
+      throws BestandException, ParseException {
     while (csvBestand.hasNext()) {
       lijnen++;
       String[]  veld          = csvBestand.next();
@@ -301,22 +400,32 @@ public class CsvNaarJson extends Batchjob {
       String    latijnsenaam  = veld[1];
       String    naam          = veld[2];
 
-      verwerkTaxon(rang, latijnsenaam, naam, taal);
+      verwerkTaxon(rang, latijnsenaam, naam);
     }
   }
 
   private static void verwerkTaxon(String rang, String latijnsenaam,
-                                   String naam, String taal) {
+                                   String naam)
+      throws ParseException {
     JSONObject  namen       = new JSONObject();
-    JSONObject  taxon       = new JSONObject();
     Integer     volgnummer  = getVolgnummer(rang);
 
-    namen.put(taal, naam);
-    taxon.put(NatuurTools.KEY_LATIJN, latijnsenaam);
-    taxon.put(NatuurTools.KEY_NAMEN, namen);
-    taxon.put(NatuurTools.KEY_RANG, rang);
-    taxon.put(NatuurTools.KEY_SEQ, volgnummer);
+    controleerHierarchie(rang, latijnsenaam);
 
-    addTaxon(rang, taxon);
+    if (!jsonRang.get(rang).isEmpty()) {
+      jsonRangen.get(rang).add(parser.parse(jsonRang.get(rang).toString()));
+      jsonRang.get(rang).clear();
+    }
+
+    if (DoosUtils.isNotBlankOrNull(naam)) {
+      namen.put(taal, naam);
+    }
+    jsonRang.get(rang).put(NatuurTools.KEY_LATIJN, latijnsenaam);
+    if (!namen.isEmpty()) {
+      jsonRang.get(rang).put(NatuurTools.KEY_NAMEN,
+                             parser.parse(namen.toString()));
+    }
+    jsonRang.get(rang).put(NatuurTools.KEY_RANG, rang);
+    jsonRang.get(rang).put(NatuurTools.KEY_SEQ, volgnummer);
   }
 }
