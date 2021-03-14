@@ -207,7 +207,7 @@ public class TaxaImport extends Batchjob {
       setTaxon(taxon);
       DoosUtils.naarScherm(MessageFormat.format(
                     resourceBundle.getString(NatuurTools.MSG_WIJZIGING),
-                    prefix.get(taxon.getRang()) + "   ",
+                    prefix.get(taxon.getRang()) + "    ",
                     resourceBundle.getString(NatuurTools.MSG_HIERARCHIE),
                     verandering.toString().trim()));
     }
@@ -227,7 +227,7 @@ public class TaxaImport extends Batchjob {
             DoosUtils.naarScherm(
                 MessageFormat.format(
                     resourceBundle.getString(NatuurTools.MSG_VERSCHIL),
-                    prefix.get(taxon.getRang()) + "   ", taal,
+                    prefix.get(taxon.getRang()) + "    ", taal,
                     taxonnamen.get(taal), taxonnaamDto.getNaam()));
             taxonnaamDto.setNaam(taxonnamen.get(taal).toString());
             setTaxonnaam(taxonnaamDto);
@@ -236,7 +236,7 @@ public class TaxaImport extends Batchjob {
           DoosUtils.naarScherm(
                 MessageFormat.format(
                     resourceBundle.getString(NatuurTools.MSG_NIEUW),
-                    prefix.get(taxon.getRang()) + "   ", taal,
+                    prefix.get(taxon.getRang()) + "    ", taal,
                     taxonnamen.get(taal)));
           taxonnaamDto  = new TaxonnaamDto();
           taxonnaamDto.setNaam(taxonnamen.get(taal).toString());
@@ -268,7 +268,7 @@ public class TaxaImport extends Batchjob {
 
     ranglijst.forEach(rang -> {
       prefix.put(rang.getRang(),
-                 String.format("%" + rang.getNiveau() + "s", " "));
+                 DoosUtils.stringMetLengte("", rang.getNiveau().intValue()));
       rangen.add(rang.getRang());
       totalen.put(rang.getRang(), 0);
     });
@@ -478,7 +478,7 @@ public class TaxaImport extends Batchjob {
     Integer seq           =
         Integer.valueOf(json.get(NatuurTools.KEY_SEQ).toString());
 
-    DoosUtils.naarScherm(String.format("%s%3s %s",
+    DoosUtils.naarScherm(String.format("%s%-3s %s",
                                        prefix.get(rang), rang, latijnsenaam));
 
     TaxonDto  taxon = getTaxon(latijnsenaam, parentId, seq, rang);
