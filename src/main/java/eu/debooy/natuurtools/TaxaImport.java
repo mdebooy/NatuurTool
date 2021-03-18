@@ -278,8 +278,8 @@ public class TaxaImport extends Batchjob {
                                    Integer volgnummer, String rang) {
     em.getTransaction().begin();
     Query query = em.createNamedQuery(QRY_LATIJNSENAAM);
-    em.getTransaction().commit();
     query.setParameter(PAR_LATIJNSENAAM, latijnsenaam);
+    em.getTransaction().commit();
     TaxonDto  resultaat;
     try {
       resultaat = (TaxonDto) query.getSingleResult();
