@@ -315,16 +315,25 @@ public class CsvNaarJson extends Batchjob {
         laatste = rang;
       } else {
         if (!jsonRangen.get(rang).isEmpty()) {
-          jsonRangen.get(rang).add(parser.parse(jsonRangen.get(laatste)
-                                                          .toString()));
-          jsonRang.get(laatste).clear();
+          if (!jsonRangen.get(laatste).isEmpty()) {
+            for (Object subrang : (JSONArray) jsonRangen.get(laatste)) {
+              jsonRangen.get(rang).add(parser.parse(subrang.toString()));
+            }
+            jsonRangen.get(laatste).clear();
+          }
           laatste = rang;
         }
       }
     }
 
-    jsonRang.get(root).put(NatuurTools.KEY_SUBRANGEN,
-                            parser.parse(jsonRangen.get(laatste).toString()));
+    if (!jsonRang.get(root).isEmpty()) {
+      jsonRang.get(root).put(NatuurTools.KEY_SUBRANGEN,
+                             parser.parse(jsonRangen.get(laatste).toString()));
+    } else {
+      for (Object subrang : (JSONArray) jsonRangen.get(laatste)) {
+        jsonRangen.get(root).add(parser.parse(subrang.toString()));
+      }
+    }
     jsonRangen.get(laatste).clear();
   }
 
