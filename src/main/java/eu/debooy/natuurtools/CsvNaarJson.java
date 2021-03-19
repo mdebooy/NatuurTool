@@ -54,10 +54,6 @@ public class CsvNaarJson extends Batchjob {
   private static final  ResourceBundle  resourceBundle  =
       ResourceBundle.getBundle("ApplicatieResources", Locale.getDefault());
 
-  private static final  String  RANG_GESLACHT   = "ge";
-  private static final  String  RANG_ONDERSOORT = "oso";
-  private static final  String  RANG_SOORT      = "so";
-
   private static final  Map<String, JSONObject> jsonRang    = new HashMap<>();
   private static final  Map<String, JSONArray>  jsonRangen  = new HashMap<>();
   private static final  JSONParser              parser      = new JSONParser();
@@ -66,7 +62,6 @@ public class CsvNaarJson extends Batchjob {
 
   private static  EntityManager em;
   private static  Integer       lijnen      = 0;
-  private static  String        root        = "";
   private static  String        taal        = "";
   private static  String        vorigeRang  = "";
 
@@ -75,14 +70,14 @@ public class CsvNaarJson extends Batchjob {
   private static void controleerHierarchie(String rang, String latijnsenaam)
       throws ParseException {
     // Genereer het geslacht als deze niet in het bestand staat.
-    if (rang.equals(RANG_SOORT)) {
-      genereerRang(RANG_GESLACHT, latijnsenaam.split(" ")[0]);
+    if (rang.equals(NatuurTools.RANG_SOORT)) {
+      genereerRang(NatuurTools.RANG_GESLACHT, latijnsenaam.split(" ")[0]);
     }
 
     // Genereer het soort als deze niet in het bestand staat.
-    if (rang.equals(RANG_ONDERSOORT)) {
+    if (rang.equals(NatuurTools.RANG_ONDERSOORT)) {
       String[]  woorden = latijnsenaam.split(" ");
-      genereerRang(RANG_SOORT, woorden[0] + " " + woorden[1]);
+      genereerRang(NatuurTools.RANG_SOORT, woorden[0] + " " + woorden[1]);
     }
 
     if (!rang.equals(vorigeRang)) {
@@ -120,8 +115,7 @@ public class CsvNaarJson extends Batchjob {
     CsvBestand  csvBestand  = null;
     JSONObject  namen       = new JSONObject();
     TaxonDto    parent      = getTaxon(taxoninfo[1]);
-
-    root        = parent.getRang();
+    String      root        = parent.getRang();
     vorigeRang  = root;
 
     jsonRang.get(root).put(NatuurTools.KEY_LATIJN, parent.getLatijnsenaam());
@@ -173,7 +167,9 @@ public class CsvNaarJson extends Batchjob {
                 rang, totalen.get(rang)));
       }
     });
-    DoosUtils.naarScherm(String.format("lijnen: %,6d", lijnen));
+    DoosUtils.naarScherm(
+        MessageFormat.format(resourceBundle.getString(NatuurTools.MSG_LIJNEN),
+                             String.format("%,6d", lijnen)));
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(getMelding(MSG_KLAAR));
     DoosUtils.naarScherm();
@@ -284,6 +280,30 @@ public class CsvNaarJson extends Batchjob {
     DoosUtils.naarScherm();
   }
 
+  protected static String naarRang(String rang, String laatste)
+      throws ParseException {
+    if (!jsonRangen.get(laatste).isEmpty()) {
+      jsonRang.get(rang).put(NatuurTools.KEY_SUBRANGEN,
+                             parser.parse(jsonRangen.get(laatste)
+                                                    .toString()));
+      jsonRangen.get(laatste).clear();
+    }
+    jsonRangen.get(rang).add(parser.parse(jsonRang.get(rang)
+                                                  .toString()));
+    jsonRang.get(rang).clear();
+    return rang;
+  }
+
+  protected static String naarRangen(String rang, String laatste)
+      throws ParseException {
+    for (Object subrang : (JSONArray) jsonRangen.get(laatste)) {
+      jsonRangen.get(rang).add(parser.parse(subrang.toString()));
+    }
+    jsonRangen.get(laatste).clear();
+
+    return rang;
+  }
+
   protected static void printMessages(List<Message> fouten) {
     fouten.forEach(fout ->
       DoosUtils.foutNaarScherm(getMelding(LBL_FOUT, fout.toString())));
@@ -303,25 +323,11 @@ public class CsvNaarJson extends Batchjob {
     for (int i = rangen.size()-2; i > iRoot; i--) {
       String  rang    = rangen.get(i);
       if (!jsonRang.get(rang).isEmpty()) {
-        if (!jsonRangen.get(laatste).isEmpty()) {
-          jsonRang.get(rang).put(NatuurTools.KEY_SUBRANGEN,
-                                 parser.parse(jsonRangen.get(laatste)
-                                                        .toString()));
-          jsonRangen.get(laatste).clear();
-        }
-        jsonRangen.get(rang).add(parser.parse(jsonRang.get(rang)
-                                                      .toString()));
-        jsonRang.get(rang).clear();
-        laatste = rang;
+        laatste = naarRang(rang, laatste);
       } else {
-        if (!jsonRangen.get(rang).isEmpty()) {
-          if (!jsonRangen.get(laatste).isEmpty()) {
-            for (Object subrang : (JSONArray) jsonRangen.get(laatste)) {
-              jsonRangen.get(rang).add(parser.parse(subrang.toString()));
-            }
-            jsonRangen.get(laatste).clear();
-          }
-          laatste = rang;
+        if (!jsonRangen.get(rang).isEmpty()
+            && !jsonRangen.get(laatste).isEmpty()) {
+          laatste = naarRangen(rang, laatste);
         }
       }
     }

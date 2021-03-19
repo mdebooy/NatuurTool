@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -48,22 +49,27 @@ public class IocNamen extends Batchjob {
   private static final  JSONObject      orde            = new JSONObject();
   private static final  JSONArray       ordes           = new JSONArray();
   private static final  JSONParser      parser          = new JSONParser();
+  private static final  List<String>    rangen          = new ArrayList<>();
   private static final  ResourceBundle  resourceBundle  =
       ResourceBundle.getBundle("ApplicatieResources", Locale.getDefault());
   private static final  JSONObject      soort           = new JSONObject();
   private static final  JSONArray       soorten         = new JSONArray();
+  private static final  Map<String, Integer>
+                                        totalen = new HashMap<>();
+
+  private static  String[]  taal;
+  private static  String    vorigGeslacht = "";
 
   private IocNamen() {}
+
+  private static void addRang(String rang) {
+    totalen.put(rang, totalen.get(rang)+1);
+  }
 
   public static void execute(String[] args) {
     CsvBestand    csvBestand        = null;
     int           lijnen            = -1;
-    int           nFamilies         = 0;
-    int           nGeslachten       = 0;
-    int           nOrdes            = 0;
-    int           nSoorten          = 0;
     JSONObject    taxa              = new JSONObject();
-    String        vorigGeslacht     = "";
 
     Banner.printDoosBanner(resourceBundle.getString("banner.iocnamen"));
 
@@ -71,7 +77,8 @@ public class IocNamen extends Batchjob {
       return;
     }
 
-    String[]  taal  = parameters.get(NatuurTools.PAR_TALEN).split(",");
+    taal  = parameters.get(NatuurTools.PAR_TALEN).split(",");
+    setRangen();
 
     try {
       csvBestand  =
@@ -87,59 +94,11 @@ public class IocNamen extends Batchjob {
 
       while (csvBestand.hasNext()) {
         lijnen++;
-        String[]  veld = csvBestand.next();
-        // Nieuwe Orde
-        if (DoosUtils.isNotBlankOrNull(veld[1])) {
-          nieuweOrde();
-          nOrdes++;
-          orde.put(NatuurTools.KEY_SEQ, nOrdes);
-          orde.put(NatuurTools.KEY_RANG, "or");
-          orde.put(NatuurTools.KEY_LATIJN,
-                   veld[1].substring(0, 1).toUpperCase()
-                   + veld[1].substring(1).toLowerCase());
-        }
-        // Nieuwe familie
-        if (DoosUtils.isNotBlankOrNull(veld[2])) {
-          nieuweFamilie();
-          nFamilies++;
-          familie.put(NatuurTools.KEY_SEQ, nFamilies);
-          familie.put(NatuurTools.KEY_RANG, "fa");
-          familie.put(NatuurTools.KEY_LATIJN,
-                   veld[2].substring(0, 1).toUpperCase()
-                   + veld[2].substring(1).toLowerCase());
-        }
-
-        // Nieuw soort
-        if (DoosUtils.isNotBlankOrNull(veld[3])) {
-          String  naam  = veld[3].split(" ")[0];
-          // Nieuw geslacht?
-          if (!naam.equals(vorigGeslacht)) {
-            nieuwGeslacht();
-            nGeslachten++;
-            geslacht.put(NatuurTools.KEY_SEQ, nGeslachten);
-            geslacht.put(NatuurTools.KEY_RANG, "ge");
-            geslacht.put(NatuurTools.KEY_LATIJN,
-                     naam.substring(0, 1).toUpperCase()
-                     + naam.substring(1).toLowerCase());
-            vorigGeslacht = naam;
-          }
-          nieuweSoort();
-          nSoorten++;
-          soort.put(NatuurTools.KEY_SEQ, nSoorten);
-          soort.put(NatuurTools.KEY_RANG, "so");
-          soort.put(NatuurTools.KEY_LATIJN,
-                   veld[3].substring(0, 1).toUpperCase()
-                   + veld[3].substring(1).toLowerCase());
-        }
-        for (int i = 0; i < taal.length; i++) {
-          if (DoosUtils.isNotBlankOrNull(veld[i+4])) {
-            namen.put(taal[i], veld[i+4]);
-          }
-        }
+        verwerkLijn(csvBestand.next());
       }
 
       nieuweOrde();
-      taxa.put(NatuurTools.KEY_RANG, "kl");
+      taxa.put(NatuurTools.KEY_RANG, NatuurTools.RANG_KLASSE);
       taxa.put(NatuurTools.KEY_LATIJN, "Aves");
       taxa.put(NatuurTools.KEY_SUBRANGEN, ordes);
 
@@ -162,22 +121,19 @@ public class IocNamen extends Batchjob {
     DoosUtils.naarScherm(
         MessageFormat.format(resourceBundle.getString(NatuurTools.MSG_LIJNEN),
                              String.format("%,6d", lijnen)));
-    DoosUtils.naarScherm(
-        MessageFormat.format(resourceBundle.getString(NatuurTools.MSG_ORDES),
-                             String.format("%,6d", nOrdes)));
-    DoosUtils.naarScherm(
-        MessageFormat.format(resourceBundle.getString(NatuurTools.MSG_FAMILIES),
-                             String.format("%,6d", nFamilies)));
-    DoosUtils.naarScherm(
-        MessageFormat.format(
-            resourceBundle.getString(NatuurTools.MSG_GESLACHTEN),
-            String.format("%,6d", nGeslachten)));
-    DoosUtils.naarScherm(
-        MessageFormat.format(resourceBundle.getString(NatuurTools.MSG_SOORTEN),
-                             String.format("%,6d", nSoorten)));
+    rangen.forEach(rang -> {
+      if (totalen.get(rang) > 0) {
+        DoosUtils.naarScherm(String.format("%6s: %,6d",
+                rang, totalen.get(rang)));
+      }
+    });
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(getMelding(MSG_KLAAR));
     DoosUtils.naarScherm();
+  }
+
+  private static Integer getVolgnummer(String rang) {
+    return totalen.get(rang);
   }
 
   public static void help() {
@@ -320,6 +276,16 @@ public class IocNamen extends Batchjob {
     return false;
  }
 
+  private static void setRangen() {
+    for (String rang : new String[] {NatuurTools.RANG_ORDE,
+                                     NatuurTools.RANG_FAMILIE,
+                                     NatuurTools.RANG_GESLACHT,
+                                     NatuurTools.RANG_SOORT}) {
+      rangen.add(rang);
+      totalen.put(rang, 0);
+    }
+  }
+
   private static int skipHeader(CsvBestand csvBestand) {
     boolean   einde   = false;
     int       lijnen  = 0;
@@ -338,5 +304,58 @@ public class IocNamen extends Batchjob {
     }
 
     return lijnen;
+  }
+
+  private static void verwerkLijn(String[] veld)
+      throws ParseException {
+    // Nieuwe Orde
+    if (DoosUtils.isNotBlankOrNull(veld[1])) {
+      nieuweOrde();
+      addRang(NatuurTools.RANG_ORDE);
+      orde.put(NatuurTools.KEY_SEQ, getVolgnummer(NatuurTools.RANG_ORDE));
+      orde.put(NatuurTools.KEY_RANG, NatuurTools.RANG_ORDE);
+      orde.put(NatuurTools.KEY_LATIJN,
+               veld[1].substring(0, 1).toUpperCase()
+               + veld[1].substring(1).toLowerCase());
+    }
+    // Nieuwe familie
+    if (DoosUtils.isNotBlankOrNull(veld[2])) {
+      nieuweFamilie();
+      addRang(NatuurTools.RANG_FAMILIE);
+      familie.put(NatuurTools.KEY_SEQ, getVolgnummer(NatuurTools.RANG_FAMILIE));
+      familie.put(NatuurTools.KEY_RANG, NatuurTools.RANG_FAMILIE);
+      familie.put(NatuurTools.KEY_LATIJN,
+               veld[2].substring(0, 1).toUpperCase()
+               + veld[2].substring(1).toLowerCase());
+    }
+
+    // Nieuw soort
+    if (DoosUtils.isNotBlankOrNull(veld[3])) {
+      String  naam  = veld[3].split(" ")[0];
+      // Nieuw geslacht?
+      if (!naam.equals(vorigGeslacht)) {
+        nieuwGeslacht();
+        addRang(NatuurTools.RANG_GESLACHT);
+        geslacht.put(NatuurTools.KEY_SEQ,
+                     getVolgnummer(NatuurTools.RANG_GESLACHT));
+        geslacht.put(NatuurTools.KEY_RANG, NatuurTools.RANG_GESLACHT);
+        geslacht.put(NatuurTools.KEY_LATIJN,
+                 naam.substring(0, 1).toUpperCase()
+                 + naam.substring(1).toLowerCase());
+        vorigGeslacht = naam;
+      }
+      nieuweSoort();
+      addRang(NatuurTools.RANG_SOORT);
+      soort.put(NatuurTools.KEY_SEQ, getVolgnummer(NatuurTools.RANG_SOORT));
+      soort.put(NatuurTools.KEY_RANG, NatuurTools.RANG_SOORT);
+      soort.put(NatuurTools.KEY_LATIJN,
+               veld[3].substring(0, 1).toUpperCase()
+               + veld[3].substring(1).toLowerCase());
+    }
+    for (int i = 0; i < taal.length; i++) {
+      if (DoosUtils.isNotBlankOrNull(veld[i+4])) {
+        namen.put(taal[i], veld[i+4]);
+      }
+    }
   }
 }

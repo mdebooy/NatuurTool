@@ -71,16 +71,12 @@ public class NatuurTools extends Batchjob {
   protected static final  String  LBL_WACHTWOORD  = "label.wachtwoord";
 
   protected static final  String  MSG_AANMAKEN      = "msg.aanmaken";
-  protected static final  String  MSG_FAMILIES      = "msg.families";
-  protected static final  String  MSG_GESLACHTEN    = "msg.geslachten";
   protected static final  String  MSG_HERNUMMER     = "msg.hernummer";
   protected static final  String  MSG_HIERARCHIE    = "msg.hierarchie";
   protected static final  String  MSG_LIJNEN        = "msg.lijnen";
   protected static final  String  MSG_NIEUW         = "msg.nieuw";
   protected static final  String  MSG_ONBEKEND      = "msg.onbekend";
-  protected static final  String  MSG_ORDES         = "msg.ordes";
   protected static final  String  MSG_SKIPSTRUCTUUR = "msg.skipstructuur";
-  protected static final  String  MSG_SOORTEN       = "msg.soorten";
   protected static final  String  MSG_VERSCHIL      = "msg.verschil";
   protected static final  String  MSG_WIJZIGEN      = "msg.wijzigen";
   protected static final  String  MSG_WIJZIGING     = "msg.wijziging";
@@ -94,6 +90,13 @@ public class NatuurTools extends Batchjob {
   protected static final  String  PAR_TALEN         = "talen";
   protected static final  String  PAR_TAXAROOT      = "taxaroot";
   protected static final  String  PAR_WACHTWOORD    = "wachtwoord";
+
+  protected static final  String  RANG_FAMILIE    = "fa";
+  protected static final  String  RANG_GESLACHT   = "ge";
+  protected static final  String  RANG_KLASSE     = "kl";
+  protected static final  String  RANG_ORDE       = "or";
+  protected static final  String  RANG_ONDERSOORT = "oso";
+  protected static final  String  RANG_SOORT      = "so";
 
   private NatuurTools() {}
 

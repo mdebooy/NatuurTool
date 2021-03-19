@@ -246,17 +246,16 @@ public class TaxaImport extends Batchjob {
         }
       }
     }
-    if (!skipstructuur) {
-      taxon.getTaxonnamen().forEach(dto -> {
-        if (!taxonnamen.containsKey(dto.getTaal())) {
-          DoosUtils.foutNaarScherm(
-              MessageFormat.format(
-                  resourceBundle.getString(NatuurTools.MSG_ONBEKEND),
-                  prefix.get(taxon.getRang()) + "   ", dto.getTaal(),
-                  dto.getNaam()));
-        }
-      });
-    }
+
+    taxon.getTaxonnamen().forEach(dto -> {
+      if (!taxonnamen.containsKey(dto.getTaal())) {
+        DoosUtils.foutNaarScherm(
+            MessageFormat.format(
+                resourceBundle.getString(NatuurTools.MSG_ONBEKEND),
+                prefix.get(taxon.getRang()) + "   ", dto.getTaal(),
+                dto.getNaam()));
+      }
+    });
   }
 
   private static void getRangen() {
