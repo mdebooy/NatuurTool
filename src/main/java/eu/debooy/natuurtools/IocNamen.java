@@ -259,7 +259,8 @@ public class IocNamen extends Batchjob {
           MessageFormat.format(
               getMelding(ERR_BEVATDIRECTORY), NatuurTools.PAR_IOCBESTAND));
     }
-    if (DoosUtils.nullToEmpty(parameters.get(PAR_JSONBESTAND))
+    if (arguments.hasArgument(PAR_JSONBESTAND)
+        && DoosUtils.nullToEmpty(parameters.get(PAR_JSONBESTAND))
                  .contains(File.separator)) {
       fouten.add(
           MessageFormat.format(

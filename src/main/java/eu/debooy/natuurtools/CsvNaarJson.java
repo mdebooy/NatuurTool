@@ -389,7 +389,8 @@ public class CsvNaarJson extends Batchjob {
           MessageFormat.format(
               getMelding(ERR_BEVATDIRECTORY), PAR_CSVBESTAND));
     }
-    if (DoosUtils.nullToEmpty(parameters.get(PAR_JSONBESTAND))
+    if (arguments.hasArgument(PAR_JSONBESTAND)
+        && DoosUtils.nullToEmpty(parameters.get(PAR_JSONBESTAND))
                  .contains(File.separator)) {
       fouten.add(
           MessageFormat.format(

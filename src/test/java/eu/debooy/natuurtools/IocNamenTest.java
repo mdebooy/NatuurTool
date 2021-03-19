@@ -100,8 +100,8 @@ public class IocNamenTest extends BatchTest {
 
     VangOutEnErr.execute(IocNamen.class, "execute", args, out, err);
 
-    assertEquals("Zonder parameters - helptekst", 27, out.size());
-    assertEquals("Zonder parameters - fouten", 2, err.size());
+    assertEquals("IocBestand Met Directory - helptekst", 27, out.size());
+    assertEquals("IocBestand Met Directory - fouten", 1, err.size());
   }
 
   @Test
@@ -116,8 +116,8 @@ public class IocNamenTest extends BatchTest {
 
     VangOutEnErr.execute(IocNamen.class, "execute", args, out, err);
 
-    assertEquals("Zonder parameters - helptekst", 27, out.size());
-    assertEquals("Zonder parameters - fouten", 1, err.size());
+    assertEquals("JsonBestand Met Directory - helptekst", 27, out.size());
+    assertEquals("JsonBestand Met Directory - fouten", 1, err.size());
   }
 
   @Test
