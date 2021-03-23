@@ -32,8 +32,18 @@ public class NatuurToolsTest extends BatchTest {
 
     VangOutEnErr.execute(NatuurTools.class, "main", args, out, err);
 
-    assertEquals("Geen tool - helptekst", 75, out.size());
+    assertEquals("Geen tool - helptekst", 93, out.size());
     assertEquals("Geen tool - fouten", 0, err.size());
+  }
+
+  @Test
+  public void testDbNaarJson() {
+    String[]  args      = new String[] {"DbNaarJson"};
+
+    VangOutEnErr.execute(NatuurTools.class, "main", args, out, err);
+
+    assertEquals("DbNaarJson - helptekst", 26, out.size());
+    assertEquals("DbNaarJson - fouten", 1, err.size());
   }
 
   @Test
@@ -62,7 +72,7 @@ public class NatuurToolsTest extends BatchTest {
 
     VangOutEnErr.execute(NatuurTools.class, "main", args, out, err);
 
-    assertEquals("onbestaand - helptekst", 75, out.size());
+    assertEquals("onbestaand - helptekst", 93, out.size());
     assertEquals("onbestaand - fouten", 1, err.size());
   }
 

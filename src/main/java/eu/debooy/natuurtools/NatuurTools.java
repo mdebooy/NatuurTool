@@ -121,12 +121,16 @@ public class NatuurTools extends Batchjob {
   }
 
   public static void help() {
+    DoosUtils.naarScherm("  DbNaarJson  ",
+                         resourceBundle.getString("help.dbnaarjson"), 80);
     DoosUtils.naarScherm("  CsvNaarJson ",
                          resourceBundle.getString("help.csvnaarjson"), 80);
     DoosUtils.naarScherm("  IOCNamen    ",
                          resourceBundle.getString("help.iocnamen"), 80);
     DoosUtils.naarScherm("  TaxaImport  ",
                          resourceBundle.getString("help.taxaimport"), 80);
+    DoosUtils.naarScherm();
+    DbNaarJson.help();
     DoosUtils.naarScherm();
     CsvNaarJson.help();
     DoosUtils.naarScherm();
@@ -147,6 +151,10 @@ public class NatuurTools extends Batchjob {
     String[]  commandoArgs  = new String[args.length-1];
     System.arraycopy(args, 1, commandoArgs, 0, args.length-1);
 
+    if ("dbnaarjson".equalsIgnoreCase(commando)) {
+      DbNaarJson.execute(commandoArgs);
+      return;
+    }
     if ("csvnaarjson".equalsIgnoreCase(commando)) {
       CsvNaarJson.execute(commandoArgs);
       return;
