@@ -259,11 +259,9 @@ public class TaxaImport extends Batchjob {
   }
 
   private static void getRangen() {
-    em.getTransaction().begin();
     List<RangDto> ranglijst =
         em.createQuery("select r from RangDto r order by r.niveau")
           .getResultList();
-    em.getTransaction().commit();
 
     ranglijst.forEach(rang -> {
       prefix.put(rang.getRang(),
@@ -275,10 +273,8 @@ public class TaxaImport extends Batchjob {
 
   private static TaxonDto getTaxon(String latijnsenaam, Long parentId,
                                    Integer volgnummer, String rang) {
-    em.getTransaction().begin();
     Query query = em.createNamedQuery(QRY_LATIJNSENAAM);
     query.setParameter(PAR_LATIJNSENAAM, latijnsenaam);
-    em.getTransaction().commit();
     TaxonDto  resultaat;
     try {
       resultaat = (TaxonDto) query.getSingleResult();

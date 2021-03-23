@@ -261,7 +261,7 @@ public class IocNamen extends Batchjob {
     }
     if (arguments.hasArgument(PAR_JSONBESTAND)
         && DoosUtils.nullToEmpty(parameters.get(PAR_JSONBESTAND))
-                 .contains(File.separator)) {
+                    .contains(File.separator)) {
       fouten.add(
           MessageFormat.format(
               getMelding(ERR_BEVATDIRECTORY), PAR_JSONBESTAND));

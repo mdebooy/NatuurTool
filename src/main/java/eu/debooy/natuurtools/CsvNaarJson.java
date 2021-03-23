@@ -188,11 +188,9 @@ public class CsvNaarJson extends Batchjob {
   }
 
   private static void getRangen() {
-    em.getTransaction().begin();
     List<RangDto> ranglijst =
         em.createQuery("select r from RangDto r order by r.niveau")
           .getResultList();
-    em.getTransaction().commit();
 
     ranglijst.forEach(rang -> {
       jsonRang.put((rang.getRang()), new JSONObject());
@@ -203,9 +201,7 @@ public class CsvNaarJson extends Batchjob {
   }
 
   private static TaxonDto getTaxon(String latijnsenaam) {
-    em.getTransaction().begin();
     Query query = em.createNamedQuery(QRY_LATIJNSENAAM);
-    em.getTransaction().commit();
     query.setParameter(PAR_LATIJNSENAAM, latijnsenaam);
     TaxonDto  resultaat;
     try {
@@ -391,7 +387,7 @@ public class CsvNaarJson extends Batchjob {
     }
     if (arguments.hasArgument(PAR_JSONBESTAND)
         && DoosUtils.nullToEmpty(parameters.get(PAR_JSONBESTAND))
-                 .contains(File.separator)) {
+                    .contains(File.separator)) {
       fouten.add(
           MessageFormat.format(
               getMelding(ERR_BEVATDIRECTORY), PAR_JSONBESTAND));
