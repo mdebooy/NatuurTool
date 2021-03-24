@@ -22,13 +22,18 @@ import eu.debooy.doosutils.Batchjob;
 import eu.debooy.doosutils.DoosUtils;
 import eu.debooy.doosutils.access.JsonBestand;
 import eu.debooy.doosutils.exception.BestandException;
+import eu.debooy.natuur.domain.TaxonDto;
+import static eu.debooy.natuur.domain.TaxonDto.PAR_LATIJNSENAAM;
+import static eu.debooy.natuur.domain.TaxonDto.QRY_LATIJNSENAAM;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
+import javax.persistence.Query;
 import org.json.simple.JSONObject;
 
 
@@ -118,6 +123,19 @@ public class NatuurTools extends Batchjob {
 
     return Persistence.createEntityManagerFactory("natuur", props)
                       .createEntityManager();
+  }
+
+  protected static TaxonDto getTaxon(String latijnsenaam, EntityManager em) {
+    Query query = em.createNamedQuery(QRY_LATIJNSENAAM);
+    query.setParameter(PAR_LATIJNSENAAM, latijnsenaam);
+    TaxonDto  resultaat;
+    try {
+      resultaat = (TaxonDto) query.getSingleResult();
+    } catch (NoResultException e) {
+      resultaat = new TaxonDto();
+    }
+
+    return resultaat;
   }
 
   public static void help() {

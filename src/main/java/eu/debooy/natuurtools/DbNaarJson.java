@@ -24,13 +24,10 @@ import static eu.debooy.doosutils.Batchjob.setDirParameter;
 import eu.debooy.doosutils.DoosUtils;
 import eu.debooy.natuur.domain.RangDto;
 import eu.debooy.natuur.domain.TaxonDto;
-import static eu.debooy.natuur.domain.TaxonDto.PAR_LATIJNSENAAM;
-import static eu.debooy.natuur.domain.TaxonDto.QRY_LATIJNSENAAM;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -87,7 +84,7 @@ public class DbNaarJson extends Batchjob {
     getRangen();
 
     JSONObject  namen       = new JSONObject();
-    TaxonDto    parent      = getTaxon(taxoninfo[1]);
+    TaxonDto    parent      = NatuurTools.getTaxon(taxoninfo[1], em);
     JSONObject  root        = new JSONObject();
 
     root.put(NatuurTools.KEY_LATIJN, parent.getLatijnsenaam());
@@ -131,19 +128,6 @@ public class DbNaarJson extends Batchjob {
       rangen.add(rang.getRang());
       totalen.put(rang.getRang(), 0);
     });
-  }
-
-  private static TaxonDto getTaxon(String latijnsenaam) {
-    Query query = em.createNamedQuery(QRY_LATIJNSENAAM);
-    query.setParameter(PAR_LATIJNSENAAM, latijnsenaam);
-    TaxonDto  resultaat;
-    try {
-      resultaat = (TaxonDto) query.getSingleResult();
-    } catch (NoResultException e) {
-      resultaat = new TaxonDto();
-    }
-
-    return resultaat;
   }
 
   public static void help() {

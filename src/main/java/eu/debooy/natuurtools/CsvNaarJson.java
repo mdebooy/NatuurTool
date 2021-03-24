@@ -27,8 +27,6 @@ import eu.debooy.doosutils.components.Message;
 import eu.debooy.doosutils.exception.BestandException;
 import eu.debooy.natuur.domain.RangDto;
 import eu.debooy.natuur.domain.TaxonDto;
-import static eu.debooy.natuur.domain.TaxonDto.PAR_LATIJNSENAAM;
-import static eu.debooy.natuur.domain.TaxonDto.QRY_LATIJNSENAAM;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
@@ -39,8 +37,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.Query;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -114,7 +110,7 @@ public class CsvNaarJson extends Batchjob {
 
     CsvBestand  csvBestand  = null;
     JSONObject  namen       = new JSONObject();
-    TaxonDto    parent      = getTaxon(taxoninfo[1]);
+    TaxonDto    parent      = NatuurTools.getTaxon(taxoninfo[1], em);
     String      root        = parent.getRang();
     vorigeRang  = root;
 
@@ -198,19 +194,6 @@ public class CsvNaarJson extends Batchjob {
       rangen.add(rang.getRang());
       totalen.put(rang.getRang(), 0);
     });
-  }
-
-  private static TaxonDto getTaxon(String latijnsenaam) {
-    Query query = em.createNamedQuery(QRY_LATIJNSENAAM);
-    query.setParameter(PAR_LATIJNSENAAM, latijnsenaam);
-    TaxonDto  resultaat;
-    try {
-      resultaat = (TaxonDto) query.getSingleResult();
-    } catch (NoResultException e) {
-      resultaat = new TaxonDto();
-    }
-
-    return resultaat;
   }
 
   private static Integer getVolgnummer(String rang) {
