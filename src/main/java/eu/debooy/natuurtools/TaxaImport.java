@@ -333,7 +333,7 @@ public class TaxaImport extends Batchjob {
     DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_TALEN, 14),
                          resourceBundle.getString(NatuurTools.HLP_INCLUDETALEN),
                          80);
-    DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_WACHTWOORD, 12),
+    DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_WACHTWOORD, 14),
                          resourceBundle.getString(NatuurTools.HLP_WACHTWOORD),
                          80);
     DoosUtils.naarScherm();
