@@ -54,6 +54,7 @@ public class NatuurTools extends Batchjob {
   protected static final  String  HLP_IOCJSON       = "help.iocjson";
   protected static final  String  HLP_JSONBESTAND   = "help.jsonbestand";
   protected static final  String  HLP_SKIPSTRUCTUUR = "help.skipstructuur";
+  protected static final  String  HLP_RANGEN        = "help.rangen";
   protected static final  String  HLP_READONLY      = "help.readonly";
   protected static final  String  HLP_TAAL          = "help.taal";
   protected static final  String  HLP_TALEN         = "help.talen";
@@ -71,6 +72,7 @@ public class NatuurTools extends Batchjob {
   protected static final  String  LBL_DBUSER      = "label.dbuser";
   protected static final  String  LBL_IOCBESTAND  = "label.iocbestand";
   protected static final  String  LBL_JSONBESTAND = "label.jsonbestand";
+  protected static final  String  LBL_RANGEN      = "label.rangen";
   protected static final  String  LBL_TALEN       = "label.talen";
   protected static final  String  LBL_TAXAROOT    = "label.taxaroot";
   protected static final  String  LBL_WACHTWOORD  = "label.wachtwoord";
@@ -91,6 +93,7 @@ public class NatuurTools extends Batchjob {
   protected static final  String  PAR_DBURL         = "dburl";
   protected static final  String  PAR_DBUSER        = "dbuser";
   protected static final  String  PAR_HERNUMMER     = "hernummer";
+  protected static final  String  PAR_RANGEN        = "rangen";
   protected static final  String  PAR_SKIPSTRUCTUUR = "skipstructuur";
   protected static final  String  PAR_TALEN         = "talen";
   protected static final  String  PAR_TAXAROOT      = "taxaroot";
@@ -102,6 +105,8 @@ public class NatuurTools extends Batchjob {
   protected static final  String  RANG_ORDE       = "or";
   protected static final  String  RANG_ONDERSOORT = "oso";
   protected static final  String  RANG_SOORT      = "so";
+
+  protected static final  String  TXT_BANNER  = "";
 
   private NatuurTools() {}
 
@@ -147,6 +152,8 @@ public class NatuurTools extends Batchjob {
                          resourceBundle.getString("help.iocnamen"), 80);
     DoosUtils.naarScherm("  TaxaImport  ",
                          resourceBundle.getString("help.taxaimport"), 80);
+    DoosUtils.naarScherm("  Taxonomie   ",
+                         resourceBundle.getString("help.taxonomie"), 80);
     DoosUtils.naarScherm();
     DbNaarJson.help();
     DoosUtils.naarScherm();
@@ -155,40 +162,43 @@ public class NatuurTools extends Batchjob {
     IocNamen.help();
     DoosUtils.naarScherm();
     TaxaImport.help();
+    DoosUtils.naarScherm();
+    Taxonomie.help();
   }
 
   public static void main(String[] args) {
     if (args.length == 0) {
-      Banner.printDoosBanner("Natuur Tools");
+      Banner.printDoosBanner(TXT_BANNER);
       help();
       return;
     }
 
     String    commando      = args[0];
-
     String[]  commandoArgs  = new String[args.length-1];
     System.arraycopy(args, 1, commandoArgs, 0, args.length-1);
 
-    if ("dbnaarjson".equalsIgnoreCase(commando)) {
-      DbNaarJson.execute(commandoArgs);
-      return;
+    switch (commando.toLowerCase()) {
+      case "dbnaarjson":
+        DbNaarJson.execute(commandoArgs);
+        break;
+      case "csvnaarjson":
+        CsvNaarJson.execute(commandoArgs);
+        break;
+      case "iocnamen":
+        IocNamen.execute(commandoArgs);
+        break;
+      case "taxaimport":
+        TaxaImport.execute(commandoArgs);
+        break;
+      case "taxonomie":
+        Taxonomie.execute(commandoArgs);
+        break;
+      default:
+        Banner.printDoosBanner(TXT_BANNER);
+        help();
+        DoosUtils.foutNaarScherm(getMelding(ERR_TOOLONBEKEND));
+        break;
     }
-    if ("csvnaarjson".equalsIgnoreCase(commando)) {
-      CsvNaarJson.execute(commandoArgs);
-      return;
-    }
-    if ("iocnamen".equalsIgnoreCase(commando)) {
-      IocNamen.execute(commandoArgs);
-      return;
-    }
-    if ("taxaimport".equalsIgnoreCase(commando)) {
-      TaxaImport.execute(commandoArgs);
-      return;
-    }
-
-    Banner.printDoosBanner("Natuur Tools");
-    help();
-    DoosUtils.foutNaarScherm(getMelding(ERR_TOOLONBEKEND));
   }
 
   protected static void setTalenParameter(Arguments arguments,
@@ -222,5 +232,4 @@ public class NatuurTools extends Batchjob {
       }
     }
   }
-
 }

@@ -32,7 +32,7 @@ public class NatuurToolsTest extends BatchTest {
 
     VangOutEnErr.execute(NatuurTools.class, "main", args, out, err);
 
-    assertEquals("Geen tool - helptekst", 93, out.size());
+    assertEquals("Geen tool - helptekst", 113, out.size());
     assertEquals("Geen tool - fouten", 0, err.size());
   }
 
@@ -72,7 +72,7 @@ public class NatuurToolsTest extends BatchTest {
 
     VangOutEnErr.execute(NatuurTools.class, "main", args, out, err);
 
-    assertEquals("onbestaand - helptekst", 93, out.size());
+    assertEquals("onbestaand - helptekst", 113, out.size());
     assertEquals("onbestaand - fouten", 1, err.size());
   }
 
