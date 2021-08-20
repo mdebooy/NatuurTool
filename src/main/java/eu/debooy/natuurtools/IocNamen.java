@@ -57,6 +57,7 @@ public class IocNamen extends Batchjob {
   private static final  Map<String, Integer>
                                         totalen = new HashMap<>();
 
+  private static  Integer   sequence      = 1;
   private static  String[]  taal;
   private static  String    vorigGeslacht = "";
 
@@ -64,6 +65,7 @@ public class IocNamen extends Batchjob {
 
   private static void addRang(String rang) {
     totalen.put(rang, totalen.get(rang)+1);
+    sequence++;
   }
 
   public static void execute(String[] args) {
@@ -124,16 +126,12 @@ public class IocNamen extends Batchjob {
     rangen.forEach(rang -> {
       if (totalen.get(rang) > 0) {
         DoosUtils.naarScherm(String.format("%6s: %,6d",
-                rang, totalen.get(rang)));
+                                           rang, totalen.get(rang)));
       }
     });
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(getMelding(MSG_KLAAR));
     DoosUtils.naarScherm();
-  }
-
-  private static Integer getVolgnummer(String rang) {
-    return totalen.get(rang);
   }
 
   public static void help() {
@@ -313,7 +311,7 @@ public class IocNamen extends Batchjob {
     if (DoosUtils.isNotBlankOrNull(veld[1])) {
       nieuweOrde();
       addRang(NatuurTools.RANG_ORDE);
-      orde.put(NatuurTools.KEY_SEQ, getVolgnummer(NatuurTools.RANG_ORDE));
+      orde.put(NatuurTools.KEY_SEQ, sequence);
       orde.put(NatuurTools.KEY_RANG, NatuurTools.RANG_ORDE);
       orde.put(NatuurTools.KEY_LATIJN,
                veld[1].substring(0, 1).toUpperCase()
@@ -323,7 +321,7 @@ public class IocNamen extends Batchjob {
     if (DoosUtils.isNotBlankOrNull(veld[2])) {
       nieuweFamilie();
       addRang(NatuurTools.RANG_FAMILIE);
-      familie.put(NatuurTools.KEY_SEQ, getVolgnummer(NatuurTools.RANG_FAMILIE));
+      familie.put(NatuurTools.KEY_SEQ, sequence);
       familie.put(NatuurTools.KEY_RANG, NatuurTools.RANG_FAMILIE);
       familie.put(NatuurTools.KEY_LATIJN,
                veld[2].substring(0, 1).toUpperCase()
@@ -337,8 +335,7 @@ public class IocNamen extends Batchjob {
       if (!naam.equals(vorigGeslacht)) {
         nieuwGeslacht();
         addRang(NatuurTools.RANG_GESLACHT);
-        geslacht.put(NatuurTools.KEY_SEQ,
-                     getVolgnummer(NatuurTools.RANG_GESLACHT));
+        geslacht.put(NatuurTools.KEY_SEQ, sequence);
         geslacht.put(NatuurTools.KEY_RANG, NatuurTools.RANG_GESLACHT);
         geslacht.put(NatuurTools.KEY_LATIJN,
                  naam.substring(0, 1).toUpperCase()
@@ -347,7 +344,7 @@ public class IocNamen extends Batchjob {
       }
       nieuweSoort();
       addRang(NatuurTools.RANG_SOORT);
-      soort.put(NatuurTools.KEY_SEQ, getVolgnummer(NatuurTools.RANG_SOORT));
+      soort.put(NatuurTools.KEY_SEQ, sequence);
       soort.put(NatuurTools.KEY_RANG, NatuurTools.RANG_SOORT);
       soort.put(NatuurTools.KEY_LATIJN,
                veld[3].substring(0, 1).toUpperCase()
