@@ -188,12 +188,12 @@ public class TaxaImport extends Batchjob {
 
   private static void controleerHierarchie(TaxonDto taxon, Long parentId,
                                            Integer volgnummer) {
-    if (readonly || skipstructuur) {
+    if (readonly) {
       return;
     }
 
     StringBuilder verandering = new StringBuilder();
-    if (!parentId.equals(taxon.getParentId())) {
+    if (!skipstructuur && !parentId.equals(taxon.getParentId())) {
       verandering.append("parentId: ").append(taxon.getParentId())
                  .append(" - > ").append(parentId).append(" ");
       taxon.setParentId(parentId);
@@ -215,7 +215,7 @@ public class TaxaImport extends Batchjob {
 
   private static void controleerTaxonnamen(TaxonDto taxon,
                                            JSONObject taxonnamen) {
-    for (Object key : taxonnamen.keySet()) {
+    for (var key : taxonnamen.keySet()) {
       String  taal  = key.toString();
       if (isTaalValid(taal)
           && DoosUtils.isNotBlankOrNull(taxonnamen.get(taal))) {
@@ -278,6 +278,8 @@ public class TaxaImport extends Batchjob {
     TaxonDto  resultaat;
     try {
       resultaat = (TaxonDto) query.getSingleResult();
+      addRang(rang);
+      printTaxon(rang, latijnsenaam);
     } catch (NoResultException e) {
       resultaat = new TaxonDto();
       resultaat.setLatijnsenaam(latijnsenaam);
@@ -286,6 +288,8 @@ public class TaxaImport extends Batchjob {
       if (aanmaak) {
         resultaat.setParentId(parentId);
         addTaxon(resultaat);
+        addRang(rang);
+        printTaxon(rang, latijnsenaam);
       } else {
         resultaat.setParentId(ONBEKEND);
       }
@@ -353,6 +357,11 @@ public class TaxaImport extends Batchjob {
       DoosUtils.foutNaarScherm(getMelding(LBL_FOUT, fout.toString())));
   }
 
+  protected static void printTaxon(String rang, String latijnsenaam) {
+    DoosUtils.naarScherm(String.format("%s%-3s %s",
+                                       prefix.get(rang), rang, latijnsenaam));
+  }
+
   private static boolean setParameters(String[] args) {
     Arguments     arguments = new Arguments(args);
     List<String>  fouten    = new ArrayList<>();
@@ -409,28 +418,28 @@ public class TaxaImport extends Batchjob {
 
   private static void setSwitches() {
     if (DoosUtils.isTrue(parameters.get(PAR_READONLY))) {
-      readonly        = true;
-    } else {
-      DoosUtils.naarScherm();
-      DoosUtils.naarScherm(resourceBundle.getString(NatuurTools.MSG_WIJZIGEN));
-      if (DoosUtils.isTrue(parameters.get(NatuurTools.PAR_SKIPSTRUCTUUR))) {
-        skipstructuur = true;
-        DoosUtils.naarScherm(resourceBundle
-                                .getString(NatuurTools.MSG_SKIPSTRUCTUUR));
-      } else {
-        if (DoosUtils.isTrue(parameters.get(NatuurTools.PAR_AANMAAK))) {
-          aanmaak       = true;
-          DoosUtils.naarScherm(resourceBundle
-                                  .getString(NatuurTools.MSG_AANMAKEN));
-        }
-        if (DoosUtils.isTrue(parameters.get(NatuurTools.PAR_HERNUMMER))) {
-          hernummer     = true;
-          DoosUtils.naarScherm(resourceBundle
-                                  .getString(NatuurTools.MSG_HERNUMMER));
-        }
-      }
-      DoosUtils.naarScherm();
+      readonly      = true;
+      return;
     }
+
+    DoosUtils.naarScherm();
+    DoosUtils.naarScherm(resourceBundle.getString(NatuurTools.MSG_WIJZIGEN));
+    if (DoosUtils.isTrue(parameters.get(NatuurTools.PAR_SKIPSTRUCTUUR))) {
+      skipstructuur = true;
+      DoosUtils.naarScherm(resourceBundle
+                              .getString(NatuurTools.MSG_SKIPSTRUCTUUR));
+    }
+    if (DoosUtils.isTrue(parameters.get(NatuurTools.PAR_AANMAAK))) {
+      aanmaak       = true;
+      DoosUtils.naarScherm(resourceBundle
+                              .getString(NatuurTools.MSG_AANMAKEN));
+    }
+    if (DoosUtils.isTrue(parameters.get(NatuurTools.PAR_HERNUMMER))) {
+      hernummer     = true;
+      DoosUtils.naarScherm(resourceBundle
+                              .getString(NatuurTools.MSG_HERNUMMER));
+    }
+    DoosUtils.naarScherm();
   }
 
   private static void setTaxon(TaxonDto taxon) {
@@ -473,11 +482,7 @@ public class TaxaImport extends Batchjob {
     Integer seq           =
         Integer.valueOf(json.get(NatuurTools.KEY_SEQ).toString());
 
-    DoosUtils.naarScherm(String.format("%s%-3s %s",
-                                       prefix.get(rang), rang, latijnsenaam));
-
     TaxonDto  taxon = getTaxon(latijnsenaam, parentId, seq, rang);
-    addRang(rang);
     controleerHierarchie(taxon, parentId, seq);
 
     if (null == taxon.getTaxonId()) {

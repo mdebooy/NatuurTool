@@ -48,7 +48,7 @@
                     "nl": "Struisvogel"
                   },
                   "rang": "so",
-                  "seq": 1
+                  "seq": 4
                 },
                 {
                   "latijn": "Struthio molybdophanes",
@@ -77,13 +77,13 @@
                     "nl": "Somalische Struisvogel"
                   },
                   "rang": "so",
-                  "seq": 2
+                  "seq": 5
                 }
               ],
-              "seq": 1
+              "seq": 3
             }
           ],
-          "seq": 1
+          "seq": 2
         }
       ],
       "seq": 1
@@ -129,10 +129,10 @@
                     "nl": "Anioema"
                   },
                   "rang": "so",
-                  "seq": 3
+                  "seq": 9
                 }
               ],
-              "seq": 2
+              "seq": 8
             },
             {
               "latijn": "Chauna",
@@ -167,7 +167,7 @@
                     "nl": "Witwanghoenderkoet"
                   },
                   "rang": "so",
-                  "seq": 4
+                  "seq": 11
                 },
                 {
                   "latijn": "Chauna torquata",
@@ -198,13 +198,13 @@
                     "nl": "Kuifhoenderkoet"
                   },
                   "rang": "so",
-                  "seq": 5
+                  "seq": 12
                 }
               ],
-              "seq": 3
+              "seq": 10
             }
           ],
-          "seq": 2
+          "seq": 7
         },
         {
           "latijn": "Anseranatidae",
@@ -244,16 +244,16 @@
                     "nl": "Ekstergans"
                   },
                   "rang": "so",
-                  "seq": 6
+                  "seq": 15
                 }
               ],
-              "seq": 4
+              "seq": 14
             }
           ],
-          "seq": 3
+          "seq": 13
         }
       ],
-      "seq": 2
+      "seq": 6
     }
   ]
 }

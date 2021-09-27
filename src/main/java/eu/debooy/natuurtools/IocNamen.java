@@ -57,7 +57,7 @@ public class IocNamen extends Batchjob {
   private static final  Map<String, Integer>
                                         totalen = new HashMap<>();
 
-  private static  Integer   sequence      = 1;
+  private static  Integer   sequence      = 0;
   private static  String[]  taal;
   private static  String    vorigGeslacht = "";
 
