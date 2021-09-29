@@ -28,7 +28,7 @@ import org.junit.Test;
 public class NatuurToolsTest extends BatchTest {
   @Test
   public void testLeeg() {
-    String[]  args      = new String[] {};
+    var args      = new String[] {};
 
     VangOutEnErr.execute(NatuurTools.class, "main", args, out, err);
 
@@ -37,18 +37,8 @@ public class NatuurToolsTest extends BatchTest {
   }
 
   @Test
-  public void testDbNaarJson() {
-    String[]  args      = new String[] {"DbNaarJson"};
-
-    VangOutEnErr.execute(NatuurTools.class, "main", args, out, err);
-
-    assertEquals("DbNaarJson - helptekst", 26, out.size());
-    assertEquals("DbNaarJson - fouten", 1, err.size());
-  }
-
-  @Test
   public void testCsvNaarJson() {
-    String[]  args      = new String[] {"CsvNaarJson"};
+    var args      = new String[] {"CsvNaarJson"};
 
     VangOutEnErr.execute(NatuurTools.class, "main", args, out, err);
 
@@ -57,8 +47,18 @@ public class NatuurToolsTest extends BatchTest {
   }
 
   @Test
+  public void testDbNaarJson() {
+    var args      = new String[] {"DbNaarJson"};
+
+    VangOutEnErr.execute(NatuurTools.class, "main", args, out, err);
+
+    assertEquals("DbNaarJson - helptekst", 26, out.size());
+    assertEquals("DbNaarJson - fouten", 1, err.size());
+  }
+
+  @Test
   public void testIocNamen() {
-    String[]  args      = new String[] {"IocNamen"};
+    var args      = new String[] {"IocNamen"};
 
     VangOutEnErr.execute(NatuurTools.class, "main", args, out, err);
 
@@ -68,7 +68,7 @@ public class NatuurToolsTest extends BatchTest {
 
   @Test
   public void testOnbestaand() {
-    String[]  args      = new String[] {"onbestaand"};
+    var args      = new String[] {"onbestaand"};
 
     VangOutEnErr.execute(NatuurTools.class, "main", args, out, err);
 
@@ -77,12 +77,22 @@ public class NatuurToolsTest extends BatchTest {
   }
 
   @Test
-  public void testTaxaNamenImport() {
-    String[]  args      = new String[] {"TaxaImport"};
+  public void testTaxaImport() {
+    var args      = new String[] {"TaxaImport"};
 
     VangOutEnErr.execute(NatuurTools.class, "main", args, out, err);
 
     assertEquals("TaxaImport - helptekst", 31, out.size());
     assertEquals("TaxaImport - fouten", 1, err.size());
+  }
+
+  @Test
+  public void testTaxonomie() {
+    var args      = new String[] {"Taxonomie"};
+
+    VangOutEnErr.execute(NatuurTools.class, "main", args, out, err);
+
+    assertEquals("Taxonomie - helptekst", 29, out.size());
+    assertEquals("Taxonomie - fouten", 1, err.size());
   }
 }

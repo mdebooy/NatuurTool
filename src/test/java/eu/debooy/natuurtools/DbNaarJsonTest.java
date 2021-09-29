@@ -35,13 +35,12 @@ public class DbNaarJsonTest extends BatchTest {
 
   @Test
   public void testJsonBestandMetDirectory() {
-    String[]  args      = new String[] {"--" + PAR_JSONBESTAND
-                                         + "=" + TEMP + File.separator
-                                         + BST_JSON,
-                                        "--" + NatuurTools.PAR_DBURL + "=url",
-                                        "--" + NatuurTools.PAR_DBUSER + "=user",
-                                        "--" + NatuurTools.PAR_TAXAROOT +
-                                        "=kl,Aves"};
+    var args  = new String[] {"--" + PAR_JSONBESTAND
+                                + "=" + TEMP + File.separator
+                                + BST_JSON,
+                              "--" + NatuurTools.PAR_DBURL + "=url",
+                              "--" + NatuurTools.PAR_DBUSER + "=user",
+                              "--" + NatuurTools.PAR_TAXAROOT + "=kl,Aves"};
 
     VangOutEnErr.execute(DbNaarJson.class, "execute", args, out, err);
 
@@ -51,7 +50,7 @@ public class DbNaarJsonTest extends BatchTest {
 
   @Test
   public void testLeeg() {
-    String[]  args      = new String[] {};
+    var args  = new String[] {};
 
     VangOutEnErr.execute(DbNaarJson.class, "execute", args, out, err);
 

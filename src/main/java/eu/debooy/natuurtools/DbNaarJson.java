@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-import javax.persistence.Query;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -79,13 +78,13 @@ public class DbNaarJson extends Batchjob {
                 parameters.get(NatuurTools.PAR_DBURL));
     }
 
-    String[]    taxoninfo   = parameters.get(NatuurTools.PAR_TAXAROOT)
+    String[]  taxoninfo = parameters.get(NatuurTools.PAR_TAXAROOT)
                                         .split(",");
     getRangen();
 
-    JSONObject  namen       = new JSONObject();
-    TaxonDto    parent      = NatuurTools.getTaxon(taxoninfo[1], em);
-    JSONObject  root        = new JSONObject();
+    var       namen     = new JSONObject();
+    TaxonDto  parent    = NatuurTools.getTaxon(taxoninfo[1], em);
+    var       root      = new JSONObject();
 
     root.put(NatuurTools.KEY_LATIJN, parent.getLatijnsenaam());
     root.put(NatuurTools.KEY_RANG, parent.getRang());
@@ -175,7 +174,7 @@ public class DbNaarJson extends Batchjob {
   }
 
   private static boolean setParameters(String[] args) {
-    Arguments     arguments = new Arguments(args);
+    var           arguments = new Arguments(args);
     List<String>  fouten    = new ArrayList<>();
 
     arguments.setParameters(new String[] {PAR_CHARSETUIT,
@@ -221,8 +220,8 @@ public class DbNaarJson extends Batchjob {
   }
 
   private static JSONArray verwerkKinderen(Long parentId) {
-    JSONArray jsonRangen  = new JSONArray();
-    Query     query       = em.createNamedQuery(TaxonDto.QRY_KINDEREN);
+    var jsonRangen  = new JSONArray();
+    var query       = em.createNamedQuery(TaxonDto.QRY_KINDEREN);
     query.setParameter(TaxonDto.PAR_OUDER, parentId);
     List<TaxonDto>  taxa = new ArrayList<>();
     try {
@@ -233,8 +232,8 @@ public class DbNaarJson extends Batchjob {
 
     taxa.forEach(taxon -> {
       addRang(taxon.getRang());
-      JSONObject  jsonRang  = new JSONObject();
-      JSONObject  namen     = new JSONObject();
+      var jsonRang  = new JSONObject();
+      var namen     = new JSONObject();
       jsonRang.put(NatuurTools.KEY_LATIJN, taxon.getLatijnsenaam());
       jsonRang.put(NatuurTools.KEY_RANG, taxon.getRang());
       jsonRang.put(NatuurTools.KEY_SEQ, taxon.getVolgnummer());

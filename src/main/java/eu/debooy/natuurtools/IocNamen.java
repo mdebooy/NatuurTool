@@ -286,8 +286,8 @@ public class IocNamen extends Batchjob {
   }
 
   private static int skipHeader(CsvBestand csvBestand) {
-    boolean   einde   = false;
-    int       lijnen  = 0;
+    var       einde   = false;
+    var       lijnen  = 0;
     String[]  veld;
     while (csvBestand.hasNext() && !einde) {
       try {
@@ -350,7 +350,7 @@ public class IocNamen extends Batchjob {
                veld[3].substring(0, 1).toUpperCase()
                + veld[3].substring(1).toLowerCase());
     }
-    for (int i = 0; i < taal.length; i++) {
+    for (var i = 0; i < taal.length; i++) {
       if (DoosUtils.isNotBlankOrNull(veld[i+4])) {
         namen.put(taal[i], veld[i+4]);
       }

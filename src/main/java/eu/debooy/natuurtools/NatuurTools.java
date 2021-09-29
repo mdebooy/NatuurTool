@@ -33,7 +33,6 @@ import java.util.ResourceBundle;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
-import javax.persistence.Query;
 import org.json.simple.JSONObject;
 
 
@@ -120,7 +119,7 @@ public class NatuurTools extends Batchjob {
 
   protected static EntityManager getEntityManager(String dbuser, String dburl,
                                                   String wachtwoord) {
-    Properties  props     = new Properties();
+    var props = new Properties();
 
     props.put("openjpa.ConnectionURL",      "jdbc:postgresql://" + dburl);
     props.put("openjpa.ConnectionUserName", dbuser);
@@ -131,7 +130,7 @@ public class NatuurTools extends Batchjob {
   }
 
   protected static TaxonDto getTaxon(String latijnsenaam, EntityManager em) {
-    Query query = em.createNamedQuery(QRY_LATIJNSENAAM);
+    var query = em.createNamedQuery(QRY_LATIJNSENAAM);
     query.setParameter(PAR_LATIJNSENAAM, latijnsenaam);
     TaxonDto  resultaat;
     try {

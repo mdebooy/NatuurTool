@@ -37,7 +37,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 
 
 /**
@@ -171,7 +170,7 @@ public class Taxonomie extends Batchjob {
   }
 
   private static boolean setParameters(String[] args) {
-    Arguments     arguments = new Arguments(args);
+    var           arguments = new Arguments(args);
     List<String>  fouten    = new ArrayList<>();
 
     arguments.setParameters(new String[] {NatuurTools.PAR_DBURL,
@@ -222,9 +221,9 @@ public class Taxonomie extends Batchjob {
         || rangen.contains(parent.getRang())) {
       DoosUtils.naarScherm(prefix.get(parent.getRang()) + " " + parent.getRang()
                             + " " + parent.getLatijnsenaam());
-      StringBuilder regel   = new StringBuilder();
-      String        naam    = parent.getNaam(parameters.get(PAR_TAAL));
-      String        latijn  = parent.getLatijnsenaam();
+      var     regel   = new StringBuilder();
+      String  naam    = parent.getNaam(parameters.get(PAR_TAAL));
+      String  latijn  = parent.getLatijnsenaam();
       regel.append("\\taxon{")
            .append(parent.getRang()).append("}{")
            .append(latijn).append("}{");
@@ -244,7 +243,7 @@ public class Taxonomie extends Batchjob {
       texBestand.write(regel.append("}").toString());
     }
 
-    Query query = em.createNamedQuery(QRY_KINDEREN);
+    var query = em.createNamedQuery(QRY_KINDEREN);
     query.setParameter(PAR_OUDER, parent.getTaxonId());
 
     List<TaxonDto>  taxa  = query.getResultList();

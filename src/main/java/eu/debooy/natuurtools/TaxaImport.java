@@ -44,7 +44,6 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-import javax.persistence.Query;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -73,7 +72,7 @@ public class TaxaImport extends Batchjob {
 
   public static void execute(String[] args) {
     JsonBestand jsonBestand   = null;
-    String      latijnsenaam  = "?";
+    var         latijnsenaam  = "?";
 
     Banner.printDoosBanner(resourceBundle.getString("banner.taxaimport"));
 
@@ -103,18 +102,18 @@ public class TaxaImport extends Batchjob {
     getRangen();
 
     try {
-      jsonBestand       =
+      jsonBestand     =
           new JsonBestand.Builder()
                          .setBestand(parameters.get(PAR_INVOERDIR)
                                     + parameters.get(PAR_JSONBESTAND)
                                     + EXT_JSON)
                          .setCharset(parameters.get(PAR_CHARSETIN))
                          .build();
-      latijnsenaam      = jsonBestand.read().get(NatuurTools.KEY_LATIJN)
+      latijnsenaam    = jsonBestand.read().get(NatuurTools.KEY_LATIJN)
                                             .toString();
-      String  rang      = jsonBestand.read().get(NatuurTools.KEY_RANG)
+      var   rang      = jsonBestand.read().get(NatuurTools.KEY_RANG)
                                             .toString();
-      Long    parentId  = getTaxon(latijnsenaam, 0L, 0, rang).getTaxonId();
+      Long  parentId  = getTaxon(latijnsenaam, 0L, 0, rang).getTaxonId();
       for (Object taxa :
               (JSONArray) jsonBestand.read().get(NatuurTools.KEY_SUBRANGEN)) {
         verwerkRang(parentId, (JSONObject) taxa);
@@ -192,7 +191,7 @@ public class TaxaImport extends Batchjob {
       return;
     }
 
-    StringBuilder verandering = new StringBuilder();
+    var verandering = new StringBuilder();
     if (!skipstructuur && !parentId.equals(taxon.getParentId())) {
       verandering.append("parentId: ").append(taxon.getParentId())
                  .append(" - > ").append(parentId).append(" ");
@@ -216,7 +215,7 @@ public class TaxaImport extends Batchjob {
   private static void controleerTaxonnamen(TaxonDto taxon,
                                            JSONObject taxonnamen) {
     for (var key : taxonnamen.keySet()) {
-      String  taal  = key.toString();
+      var taal  = key.toString();
       if (isTaalValid(taal)
           && DoosUtils.isNotBlankOrNull(taxonnamen.get(taal))) {
         TaxonnaamDto  taxonnaamDto;
@@ -273,7 +272,7 @@ public class TaxaImport extends Batchjob {
 
   private static TaxonDto getTaxon(String latijnsenaam, Long parentId,
                                    Integer volgnummer, String rang) {
-    Query query = em.createNamedQuery(QRY_LATIJNSENAAM);
+    var query = em.createNamedQuery(QRY_LATIJNSENAAM);
     query.setParameter(PAR_LATIJNSENAAM, latijnsenaam);
     TaxonDto  resultaat;
     try {
@@ -363,7 +362,7 @@ public class TaxaImport extends Batchjob {
   }
 
   private static boolean setParameters(String[] args) {
-    Arguments     arguments = new Arguments(args);
+    var           arguments = new Arguments(args);
     List<String>  fouten    = new ArrayList<>();
 
     arguments.setParameters(new String[] {NatuurTools.PAR_AANMAAK,
@@ -477,9 +476,9 @@ public class TaxaImport extends Batchjob {
   }
 
   private static void verwerkRang(Long parentId, JSONObject json) {
-    String  latijnsenaam  = json.get(NatuurTools.KEY_LATIJN).toString();
-    String  rang          = json.get(NatuurTools.KEY_RANG).toString();
-    Integer seq           =
+    var latijnsenaam  = json.get(NatuurTools.KEY_LATIJN).toString();
+    var rang          = json.get(NatuurTools.KEY_RANG).toString();
+    var seq           =
         Integer.valueOf(json.get(NatuurTools.KEY_SEQ).toString());
 
     TaxonDto  taxon = getTaxon(latijnsenaam, parentId, seq, rang);

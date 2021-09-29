@@ -37,14 +37,13 @@ public class CsvNaarJsonTest extends BatchTest {
 
   @Test
   public void testCsvBestandMetDirectory() {
-    String[]  args      = new String[] {"--" + PAR_CSVBESTAND
-                                         + "=" + TEMP + File.separator
-                                         + BST_CSV,
-                                        "--invoerdir=" + TEMP,
-                                        "--" + NatuurTools.PAR_DBURL + "=url",
-                                        "--" + NatuurTools.PAR_DBUSER + "=user",
-                                        "--" + NatuurTools.PAR_TAXAROOT +
-                                        "=kl,Aves"};
+    var args  = new String[] {"--" + PAR_CSVBESTAND
+                                + "=" + TEMP + File.separator
+                                + BST_CSV,
+                              "--invoerdir=" + TEMP,
+                              "--" + NatuurTools.PAR_DBURL + "=url",
+                              "--" + NatuurTools.PAR_DBUSER + "=user",
+                              "--" + NatuurTools.PAR_TAXAROOT + "=kl,Aves"};
 
     VangOutEnErr.execute(CsvNaarJson.class, "execute", args, out, err);
 
@@ -54,16 +53,15 @@ public class CsvNaarJsonTest extends BatchTest {
 
   @Test
   public void testJsonBestandMetDirectory() {
-    String[]  args      = new String[] {"--" + PAR_CSVBESTAND
-                                         + "=" + BST_CSV,
-                                        "--" + PAR_JSONBESTAND
-                                         + "=" + TEMP + File.separator
-                                         + BST_JSON,
-                                        "--invoerdir=" + TEMP,
-                                        "--" + NatuurTools.PAR_DBURL + "=url",
-                                        "--" + NatuurTools.PAR_DBUSER + "=user",
-                                        "--" + NatuurTools.PAR_TAXAROOT +
-                                        "=kl,Aves"};
+    var args  = new String[] {"--" + PAR_CSVBESTAND
+                                + "=" + BST_CSV,
+                              "--" + PAR_JSONBESTAND
+                                + "=" + TEMP + File.separator
+                                + BST_JSON,
+                              "--invoerdir=" + TEMP,
+                              "--" + NatuurTools.PAR_DBURL + "=url",
+                              "--" + NatuurTools.PAR_DBUSER + "=user",
+                              "--" + NatuurTools.PAR_TAXAROOT + "=kl,Aves"};
 
     VangOutEnErr.execute(CsvNaarJson.class, "execute", args, out, err);
 
@@ -73,7 +71,7 @@ public class CsvNaarJsonTest extends BatchTest {
 
   @Test
   public void testLeeg() {
-    String[]  args      = new String[] {};
+    var args  = new String[] {};
 
     VangOutEnErr.execute(CsvNaarJson.class, "execute", args, out, err);
 

@@ -109,7 +109,7 @@ public class CsvNaarJson extends Batchjob {
     getRangen();
 
     CsvBestand  csvBestand  = null;
-    JSONObject  namen       = new JSONObject();
+    var         namen       = new JSONObject();
     TaxonDto    parent      = NatuurTools.getTaxon(taxoninfo[1], em);
     String      root        = parent.getRang();
     vorigeRang  = root;
@@ -323,7 +323,7 @@ public class CsvNaarJson extends Batchjob {
   }
 
   private static boolean setParameters(String[] args) {
-    Arguments     arguments = new Arguments(args);
+    var           arguments = new Arguments(args);
     List<String>  fouten    = new ArrayList<>();
 
     arguments.setParameters(new String[] {PAR_CHARSETIN,
@@ -402,8 +402,8 @@ public class CsvNaarJson extends Batchjob {
   private static void verwerkTaxon(String rang, String latijnsenaam,
                                    String naam)
       throws ParseException {
-    JSONObject  namen       = new JSONObject();
-    Integer     volgnummer  = getVolgnummer(rang);
+    var     namen       = new JSONObject();
+    Integer volgnummer  = getVolgnummer(rang);
 
     controleerHierarchie(rang, latijnsenaam);
 

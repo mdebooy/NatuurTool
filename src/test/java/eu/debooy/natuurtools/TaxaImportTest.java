@@ -45,13 +45,13 @@ public class TaxaImportTest extends BatchTest {
 
   @Test
   public void testBestandMetDirectory() {
-    String[]  args      = new String[] {"--" + PAR_JSONBESTAND
-                                         + "=" + TEMP + File.separator
-                                         + BST_JSON,
-                                        "--" + NatuurTools.PAR_TAXAROOT + "=kl,Aves",
-                                        "--dburl=localhost:5432/db",
-                                        "--dbuser=dbuser",
-                                        "--invoerdir=" + TEMP};
+    var args  = new String[] {"--" + PAR_JSONBESTAND
+                                + "=" + TEMP + File.separator
+                                + BST_JSON,
+                              "--" + NatuurTools.PAR_TAXAROOT + "=kl,Aves",
+                              "--dburl=localhost:5432/db",
+                              "--dbuser=dbuser",
+                              "--invoerdir=" + TEMP};
 
     VangOutEnErr.execute(TaxaImport.class, "execute", args, out, err);
 
@@ -61,7 +61,7 @@ public class TaxaImportTest extends BatchTest {
 
   @Test
   public void testLeeg() {
-    String[]  args      = new String[] {};
+    var args  = new String[] {};
 
     VangOutEnErr.execute(TaxaImport.class, "execute", args, out, err);
 

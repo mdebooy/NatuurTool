@@ -67,7 +67,7 @@ public class IocNamenTest extends BatchTest {
 
   @Test
   public void testCsv() throws BestandException, IOException {
-    String[]  args      = new String[] {
+    var args  = new String[] {
       "--" + NatuurTools.PAR_IOCBESTAND + "=" + BST_CSV,
       "--" + NatuurTools.PAR_TALEN + "=en,af,ca,zh,z,hr,cs,da,nl,et,fi,fr,de,hu,is,id,it,ja,lv,lt,se,no,pl,pt,ru,sk,sl,es,sv,th,uk",
       "--invoerdir=" + TEMP};
@@ -92,11 +92,11 @@ public class IocNamenTest extends BatchTest {
 
   @Test
   public void testIocBestandMetDirectory() {
-    String[]  args      = new String[] {"--" + NatuurTools.PAR_IOCBESTAND
-                                         + "=" + TEMP + File.separator
-                                         + BST_CSV,
-                                        "--" + NatuurTools.PAR_TALEN + "=en",
-                                        "--invoerdir=" + TEMP};
+    var args  = new String[] {"--" + NatuurTools.PAR_IOCBESTAND
+                                + "=" + TEMP + File.separator
+                                + BST_CSV,
+                              "--" + NatuurTools.PAR_TALEN + "=en",
+                              "--invoerdir=" + TEMP};
 
     VangOutEnErr.execute(IocNamen.class, "execute", args, out, err);
 
@@ -106,13 +106,13 @@ public class IocNamenTest extends BatchTest {
 
   @Test
   public void testJsonBestandMetDirectory() {
-    String[]  args      = new String[] {"--" + NatuurTools.PAR_IOCBESTAND
-                                         + "=" + BST_CSV,
-                                        "--" + PAR_JSONBESTAND
-                                         + "=" + TEMP + File.separator
-                                         + BST_JSON,
-                                        "--" + NatuurTools.PAR_TALEN + "=en",
-                                        "--invoerdir=" + TEMP};
+    var args  = new String[] {"--" + NatuurTools.PAR_IOCBESTAND
+                                + "=" + BST_CSV,
+                              "--" + PAR_JSONBESTAND
+                                + "=" + TEMP + File.separator
+                                + BST_JSON,
+                              "--" + NatuurTools.PAR_TALEN + "=en",
+                              "--invoerdir=" + TEMP};
 
     VangOutEnErr.execute(IocNamen.class, "execute", args, out, err);
 
@@ -122,7 +122,7 @@ public class IocNamenTest extends BatchTest {
 
   @Test
   public void testLeeg() {
-    String[]  args      = new String[] {};
+    var args  = new String[] {};
 
     VangOutEnErr.execute(IocNamen.class, "execute", args, out, err);
 
