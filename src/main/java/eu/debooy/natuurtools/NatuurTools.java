@@ -66,26 +66,29 @@ public class NatuurTools extends Batchjob {
   protected static final  String  KEY_SEQ       = "seq";
   protected static final  String  KEY_SUBRANGEN = "subrangen";
 
-  protected static final  String  LBL_CSVBESTAND  = "label.csvbestand";
-  protected static final  String  LBL_DBURL       = "label.dburl";
-  protected static final  String  LBL_DBUSER      = "label.dbuser";
-  protected static final  String  LBL_IOCBESTAND  = "label.iocbestand";
-  protected static final  String  LBL_JSONBESTAND = "label.jsonbestand";
-  protected static final  String  LBL_RANGEN      = "label.rangen";
-  protected static final  String  LBL_TALEN       = "label.talen";
-  protected static final  String  LBL_TAXAROOT    = "label.taxaroot";
-  protected static final  String  LBL_WACHTWOORD  = "label.wachtwoord";
+  protected static final  String  LBL_CSVBESTAND      = "label.csvbestand";
+  protected static final  String  LBL_DBURL           = "label.dburl";
+  protected static final  String  LBL_DBUSER          = "label.dbuser";
+  protected static final  String  LBL_IOCBESTAND      = "label.iocbestand";
+  protected static final  String  LBL_JSONBESTAND     = "label.jsonbestand";
+  protected static final  String  LBL_RANGEN          = "label.rangen";
+  protected static final  String  LBL_SOORTENONBEKEND = "label.soortenonbekend";
+  protected static final  String  LBL_TALEN           = "label.talen";
+  protected static final  String  LBL_TAXAROOT        = "label.taxaroot";
+  protected static final  String  LBL_WACHTWOORD      = "label.wachtwoord";
 
-  protected static final  String  MSG_AANMAKEN      = "msg.aanmaken";
-  protected static final  String  MSG_HERNUMMER     = "msg.hernummer";
-  protected static final  String  MSG_HIERARCHIE    = "msg.hierarchie";
-  protected static final  String  MSG_LIJNEN        = "msg.lijnen";
-  protected static final  String  MSG_NIEUW         = "msg.nieuw";
-  protected static final  String  MSG_ONBEKEND      = "msg.onbekend";
-  protected static final  String  MSG_SKIPSTRUCTUUR = "msg.skipstructuur";
-  protected static final  String  MSG_VERSCHIL      = "msg.verschil";
-  protected static final  String  MSG_WIJZIGEN      = "msg.wijzigen";
-  protected static final  String  MSG_WIJZIGING     = "msg.wijziging";
+  protected static final  String  MSG_AANMAKEN        = "msg.aanmaken";
+  protected static final  String  MSG_AANTALSOORTEN   = "msg.aantalsoorten";
+  protected static final  String  MSG_AANTALONBEKEND  = "msg.aantalonbekend";
+  protected static final  String  MSG_HERNUMMER       = "msg.hernummer";
+  protected static final  String  MSG_HIERARCHIE      = "msg.hierarchie";
+  protected static final  String  MSG_LIJNEN          = "msg.lijnen";
+  protected static final  String  MSG_NIEUW           = "msg.nieuw";
+  protected static final  String  MSG_ONBEKEND        = "msg.onbekend";
+  protected static final  String  MSG_SKIPSTRUCTUUR   = "msg.skipstructuur";
+  protected static final  String  MSG_VERSCHIL        = "msg.verschil";
+  protected static final  String  MSG_WIJZIGEN        = "msg.wijzigen";
+  protected static final  String  MSG_WIJZIGING       = "msg.wijziging";
 
   protected static final  String  PAR_AANMAAK       = "aanmaken";
   protected static final  String  PAR_IOCBESTAND    = "iocbestand";
@@ -149,6 +152,8 @@ public class NatuurTools extends Batchjob {
                          resourceBundle.getString("help.csvnaarjson"), 80);
     DoosUtils.naarScherm("  IOCNamen    ",
                          resourceBundle.getString("help.iocnamen"), 80);
+    DoosUtils.naarScherm("  IOCCheck    ",
+                         resourceBundle.getString("help.iocnamen"), 80);
     DoosUtils.naarScherm("  TaxaImport  ",
                          resourceBundle.getString("help.taxaimport"), 80);
     DoosUtils.naarScherm("  Taxonomie   ",
@@ -159,6 +164,8 @@ public class NatuurTools extends Batchjob {
     CsvNaarJson.help();
     DoosUtils.naarScherm();
     IocNamen.help();
+    DoosUtils.naarScherm();
+    IocCheck.help();
     DoosUtils.naarScherm();
     TaxaImport.help();
     DoosUtils.naarScherm();
@@ -185,6 +192,9 @@ public class NatuurTools extends Batchjob {
         break;
       case "iocnamen":
         IocNamen.execute(commandoArgs);
+        break;
+      case "ioccheck":
+        IocCheck.execute(commandoArgs);
         break;
       case "taxaimport":
         TaxaImport.execute(commandoArgs);

@@ -1,0 +1,35 @@
+{
+  "_jar": "NatuurTools.jar",
+  "_prefixlengte": 18,
+  "applicatie": "IocCheck",
+  "help": "Controleer of de latijnse namen nog in de IOC lijst voorkomen.",
+  "banner": "Check latijnse namen",
+  "parameters": [
+    {
+      "parameter": "dburl",
+      "lang": "dburl",
+      "help": "De URL voor de database connectie (localhost:5432/db).",
+      "verplicht": true
+    },
+    {
+      "parameter": "dbuser",
+      "lang": "dbuser",
+      "help": "De database gebruikersnaam.",
+      "verplicht": true
+    },
+    {
+      "parameter": "json",
+      "kort": "j",
+      "lang": "jsonbestand",
+      "help": "IOC Namen bestand in JSON-formaat.",
+      "verplicht": true
+    },
+    {
+      "parameter": "wachtwoord",
+      "kort": "w",
+      "lang": "wachtwoord",
+      "help": "Het wachtwoord van de database gebruikersnaam.",
+      "verplicht": false
+    }
+  ]
+}

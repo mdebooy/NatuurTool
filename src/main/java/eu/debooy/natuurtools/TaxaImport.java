@@ -492,7 +492,7 @@ public class TaxaImport extends Batchjob {
       controleerTaxonnamen(taxon, (JSONObject) json.get(NatuurTools.KEY_NAMEN));
     }
     if (json.containsKey(NatuurTools.KEY_SUBRANGEN)) {
-      for (Object subrang : (JSONArray) json.get(NatuurTools.KEY_SUBRANGEN)) {
+      for (var subrang : (JSONArray) json.get(NatuurTools.KEY_SUBRANGEN)) {
         verwerkRang(taxon.getTaxonId(), (JSONObject) subrang);
       }
     }
