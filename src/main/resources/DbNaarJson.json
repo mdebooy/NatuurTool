@@ -1,10 +1,17 @@
 {
   "_jar": "NatuurTools.jar",
   "_prefixlengte": 18,
-  "applicatie": "IocCheck",
-  "help": "Controleer of de latijnse namen nog in de IOC lijst voorkomen.",
-  "banner": "Check latijnse namen",
+  "applicatie": "DbNaarJson",
+  "help": "Haal een 'taxa-tak' uit de database en zet die in een JSON-bestand.",
+  "banner": "Taxa vanuit de database naar JSON",
   "parameters": [
+    {
+      "parameter": "charsetuit",
+      "lang": "charsetuit",
+      "help": "De characterset van de uitvoer als deze niet {0} is.",
+      "type": "charset",
+      "verplicht": false
+    },
     {
       "parameter": "dburl",
       "lang": "dburl",
@@ -24,6 +31,12 @@
       "lang": "jsonbestand",
       "help": "IOC Namen bestand in JSON-formaat.",
       "type": "bestand",
+      "verplicht": true
+    },
+    {
+      "parameter": "taxa",
+      "lang": "taxaroot",
+      "help": "De 'root' van het invoerbestand (rang,latijnsenaam).",
       "verplicht": true
     },
     {

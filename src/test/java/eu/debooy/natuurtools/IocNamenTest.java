@@ -39,14 +39,12 @@ public class IocNamenTest extends BatchTest {
   protected static final  ClassLoader CLASSLOADER =
       IocNamenTest.class.getClassLoader();
 
-  private static final  String  BST_CSV         = "MultilingIOC.csv";
-  private static final  String  BST_JSON        = "MultilingIOC.json";
-  private static final  String  PAR_JSONBESTAND = "jsonbestand";
-
+  private static final  String  BST_CSV   = "MultilingIOC.csv";
+  private static final  String  BST_JSON  = "MultilingIOC.json";
 
   @AfterClass
   public static void afterClass() {
-    verwijderBestanden(TEMP + File.separator,
+    verwijderBestanden(getTemp() + File.separator,
                        new String[] {BST_CSV, BST_JSON});
   }
 
@@ -58,7 +56,7 @@ public class IocNamenTest extends BatchTest {
 
     try {
       kopieerBestand(CLASSLOADER, BST_CSV,
-                     TEMP + File.separator + BST_CSV);
+                     getTemp() + File.separator + BST_CSV);
     } catch (IOException e) {
       System.out.println(e.getLocalizedMessage());
       throw new BestandException(e);
@@ -68,14 +66,13 @@ public class IocNamenTest extends BatchTest {
   @Test
   public void testCsv() throws BestandException, IOException {
     var args  = new String[] {
-      "--" + NatuurTools.PAR_IOCBESTAND + "=" + BST_CSV,
-      "--" + NatuurTools.PAR_TALEN + "=en,af,ca,zh,z,hr,cs,da,nl,et,fi,fr,de,hu,is,id,it,ja,lv,lt,se,no,pl,pt,ru,sk,sl,es,sv,th,uk",
-      "--invoerdir=" + TEMP};
+      "--" + NatuurTools.PAR_IOCBESTAND + "=" + getTemp() + File.separator
+           + BST_CSV,
+      "--" + NatuurTools.PAR_TALEN + "=en,af,ca,zh,z,hr,cs,da,nl,et,fi,fr,de,hu,is,id,it,ja,lv,lt,se,no,pl,pt,ru,sk,sl,es,sv,th,uk"};
 
     VangOutEnErr.execute(IocNamen.class,
                          DoosUtilsTestConstants.CMD_EXECUTE, args, out, err);
 
-    assertEquals("CSV - helptekst", 19, out.size());
     assertEquals("CSV - fouten", 0, err.size());
     assertEquals("CSV - 12", "33", out.get(11).split(":")[1].trim());
     assertEquals("CSV - 13", "2",  out.get(12).split(":")[1].trim());
@@ -84,40 +81,10 @@ public class IocNamenTest extends BatchTest {
     assertEquals("CSV - 16", "6",  out.get(15).split(":")[1].trim());
     assertTrue("CSV - equals",
         Bestand.equals(
-            Bestand.openInvoerBestand(TEMP + File.separator
+            Bestand.openInvoerBestand(getTemp() + File.separator
                                       + BST_JSON),
             Bestand.openInvoerBestand(IocNamenTest.class.getClassLoader(),
                                       BST_JSON)));
-  }
-
-  @Test
-  public void testIocBestandMetDirectory() {
-    var args  = new String[] {"--" + NatuurTools.PAR_IOCBESTAND
-                                + "=" + TEMP + File.separator
-                                + BST_CSV,
-                              "--" + NatuurTools.PAR_TALEN + "=en",
-                              "--invoerdir=" + TEMP};
-
-    VangOutEnErr.execute(IocNamen.class, "execute", args, out, err);
-
-    assertEquals("IocBestand Met Directory - helptekst", 27, out.size());
-    assertEquals("IocBestand Met Directory - fouten", 1, err.size());
-  }
-
-  @Test
-  public void testJsonBestandMetDirectory() {
-    var args  = new String[] {"--" + NatuurTools.PAR_IOCBESTAND
-                                + "=" + BST_CSV,
-                              "--" + PAR_JSONBESTAND
-                                + "=" + TEMP + File.separator
-                                + BST_JSON,
-                              "--" + NatuurTools.PAR_TALEN + "=en",
-                              "--invoerdir=" + TEMP};
-
-    VangOutEnErr.execute(IocNamen.class, "execute", args, out, err);
-
-    assertEquals("JsonBestand Met Directory - helptekst", 27, out.size());
-    assertEquals("JsonBestand Met Directory - fouten", 1, err.size());
   }
 
   @Test
@@ -126,7 +93,6 @@ public class IocNamenTest extends BatchTest {
 
     VangOutEnErr.execute(IocNamen.class, "execute", args, out, err);
 
-    assertEquals("Zonder parameters - helptekst", 27, out.size());
     assertEquals("Zonder parameters - fouten", 1, err.size());
   }
 }

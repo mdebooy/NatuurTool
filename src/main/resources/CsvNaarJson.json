@@ -1,0 +1,66 @@
+{
+  "_jar": "NatuurTools.jar",
+  "_prefixlengte": 18,
+  "applicatie": "CsvNaarJson",
+  "help": "Converteer een CSV bestand met taxa (rang,latijnsenaam,naam) naar een JSON-bestand.",
+  "banner": "CSV lijst met taxa naar JSON",
+  "parameters": [
+    {
+      "parameter": "charsetin",
+      "lang": "charsetin",
+      "help": "De characterset van de invoer als deze niet {0} is.",
+      "type": "charset",
+      "verplicht": false
+    },
+    {
+      "parameter": "charsetuit",
+      "lang": "charsetuit",
+      "help": "De characterset van de uitvoer als deze niet {0} is.",
+      "type": "charset",
+      "verplicht": false
+    },
+    {
+      "parameter": "csvbestand",
+      "extensie": "csv",
+      "kort": "c",
+      "lang": "csvbestand",
+      "help": "IOC Namen bestand in JSON-formaat.",
+      "type": "bestand",
+      "verplicht": true
+    },
+    {
+      "parameter": "dburl",
+      "lang": "dburl",
+      "help": "De URL voor de database connectie (localhost:5432/db).",
+      "verplicht": true
+    },
+    {
+      "parameter": "dbuser",
+      "lang": "dbuser",
+      "help": "De database gebruikersnaam.",
+      "verplicht": true
+    },
+    {
+      "parameter": "json",
+      "extensie": "json",
+      "kort": "j",
+      "lang": "jsonbestand",
+      "help": "IOC Namen bestand in JSON-formaat. Als deze parameter afwezig is krijgt het bestand dezelfde naam als --csvbestand.",
+      "type": "bestand",
+      "verplicht": false
+    },
+    {
+      "parameter": "taxa",
+      "lang": "taxaroot",
+      "help": "De 'root' van het invoerbestand (rang,latijnsenaam).",
+      "verplicht": true
+    },
+    {
+      "parameter": "wachtwoord",
+      "kort": "w",
+      "lang": "wachtwoord",
+      "help": "Het wachtwoord van de database gebruikersnaam.",
+      "verplicht": false
+    }
+  ]
+}

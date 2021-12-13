@@ -1,0 +1,78 @@
+{
+  "_jar": "NatuurTools.jar",
+  "_prefixlengte": 20,
+  "applicatie": "TaxaImport",
+  "help": "Importeren van taxastructuur, in JSON formaat, met namen in verschillende talen in de database.",
+  "banner": "JSON bestand met taxa importeren",
+  "parameters": [
+    {
+      "parameter": "aanmaak",
+      "lang": "aanmaak",
+      "help": "De ontbrekende taxa toevoegen.",
+      "type": "boolean",
+      "verplicht": false
+    },
+    {
+      "parameter": "behoud",
+      "lang": "behoudstructuur",
+      "help": "Veranderen van de parenttaxon. PAS OP dit kan tussenrangen 'uitschakelen'.",
+      "type": "boolean",
+      "verplicht": false
+    },
+    {
+      "parameter": "charsetin",
+      "lang": "charsetin",
+      "help": "De characterset van de invoer als deze niet {0} is.",
+      "type": "charset",
+      "verplicht": false
+    },
+    {
+      "parameter": "dburl",
+      "lang": "dburl",
+      "help": "De URL voor de database connectie (localhost:5432/db).",
+      "verplicht": true
+    },
+    {
+      "parameter": "dbuser",
+      "lang": "dbuser",
+      "help": "De database gebruikersnaam.",
+      "verplicht": true
+    },
+    {
+      "parameter": "hernummer",
+      "lang": "hernummer",
+      "help": "Hernummer de taxa.",
+      "type": "boolean",
+      "verplicht": false
+    },
+    {
+      "parameter": "json",
+      "extensie": "json",
+      "kort": "j",
+      "lang": "jsonbestand",
+      "help": "IOC Namen bestand in JSON-formaat.",
+      "type": "bestand",
+      "verplicht": true
+    },
+    {
+      "parameter": "readonly",
+      "lang": "readonly",
+      "help": "Enkel lezen. Nu worden <aanmaken>, <hernummer> en <skipstructuur> genegeerd.",
+      "type": "boolean",
+      "verplicht": false
+    },
+    {
+      "parameter": "talen",
+      "lang": "talen",
+      "help": "Lijst, door komma's gescheiden, met talen die in het overzicht mogen staan.",
+      "verplicht": false
+    },
+    {
+      "parameter": "wachtwoord",
+      "kort": "w",
+      "lang": "wachtwoord",
+      "help": "Het wachtwoord van de database gebruikersnaam.",
+      "verplicht": false
+    }
+  ]
+}

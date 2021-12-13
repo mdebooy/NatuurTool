@@ -41,7 +41,6 @@ public class NatuurToolsTest extends BatchTest {
 
     VangOutEnErr.execute(NatuurTools.class, "main", args, out, err);
 
-    assertEquals("CsvNaarJson - helptekst", 31, out.size());
     assertEquals("CsvNaarJson - fouten", 1, err.size());
   }
 
@@ -51,7 +50,6 @@ public class NatuurToolsTest extends BatchTest {
 
     VangOutEnErr.execute(NatuurTools.class, "main", args, out, err);
 
-    assertEquals("DbNaarJson - helptekst", 26, out.size());
     assertEquals("DbNaarJson - fouten", 1, err.size());
   }
 
@@ -61,7 +59,6 @@ public class NatuurToolsTest extends BatchTest {
 
     VangOutEnErr.execute(NatuurTools.class, "main", args, out, err);
 
-    assertEquals("IocNamen - helptekst", 27, out.size());
     assertEquals("IocNamen - fouten", 1, err.size());
   }
 
@@ -80,7 +77,6 @@ public class NatuurToolsTest extends BatchTest {
 
     VangOutEnErr.execute(NatuurTools.class, "main", args, out, err);
 
-    assertEquals("TaxaImport - helptekst", 31, out.size());
     assertEquals("TaxaImport - fouten", 1, err.size());
   }
 
@@ -90,7 +86,6 @@ public class NatuurToolsTest extends BatchTest {
 
     VangOutEnErr.execute(NatuurTools.class, "main", args, out, err);
 
-    assertEquals("Taxonomie - helptekst", 29, out.size());
     assertEquals("Taxonomie - fouten", 1, err.size());
   }
 }

@@ -18,33 +18,20 @@ package eu.debooy.natuurtools;
 
 import eu.debooy.doosutils.test.BatchTest;
 import eu.debooy.doosutils.test.VangOutEnErr;
-import java.util.Locale;
-import java.util.ResourceBundle;
 import static org.junit.Assert.assertEquals;
-import org.junit.BeforeClass;
 import org.junit.Test;
+
 
 /**
  * @author Marco de Booij
  */
 public class TaxonomieTest extends BatchTest {
-  protected static final  ClassLoader CLASSLOADER =
-      TaxonomieTest.class.getClassLoader();
-
-  @BeforeClass
-  public static void beforeClass() {
-    Locale.setDefault(new Locale("nl"));
-    resourceBundle  = ResourceBundle.getBundle("ApplicatieResources",
-                                               Locale.getDefault());
-  }
-
   @Test
   public void testLeeg() {
     var args  = new String[] {};
 
     VangOutEnErr.execute(Taxonomie.class, "execute", args, out, err);
 
-    assertEquals("Zonder parameters - helptekst", 29, out.size());
     assertEquals("Zonder parameters - fouten", 1, err.size());
   }
 }

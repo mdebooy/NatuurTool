@@ -16,14 +16,12 @@
  */
 package eu.debooy.natuurtools;
 
-import eu.debooy.doosutils.Arguments;
 import eu.debooy.doosutils.Banner;
 import eu.debooy.doosutils.Batchjob;
 import eu.debooy.doosutils.DoosUtils;
+import eu.debooy.doosutils.ParameterBundle;
 import eu.debooy.doosutils.access.CsvBestand;
 import eu.debooy.doosutils.exception.BestandException;
-import java.io.File;
-import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,7 +59,7 @@ public class IocNamen extends Batchjob {
   private static  String[]  taal;
   private static  String    vorigGeslacht = "";
 
-  private IocNamen() {}
+  protected IocNamen() {}
 
   private static void addRang(String rang) {
     totalen.put(rang, totalen.get(rang)+1);
@@ -69,29 +67,34 @@ public class IocNamen extends Batchjob {
   }
 
   public static void execute(String[] args) {
-    CsvBestand    csvBestand        = null;
-    int           lijnen            = -1;
-    JSONObject    taxa              = new JSONObject();
+    setParameterBundle(new ParameterBundle.Builder()
+                           .setBaseName(NatuurTools.TOOL_IOCNAMEN)
+                           .setClassloader(IocNamen.class.getClassLoader())
+                           .setValidator(new ParameterAfwezig())
+                           .build());
 
-    Banner.printDoosBanner(resourceBundle.getString("banner.iocnamen"));
+    Banner.printDoosBanner(DoosUtils.nullToEmpty(paramBundle.getBanner()));
 
-    if (!setParameters(args)) {
+    if (!paramBundle.isValid()
+        || !paramBundle.setArgs(args)) {
+      help();
+      printFouten();
       return;
     }
 
-    taal  = parameters.get(NatuurTools.PAR_TALEN).split(",");
+    taal  = paramBundle.getString(NatuurTools.PAR_TALEN).split(",");
     setRangen();
 
-    try {
-      csvBestand  =
-          new CsvBestand.Builder()
-                        .setBestand(parameters.get(PAR_INVOERDIR) +
-                                    parameters.get(NatuurTools.PAR_IOCBESTAND)
-                                    + EXT_CSV)
-                        .setCharset(parameters.get(PAR_CHARSETIN))
-                        .setHeader(false)
-                        .build();
+    var lijnen  = -1;
+    var taxa    = new JSONObject();
 
+    try (var csvBestand  =
+          new CsvBestand.Builder()
+                        .setBestand(
+                            paramBundle.getBestand(NatuurTools.PAR_IOCBESTAND))
+                        .setCharset(paramBundle.getString(PAR_CHARSETIN))
+                        .setHeader(false)
+                        .build()) {
       lijnen  = skipHeader(csvBestand);
 
       while (csvBestand.hasNext()) {
@@ -103,22 +106,12 @@ public class IocNamen extends Batchjob {
       taxa.put(NatuurTools.KEY_RANG, NatuurTools.RANG_KLASSE);
       taxa.put(NatuurTools.KEY_LATIJN, "Aves");
       taxa.put(NatuurTools.KEY_SUBRANGEN, ordes);
-
     } catch (BestandException | ParseException e) {
       DoosUtils.foutNaarScherm("csv: " + e.getLocalizedMessage());
-    } finally {
-      if (null != csvBestand) {
-        try {
-          csvBestand.close();
-        } catch (BestandException e) {
-          DoosUtils.foutNaarScherm("csv close: " + e.getLocalizedMessage());
-        }
-      }
     }
 
-    NatuurTools.writeJson(parameters.get(PAR_UITVOERDIR)
-                           + parameters.get(PAR_JSONBESTAND) + EXT_JSON, taxa,
-                          parameters.get(PAR_CHARSETUIT));
+    NatuurTools.writeJson(paramBundle.getBestand(NatuurTools.PAR_JSON),
+                          taxa, paramBundle.getString(PAR_CHARSETUIT));
 
     DoosUtils.naarScherm(
         MessageFormat.format(resourceBundle.getString(NatuurTools.MSG_LIJNEN),
@@ -131,42 +124,6 @@ public class IocNamen extends Batchjob {
     });
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(getMelding(MSG_KLAAR));
-    DoosUtils.naarScherm();
-  }
-
-  public static void help() {
-    DoosUtils.naarScherm("java -jar NatuurTools.jar IocNamen "
-        + getMelding(LBL_OPTIE) + " "
-        + MessageFormat.format(
-              getMelding(LBL_PARAM), NatuurTools.PAR_IOCBESTAND,
-              resourceBundle.getString(NatuurTools.LBL_IOCBESTAND)) + " "
-        + MessageFormat.format(
-              getMelding(LBL_PARAM), NatuurTools.PAR_TALEN,
-              resourceBundle.getString(NatuurTools.LBL_TALEN)), 80);
-    DoosUtils.naarScherm();
-    DoosUtils.naarScherm(getParameterTekst(PAR_CHARSETIN, 12),
-        MessageFormat.format(getMelding(HLP_CHARSETIN),
-                             Charset.defaultCharset().name()), 80);
-    DoosUtils.naarScherm(getParameterTekst(PAR_CHARSETUIT, 12),
-        MessageFormat.format(getMelding(HLP_CHARSETUIT),
-                             Charset.defaultCharset().name()), 80);
-    DoosUtils.naarScherm(getParameterTekst(PAR_INVOERDIR, 12),
-                         getMelding(HLP_INVOERDIR), 80);
-    DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_IOCBESTAND, 12),
-                         resourceBundle.getString(NatuurTools.HLP_IOCBESTAND),
-                         80);
-    DoosUtils.naarScherm(getParameterTekst(PAR_JSONBESTAND, 12),
-                         resourceBundle.getString(NatuurTools.HLP_IOCJSON),
-                         80);
-    DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_TALEN, 12),
-                         resourceBundle.getString(NatuurTools.HLP_TALEN), 80);
-    DoosUtils.naarScherm(getParameterTekst(PAR_UITVOERDIR, 12),
-                         getMelding(HLP_UITVOERDIR), 80);
-    DoosUtils.naarScherm();
-    DoosUtils.naarScherm(
-        MessageFormat.format(getMelding(HLP_PARAMSVERPLICHT),
-                             NatuurTools.PAR_IOCBESTAND, NatuurTools.PAR_TALEN),
-        80);
     DoosUtils.naarScherm();
   }
 
@@ -220,60 +177,6 @@ public class IocNamen extends Batchjob {
     }
 
   }
-
-  private static boolean setParameters(String[] args) {
-    Arguments     arguments = new Arguments(args);
-    List<String>  fouten    = new ArrayList<>();
-
-    arguments.setParameters(new String[] {PAR_CHARSETIN,
-                                          PAR_CHARSETUIT,
-                                          PAR_INVOERDIR,
-                                          NatuurTools.PAR_IOCBESTAND,
-                                          PAR_JSONBESTAND,
-                                          NatuurTools.PAR_TALEN,
-                                          PAR_UITVOERDIR});
-    arguments.setVerplicht(new String[] {NatuurTools.PAR_IOCBESTAND,
-                                         NatuurTools.PAR_TALEN});
-    if (!arguments.isValid()) {
-      fouten.add(getMelding(ERR_INVALIDPARAMS));
-    }
-
-    parameters  = new HashMap<>();
-
-    setParameter(arguments, PAR_CHARSETIN, Charset.defaultCharset().name());
-    setParameter(arguments, PAR_CHARSETUIT, Charset.defaultCharset().name());
-    setDirParameter(arguments, PAR_INVOERDIR);
-    setBestandParameter(arguments, NatuurTools.PAR_IOCBESTAND, EXT_CSV);
-    setBestandParameter(arguments, PAR_JSONBESTAND, EXT_JSON);
-    if (!hasParameter(PAR_JSONBESTAND)) {
-      setParameter(PAR_JSONBESTAND, getParameter(NatuurTools.PAR_IOCBESTAND));
-    }
-    NatuurTools.setTalenParameter(arguments, parameters);
-    setDirParameter(arguments, PAR_UITVOERDIR, getParameter(PAR_INVOERDIR));
-
-    if (DoosUtils.nullToEmpty(parameters.get(NatuurTools.PAR_IOCBESTAND))
-                 .contains(File.separator)) {
-      fouten.add(
-          MessageFormat.format(
-              getMelding(ERR_BEVATDIRECTORY), NatuurTools.PAR_IOCBESTAND));
-    }
-    if (arguments.hasArgument(PAR_JSONBESTAND)
-        && DoosUtils.nullToEmpty(parameters.get(PAR_JSONBESTAND))
-                    .contains(File.separator)) {
-      fouten.add(
-          MessageFormat.format(
-              getMelding(ERR_BEVATDIRECTORY), PAR_JSONBESTAND));
-    }
-
-    if (fouten.isEmpty()) {
-      return true;
-    }
-
-    help();
-    printFouten(fouten);
-
-    return false;
- }
 
   private static void setRangen() {
     for (String rang : new String[] {NatuurTools.RANG_ORDE,

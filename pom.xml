@@ -74,73 +74,27 @@
       <groupId>eu.debooy.doosutils</groupId>
       <artifactId>doosutils-file</artifactId>
       <version>2.1.1-SNAPSHOT</version>
-      <exclusions>
-        <exclusion>
-          <groupId>eu.debooy.doosutils</groupId>
-          <artifactId>doosutils-core</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>eu.debooy.doosutils</groupId>
       <artifactId>doosutils-persistence</artifactId>
-      <version>2.2.3</version>
-      <exclusions>
-        <exclusion>
-          <groupId>eu.debooy.doosutils</groupId>
-          <artifactId>doosutils-core</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>eu.debooy.doosutils</groupId>
-          <artifactId>doosutils-test</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>eu.debooy.doosutils</groupId>
-          <artifactId>doosutils-util</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>2.2.4-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>eu.debooy.doosutils</groupId>
       <artifactId>doosutils-test</artifactId>
       <version>2.0.2-SNAPSHOT</version>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>eu.debooy.doosutils</groupId>
-          <artifactId>doosutils-core</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>eu.debooy.doosutils</groupId>
       <artifactId>doosutils-util</artifactId>
-      <version>2.1.1</version>
-      <exclusions>
-        <exclusion>
-          <groupId>eu.debooy.doosutils</groupId>
-          <artifactId>doosutils-core</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>2.1.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>eu.debooy.natuur</groupId>
       <artifactId>natuur-components</artifactId>
-      <version>3.0.0</version>
-      <exclusions>
-        <exclusion>
-          <groupId>eu.debooy.doosutils</groupId>
-          <artifactId>doosutils-core</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>eu.debooy.doosutils</groupId>
-          <artifactId>doosutils-persistence</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>eu.debooy.doosutils</groupId>
-          <artifactId>doosutils-util</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>3.0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>

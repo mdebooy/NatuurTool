@@ -16,11 +16,11 @@
  */
 package eu.debooy.natuurtools;
 
-import eu.debooy.doosutils.Arguments;
 import eu.debooy.doosutils.Banner;
 import eu.debooy.doosutils.Batchjob;
-import eu.debooy.doosutils.DoosConstants;
 import eu.debooy.doosutils.DoosUtils;
+import eu.debooy.doosutils.ParameterBundle;
+import eu.debooy.doosutils.access.BestandConstants;
 import eu.debooy.doosutils.access.JsonBestand;
 import eu.debooy.doosutils.components.Message;
 import eu.debooy.doosutils.exception.BestandException;
@@ -31,8 +31,6 @@ import static eu.debooy.natuur.domain.TaxonDto.QRY_LATIJNSENAAM;
 import eu.debooy.natuur.domain.TaxonnaamDto;
 import eu.debooy.natuur.validator.TaxonValidator;
 import eu.debooy.natuur.validator.TaxonnaamValidator;
-import java.io.File;
-import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,57 +60,56 @@ public class TaxaImport extends Batchjob {
   private static final  List<String>          talen   = new ArrayList<>();
   private static final  Map<String, Integer>  totalen = new HashMap<>();
 
-  private static  boolean       aanmaak       = false;
+  private static  boolean       aanmaak   = false;
+  private static  boolean       behoud    = false;
   private static  EntityManager em;
-  private static  boolean       hernummer     = false;
-  private static  boolean       readonly      = false;
-  private static  boolean       skipstructuur = false;
+  private static  boolean       hernummer = false;
+  private static  boolean       readonly  = false;
 
-  private TaxaImport() {}
+  protected TaxaImport() {}
 
   public static void execute(String[] args) {
-    JsonBestand jsonBestand   = null;
-    var         latijnsenaam  = "?";
+    setParameterBundle(new ParameterBundle.Builder()
+                           .setBaseName(NatuurTools.TOOL_TAXAIMPORT)
+                           .setClassloader(TaxaImport.class.getClassLoader())
+                           .build());
 
-    Banner.printDoosBanner(resourceBundle.getString("banner.taxaimport"));
+    Banner.printDoosBanner(DoosUtils.nullToEmpty(paramBundle.getBanner()));
 
-    if (!setParameters(args)) {
+    if (!paramBundle.isValid()
+        || !paramBundle.setArgs(args)) {
+      help();
+      printFouten();
       return;
     }
 
-    setSwitches();
-
-    if (parameters.containsKey(NatuurTools.PAR_TALEN)) {
-      talen.addAll(Arrays.asList(parameters.get(NatuurTools.PAR_TALEN)
-                                           .split(",")));
+    if (paramBundle.containsParameter(NatuurTools.PAR_TALEN)) {
+      talen.addAll(Arrays.asList(paramBundle.getString(NatuurTools.PAR_TALEN)
+                                            .split(",")));
       Collections.sort(talen);
     }
 
-    if (parameters.containsKey(NatuurTools.PAR_WACHTWOORD)) {
-      em  = NatuurTools.getEntityManager(
-                parameters.get(NatuurTools.PAR_DBUSER),
-                parameters.get(NatuurTools.PAR_DBURL),
-                parameters.get(NatuurTools.PAR_WACHTWOORD));
-    } else {
-      em  = NatuurTools.getEntityManager(
-                parameters.get(NatuurTools.PAR_DBUSER),
-                parameters.get(NatuurTools.PAR_DBURL));
-    }
+    em  = NatuurTools.getEntityManager(
+              paramBundle.getString(NatuurTools.PAR_DBUSER),
+              paramBundle.getString(NatuurTools.PAR_DBURL),
+              paramBundle.getString(NatuurTools.PAR_WACHTWOORD));
 
     getRangen();
+    setSwitches();
 
-    try {
-      jsonBestand     =
+    var latijnsenaam  = "?";
+
+    try (var jsonBestand   =
           new JsonBestand.Builder()
-                         .setBestand(parameters.get(PAR_INVOERDIR)
-                                    + parameters.get(PAR_JSONBESTAND)
-                                    + EXT_JSON)
-                         .setCharset(parameters.get(PAR_CHARSETIN))
-                         .build();
+                         .setBestand(
+                             paramBundle.getBestand(PAR_JSONBESTAND,
+                                                    BestandConstants.EXT_JSON))
+                         .setCharset(paramBundle.getString(PAR_CHARSETIN))
+                         .build()) {
       latijnsenaam    = jsonBestand.read().get(NatuurTools.KEY_LATIJN)
-                                            .toString();
+                                          .toString();
       var   rang      = jsonBestand.read().get(NatuurTools.KEY_RANG)
-                                            .toString();
+                                          .toString();
       Long  parentId  = getTaxon(latijnsenaam, 0L, 0, rang).getTaxonId();
       for (Object taxa :
               (JSONArray) jsonBestand.read().get(NatuurTools.KEY_SUBRANGEN)) {
@@ -120,19 +117,9 @@ public class TaxaImport extends Batchjob {
       }
     } catch (BestandException e) {
       DoosUtils.foutNaarScherm(e.getLocalizedMessage());
-    } finally {
-      if (null != jsonBestand) {
-        try {
-          jsonBestand.close();
-        } catch (BestandException e) {
-          DoosUtils.foutNaarScherm("json: " + e.getLocalizedMessage());
-        }
-      }
     }
 
-    if (null != em) {
-      em.close();
-    }
+    em.close();
 
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(latijnsenaam);
@@ -192,7 +179,7 @@ public class TaxaImport extends Batchjob {
     }
 
     var verandering = new StringBuilder();
-    if (!skipstructuur && !parentId.equals(taxon.getParentId())) {
+    if (!behoud && !parentId.equals(taxon.getParentId())) {
       verandering.append("parentId: ").append(taxon.getParentId())
                  .append(" - > ").append(parentId).append(" ");
       taxon.setParentId(parentId);
@@ -259,8 +246,7 @@ public class TaxaImport extends Batchjob {
 
   private static void getRangen() {
     List<RangDto> ranglijst =
-        em.createQuery("select r from RangDto r order by r.niveau")
-          .getResultList();
+        em.createQuery(NatuurTools.QRY_RANG).getResultList();
 
     ranglijst.forEach(rang -> {
       prefix.put(rang.getRang(),
@@ -297,56 +283,6 @@ public class TaxaImport extends Batchjob {
     return resultaat;
   }
 
-  public static void help() {
-    DoosUtils.naarScherm("java -jar NatuurTools.jar TaxaImport "
-        + getMelding(LBL_OPTIE) + " "
-        + MessageFormat.format(
-              getMelding(LBL_PARAM), PAR_JSONBESTAND,
-              resourceBundle.getString(NatuurTools.LBL_JSONBESTAND)) + " "
-        + MessageFormat.format(
-              getMelding(LBL_PARAM), NatuurTools.PAR_DBURL,
-              resourceBundle.getString(NatuurTools.LBL_DBURL)) + " "
-        + MessageFormat.format(
-              getMelding(LBL_PARAM), NatuurTools.PAR_DBUSER,
-              resourceBundle.getString(NatuurTools.LBL_DBUSER)), 80);
-    DoosUtils.naarScherm();
-    DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_AANMAAK, 14),
-                         resourceBundle.getString(NatuurTools.HLP_AANMAAK), 80);
-    DoosUtils.naarScherm(getParameterTekst(PAR_CHARSETIN, 14),
-        MessageFormat.format(getMelding(HLP_CHARSETIN),
-                             Charset.defaultCharset().name()), 80);
-    DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_DBURL, 14),
-                         resourceBundle.getString(NatuurTools.HLP_DBURL), 80);
-    DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_DBUSER, 14),
-                         resourceBundle.getString(NatuurTools.HLP_DBUSER), 80);
-    DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_HERNUMMER, 14),
-                         resourceBundle.getString(NatuurTools.HLP_HERNUMMER),
-                         80);
-    DoosUtils.naarScherm(getParameterTekst(PAR_INVOERDIR, 14),
-                         getMelding(HLP_INVOERDIR), 80);
-    DoosUtils.naarScherm(getParameterTekst(PAR_JSONBESTAND, 14),
-                         resourceBundle.getString(NatuurTools.HLP_JSONBESTAND),
-                         80);
-    DoosUtils.naarScherm(getParameterTekst(PAR_READONLY, 14),
-                         resourceBundle.getString(NatuurTools.HLP_READONLY),
-                         80);
-    DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_SKIPSTRUCTUUR, 14),
-                         resourceBundle
-                             .getString(NatuurTools.HLP_SKIPSTRUCTUUR), 80);
-    DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_TALEN, 14),
-                         resourceBundle.getString(NatuurTools.HLP_INCLUDETALEN),
-                         80);
-    DoosUtils.naarScherm(getParameterTekst(NatuurTools.PAR_WACHTWOORD, 14),
-                         resourceBundle.getString(NatuurTools.HLP_WACHTWOORD),
-                         80);
-    DoosUtils.naarScherm();
-    DoosUtils.naarScherm(
-        MessageFormat.format(getMelding(HLP_PARAMSVERPLICHT),
-                             PAR_JSONBESTAND + ", " + NatuurTools.PAR_DBURL,
-                             NatuurTools.PAR_DBUSER), 80);
-    DoosUtils.naarScherm();
-  }
-
   protected static boolean isTaalValid(String taal) {
     return talen.isEmpty() || talen.contains(taal);
   }
@@ -361,80 +297,27 @@ public class TaxaImport extends Batchjob {
                                        prefix.get(rang), rang, latijnsenaam));
   }
 
-  private static boolean setParameters(String[] args) {
-    var           arguments = new Arguments(args);
-    List<String>  fouten    = new ArrayList<>();
-
-    arguments.setParameters(new String[] {NatuurTools.PAR_AANMAAK,
-                                          PAR_CHARSETIN,
-                                          NatuurTools.PAR_DBURL,
-                                          NatuurTools.PAR_DBUSER,
-                                          NatuurTools.PAR_HERNUMMER,
-                                          PAR_INVOERDIR,
-                                          PAR_JSONBESTAND,
-                                          PAR_READONLY,
-                                          NatuurTools.PAR_SKIPSTRUCTUUR,
-                                          NatuurTools.PAR_TALEN,
-                                          NatuurTools.PAR_WACHTWOORD});
-    arguments.setVerplicht(new String[] {PAR_JSONBESTAND,
-                                         NatuurTools.PAR_DBURL,
-                                         NatuurTools.PAR_DBUSER});
-    if (!arguments.isValid()) {
-      fouten.add(getMelding(ERR_INVALIDPARAMS));
-    }
-
-    parameters  = new HashMap<>();
-
-    setParameter(arguments, NatuurTools.PAR_AANMAAK, DoosConstants.ONWAAR);
-    setParameter(arguments, PAR_CHARSETIN, Charset.defaultCharset().name());
-    setParameter(arguments, NatuurTools.PAR_DBURL);
-    setParameter(arguments, NatuurTools.PAR_DBUSER);
-    setParameter(arguments, NatuurTools.PAR_HERNUMMER, DoosConstants.ONWAAR);
-    setDirParameter(arguments, PAR_INVOERDIR);
-    setBestandParameter(arguments, PAR_JSONBESTAND, EXT_JSON);
-    setParameter(arguments, PAR_READONLY, DoosConstants.ONWAAR);
-    setParameter(arguments, NatuurTools.PAR_SKIPSTRUCTUUR,
-                 DoosConstants.ONWAAR);
-    NatuurTools.setTalenParameter(arguments, parameters);
-    setParameter(arguments, NatuurTools.PAR_WACHTWOORD);
-
-    if (DoosUtils.nullToEmpty(parameters.get(PAR_JSONBESTAND))
-                 .contains(File.separator)) {
-      fouten.add(
-          MessageFormat.format(
-              getMelding(ERR_BEVATDIRECTORY), PAR_JSONBESTAND));
-    }
-
-    if (fouten.isEmpty()) {
-      return true;
-    }
-
-    help();
-    printFouten(fouten);
-
-    return false;
-  }
-
   private static void setSwitches() {
-    if (DoosUtils.isTrue(parameters.get(PAR_READONLY))) {
+    if (paramBundle.getBoolean(PAR_READONLY)) {
       readonly      = true;
       return;
     }
 
+    aanmaak   = paramBundle.getBoolean(NatuurTools.PAR_AANMAAK);
+    behoud    = paramBundle.getBoolean(NatuurTools.PAR_BEHOUD);
+    hernummer = paramBundle.getBoolean(NatuurTools.PAR_HERNUMMER);
+
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(resourceBundle.getString(NatuurTools.MSG_WIJZIGEN));
-    if (DoosUtils.isTrue(parameters.get(NatuurTools.PAR_SKIPSTRUCTUUR))) {
-      skipstructuur = true;
+    if (behoud) {
       DoosUtils.naarScherm(resourceBundle
                               .getString(NatuurTools.MSG_SKIPSTRUCTUUR));
     }
-    if (DoosUtils.isTrue(parameters.get(NatuurTools.PAR_AANMAAK))) {
-      aanmaak       = true;
+    if (aanmaak) {
       DoosUtils.naarScherm(resourceBundle
                               .getString(NatuurTools.MSG_AANMAKEN));
     }
-    if (DoosUtils.isTrue(parameters.get(NatuurTools.PAR_HERNUMMER))) {
-      hernummer     = true;
+    if (hernummer) {
       DoosUtils.naarScherm(resourceBundle
                               .getString(NatuurTools.MSG_HERNUMMER));
     }

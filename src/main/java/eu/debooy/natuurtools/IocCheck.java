@@ -20,6 +20,7 @@ import eu.debooy.doosutils.Banner;
 import eu.debooy.doosutils.Batchjob;
 import eu.debooy.doosutils.DoosUtils;
 import eu.debooy.doosutils.ParameterBundle;
+import eu.debooy.doosutils.access.BestandConstants;
 import eu.debooy.doosutils.access.JsonBestand;
 import eu.debooy.doosutils.exception.BestandException;
 import eu.debooy.natuur.domain.DetailDto;
@@ -28,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import javax.persistence.EntityManager;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -40,8 +40,6 @@ public class IocCheck extends Batchjob {
   private static final  ResourceBundle  resourceBundle  =
       ResourceBundle.getBundle("ApplicatieResources", Locale.getDefault());
 
-  private static  EntityManager em;
-
   private static final  String  QUERY =
       "select d from DetailDto d where d.parentLatijnsenaam='Aves' "
           + "and d.rang='so' order by d.volgnummer";
@@ -52,7 +50,7 @@ public class IocCheck extends Batchjob {
 
   public static void execute(String[] args) {
     setParameterBundle(new ParameterBundle.Builder()
-                           .setBaseName("IocCheck")
+                           .setBaseName(NatuurTools.TOOL_IOCCHECK)
                            .setClassloader(IocCheck.class.getClassLoader())
                            .build());
 
@@ -67,17 +65,21 @@ public class IocCheck extends Batchjob {
 
     try (var jsonBestand =
           new JsonBestand.Builder()
-                         .setBestand(paramBundle.getBestand("json", EXT_JSON))
+                         .setBestand(
+                            paramBundle.getBestand(NatuurTools.PAR_JSON,
+                                                   BestandConstants.EXT_JSON))
                          .build()) {
-      JSONArray taxa  = (JSONArray) jsonBestand.get("taxa");
-      taxa.forEach(blad -> {
-        zoekSoorten((JSONObject) blad);
-      });
+      JSONArray taxa  = (JSONArray) jsonBestand.get(NatuurTools.KEY_TAXA);
+      taxa.forEach(blad ->  zoekSoorten((JSONObject) blad));
     } catch (BestandException e) {
       DoosUtils.foutNaarScherm(e.getLocalizedMessage());
     }
 
-    getEntityManager();
+    var em  = NatuurTools.getEntityManager(
+                  paramBundle.getString(NatuurTools.PAR_DBUSER),
+                  paramBundle.getString(NatuurTools.PAR_DBURL),
+                  paramBundle.getString(NatuurTools.PAR_WACHTWOORD));
+
     var onbekend  = 0;
     for (var detail : em.createQuery(QUERY).getResultList()) {
       if (!latijnsenamen.contains(((DetailDto) detail).getLatijnsenaam())) {
@@ -95,6 +97,8 @@ public class IocCheck extends Batchjob {
       }
     }
 
+    em.close();
+
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(
         MessageFormat.format(
@@ -106,23 +110,11 @@ public class IocCheck extends Batchjob {
             latijnsenamen.size()));
   }
 
-  private static void getEntityManager() {
-    if (paramBundle.containsParameter(NatuurTools.PAR_WACHTWOORD)) {
-      em  = NatuurTools.getEntityManager(
-                paramBundle.getString(NatuurTools.PAR_DBUSER),
-                paramBundle.getString(NatuurTools.PAR_DBURL),
-                paramBundle.getString(NatuurTools.PAR_WACHTWOORD));
-    } else {
-      em  = NatuurTools.getEntityManager(
-                paramBundle.getString(NatuurTools.PAR_DBUSER),
-                paramBundle.getString(NatuurTools.PAR_DBURL));
-    }
-  }
-
   private static void setLatijnsenamen(JSONObject tree) {
     tree.keySet()
         .stream()
-        .filter(sleutel -> "latijn".equalsIgnoreCase(sleutel.toString()))
+        .filter(sleutel -> NatuurTools.KEY_LATIJN
+                                      .equalsIgnoreCase(sleutel.toString()))
         .forEachOrdered(sleutel ->
             latijnsenamen.add(tree.get(sleutel).toString()));
   }
@@ -132,7 +124,7 @@ public class IocCheck extends Batchjob {
         .stream()
         .filter(sleutel -> (tree.get(sleutel) instanceof JSONArray))
         .forEachOrdered(sleutel -> {
-      if ("soorten".equals(sleutel)) {
+      if (NatuurTools.KEY_SOORTEN.equals(sleutel)) {
         ((JSONArray) tree.get(sleutel)).forEach(blad ->
             setLatijnsenamen((JSONObject) blad));
       } else {

@@ -8,6 +8,7 @@
 
     <class>eu.debooy.natuur.domain.DetailDto</class>
     <class>eu.debooy.natuur.domain.RangDto</class>
+    <class>eu.debooy.natuur.domain.RangnaamDto</class>
     <class>eu.debooy.natuur.domain.TaxonDto</class>
     <class>eu.debooy.natuur.domain.TaxonnaamDto</class>
 

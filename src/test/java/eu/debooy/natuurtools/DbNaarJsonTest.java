@@ -18,7 +18,6 @@ package eu.debooy.natuurtools;
 
 import eu.debooy.doosutils.test.BatchTest;
 import eu.debooy.doosutils.test.VangOutEnErr;
-import java.io.File;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
@@ -30,31 +29,12 @@ public class DbNaarJsonTest extends BatchTest {
   protected static final  ClassLoader CLASSLOADER =
       CsvNaarJsonTest.class.getClassLoader();
 
-  private static final  String  BST_JSON        = "MultilingIOC.json";
-  private static final  String  PAR_JSONBESTAND = "jsonbestand";
-
-  @Test
-  public void testJsonBestandMetDirectory() {
-    var args  = new String[] {"--" + PAR_JSONBESTAND
-                                + "=" + TEMP + File.separator
-                                + BST_JSON,
-                              "--" + NatuurTools.PAR_DBURL + "=url",
-                              "--" + NatuurTools.PAR_DBUSER + "=user",
-                              "--" + NatuurTools.PAR_TAXAROOT + "=kl,Aves"};
-
-    VangOutEnErr.execute(DbNaarJson.class, "execute", args, out, err);
-
-    assertEquals("JsonBestand Met Directory - helptekst", 26, out.size());
-    assertEquals("JsonBestand Met Directory - fouten", 1, err.size());
-  }
-
   @Test
   public void testLeeg() {
     var args  = new String[] {};
 
     VangOutEnErr.execute(DbNaarJson.class, "execute", args, out, err);
 
-    assertEquals("Zonder parameters - helptekst", 26, out.size());
     assertEquals("Zonder parameters - fouten", 1, err.size());
   }
 }
