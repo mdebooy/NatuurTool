@@ -19,8 +19,6 @@ package eu.debooy.natuurtools;
 import eu.debooy.doosutils.access.Bestand;
 import eu.debooy.doosutils.exception.BestandException;
 import eu.debooy.doosutils.test.BatchTest;
-import eu.debooy.doosutils.test.DoosUtilsTestConstants;
-import eu.debooy.doosutils.test.VangOutEnErr;
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
@@ -63,6 +61,12 @@ public class IocNamenTest extends BatchTest {
     }
   }
 
+  protected void execute(String[] args) {
+    before();
+    IocNamen.execute(args);
+    after();
+  }
+
   @Test
   public void testCsv() throws BestandException, IOException {
     var args  = new String[] {
@@ -70,8 +74,7 @@ public class IocNamenTest extends BatchTest {
            + BST_CSV,
       "--" + NatuurTools.PAR_TALEN + "=en,af,ca,zh,z,hr,cs,da,nl,et,fi,fr,de,hu,is,id,it,ja,lv,lt,se,no,pl,pt,ru,sk,sl,es,sv,th,uk"};
 
-    VangOutEnErr.execute(IocNamen.class,
-                         DoosUtilsTestConstants.CMD_EXECUTE, args, out, err);
+    execute(args);
 
     assertEquals("CSV - fouten", 0, err.size());
     assertEquals("CSV - 12", "33", out.get(11).split(":")[1].trim());
@@ -91,7 +94,7 @@ public class IocNamenTest extends BatchTest {
   public void testLeeg() {
     var args  = new String[] {};
 
-    VangOutEnErr.execute(IocNamen.class, "execute", args, out, err);
+    execute(args);
 
     assertEquals("Zonder parameters - fouten", 1, err.size());
   }

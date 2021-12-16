@@ -17,7 +17,6 @@
 package eu.debooy.natuurtools;
 
 import eu.debooy.doosutils.test.BatchTest;
-import eu.debooy.doosutils.test.VangOutEnErr;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
@@ -29,11 +28,17 @@ public class DbNaarJsonTest extends BatchTest {
   protected static final  ClassLoader CLASSLOADER =
       CsvNaarJsonTest.class.getClassLoader();
 
+  protected void execute(String[] args) {
+    before();
+    DbNaarJson.execute(args);
+    after();
+  }
+
   @Test
   public void testLeeg() {
     var args  = new String[] {};
 
-    VangOutEnErr.execute(DbNaarJson.class, "execute", args, out, err);
+    execute(args);
 
     assertEquals("Zonder parameters - fouten", 1, err.size());
   }

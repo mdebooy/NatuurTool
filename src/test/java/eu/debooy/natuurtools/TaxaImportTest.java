@@ -17,7 +17,6 @@
 package eu.debooy.natuurtools;
 
 import eu.debooy.doosutils.test.BatchTest;
-import eu.debooy.doosutils.test.VangOutEnErr;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
@@ -26,11 +25,17 @@ import org.junit.Test;
  * @author Marco de Booij
  */
 public class TaxaImportTest extends BatchTest {
+  protected void execute(String[] args) {
+    before();
+    TaxaImport.execute(args);
+    after();
+  }
+
   @Test
   public void testLeeg() {
     var args  = new String[] {};
 
-    VangOutEnErr.execute(TaxaImport.class, "execute", args, out, err);
+    execute(args);
 
     assertEquals("Zonder parameters - fouten", 1, err.size());
   }
