@@ -27,6 +27,8 @@ import java.util.Map;
  * @author Marco de Booij
  */
 public class ParameterAfwezig implements IParameterBundleValidator {
+  private static final  String  PAR_CSVBESTAND  = "csvbestand";
+
   private boolean isAfwezig(String bron, String doel,
                             Map<String, Parameter> params,
                             List<String> argumenten) {
@@ -48,9 +50,9 @@ public class ParameterAfwezig implements IParameterBundleValidator {
                   params, argumenten)) {
       setAfwezig(NatuurTools.PAR_IOCBESTAND, NatuurTools.PAR_JSON, params);
     }
-    if (isAfwezig(NatuurTools.PAR_CSVBESTAND, NatuurTools.PAR_JSON,
+    if (isAfwezig(PAR_CSVBESTAND, NatuurTools.PAR_JSON,
                   params, argumenten)) {
-      setAfwezig(NatuurTools.PAR_CSVBESTAND, NatuurTools.PAR_JSON, params);
+      setAfwezig(PAR_CSVBESTAND, NatuurTools.PAR_JSON, params);
     }
 
     return fouten;

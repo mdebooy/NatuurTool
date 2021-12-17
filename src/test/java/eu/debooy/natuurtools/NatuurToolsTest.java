@@ -31,66 +31,44 @@ public class NatuurToolsTest extends BatchTest {
     after();
   }
 
-  @Test
-  public void testLeeg() {
-    var args      = new String[] {};
-
+  private void testTool(String[] args, String tekst, int fouten) {
     execute(args);
 
-    assertEquals("Geen tool - fouten", 0, err.size());
+    assertEquals(tekst, fouten, err.size());
+  }
+
+  @Test
+  public void testLeeg() {
+    testTool(new String[] {}, "Geen tool - fouten", 0);
   }
 
   @Test
   public void testCsvNaarJson() {
-    var args      = new String[] {"CsvNaarJson"};
-
-    execute(args);
-
-    assertEquals("CsvNaarJson - fouten", 1, err.size());
+    testTool(new String[] {"CsvNaarJson"}, "CsvNaarJson - fouten", 1);
   }
 
   @Test
   public void testDbNaarJson() {
-    var args      = new String[] {"DbNaarJson"};
-
-    execute(args);
-
-    assertEquals("DbNaarJson - fouten", 1, err.size());
+    testTool(new String[] {"DbNaarJson"}, "DbNaarJson - fouten", 1);
   }
 
   @Test
   public void testIocNamen() {
-    var args      = new String[] {"IocNamen"};
-
-    execute(args);
-
-    assertEquals("IocNamen - fouten", 1, err.size());
+    testTool(new String[] {"IocNamen"}, "IocNamen - fouten", 1);
   }
 
   @Test
   public void testOnbestaand() {
-    var args      = new String[] {"onbestaand"};
-
-    execute(args);
-
-    assertEquals("onbestaand - fouten", 1, err.size());
+    testTool(new String[] {"onbestaand"}, "onbestaand - fouten", 1);
   }
 
   @Test
   public void testTaxaImport() {
-    var args      = new String[] {"TaxaImport"};
-
-    execute(args);
-
-    assertEquals("TaxaImport - fouten", 1, err.size());
+    testTool(new String[] {"TaxaImport"}, "TaxaImport - fouten", 1);
   }
 
   @Test
   public void testTaxonomie() {
-    var args      = new String[] {"Taxonomie"};
-
-    execute(args);
-
-    assertEquals("Taxonomie - fouten", 1, err.size());
+    testTool(new String[] {"Taxonomie"}, "Taxonomie - fouten", 1);
   }
 }

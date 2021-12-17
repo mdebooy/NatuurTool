@@ -102,7 +102,7 @@ public class TaxaImport extends Batchjob {
     try (var jsonBestand   =
           new JsonBestand.Builder()
                          .setBestand(
-                             paramBundle.getBestand(PAR_JSONBESTAND,
+                             paramBundle.getBestand(NatuurTools.PAR_JSON,
                                                     BestandConstants.EXT_JSON))
                          .setCharset(paramBundle.getString(PAR_CHARSETIN))
                          .build()) {
@@ -298,8 +298,8 @@ public class TaxaImport extends Batchjob {
   }
 
   private static void setSwitches() {
-    if (paramBundle.getBoolean(PAR_READONLY)) {
-      readonly      = true;
+    if (Boolean.TRUE.equals(paramBundle.getBoolean(PAR_READONLY))) {
+      readonly  = true;
       return;
     }
 

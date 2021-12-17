@@ -89,7 +89,7 @@ public class Taxonomie extends Batchjob {
                             .setLezen(false)
                             .setBestand(
                                 paramBundle
-                                    .getBestand(NatuurTools.PAR_TEXBESTAND,
+                                    .getBestand(PAR_TEXBESTAND,
                                                 BestandConstants.EXT_TEX))
                             .setCharset(BestandConstants.UTF8)
                             .build();

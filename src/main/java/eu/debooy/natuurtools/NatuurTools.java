@@ -52,11 +52,6 @@ public class NatuurTools extends Batchjob {
   protected static final  String  KEY_SUBRANGEN = "subrangen";
   protected static final  String  KEY_TAXA      = "taxa";
 
-  protected static final  String  LBL_CSVBESTAND      = "label.csvbestand";
-  protected static final  String  LBL_DBURL           = "label.dburl";
-  protected static final  String  LBL_DBUSER          = "label.dbuser";
-  protected static final  String  LBL_IOCBESTAND      = "label.iocbestand";
-  protected static final  String  LBL_JSONBESTAND     = "label.jsonbestand";
   protected static final  String  LBL_RANGEN          = "label.rangen";
   protected static final  String  LBL_SOORTENONBEKEND = "label.soortenonbekend";
   protected static final  String  LBL_TALEN           = "label.talen";
@@ -78,7 +73,6 @@ public class NatuurTools extends Batchjob {
 
   protected static final  String  PAR_AANMAAK     = "aanmaak";
   protected static final  String  PAR_BEHOUD      = "behoud";
-  protected static final  String  PAR_CSVBESTAND  = "csvbestand";
   protected static final  String  PAR_IOCBESTAND  = "iocbestand";
   protected static final  String  PAR_DBURL       = "dburl";
   protected static final  String  PAR_DBUSER      = "dbuser";
@@ -168,8 +162,8 @@ public class NatuurTools extends Batchjob {
       return;
     }
 
-    String    commando      = args[0];
-    String[]  commandoArgs  = new String[args.length-1];
+    var commando      = args[0];
+    var commandoArgs  = new String[args.length-1];
     System.arraycopy(args, 1, commandoArgs, 0, args.length-1);
 
     switch (commando.toLowerCase()) {
