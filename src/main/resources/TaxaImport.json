@@ -9,22 +9,19 @@
       "parameter": "aanmaak",
       "lang": "aanmaak",
       "help": "De ontbrekende taxa toevoegen.",
-      "type": "boolean",
-      "verplicht": false
+      "type": "boolean"
     },
     {
       "parameter": "behoud",
       "lang": "behoudstructuur",
       "help": "Veranderen van de parenttaxon. PAS OP dit kan tussenrangen 'uitschakelen'.",
-      "type": "boolean",
-      "verplicht": false
+      "type": "boolean"
     },
     {
       "parameter": "charsetin",
       "lang": "charsetin",
       "help": "De characterset van de invoer als deze niet {0} is.",
-      "type": "charset",
-      "verplicht": false
+      "type": "charset"
     },
     {
       "parameter": "dburl",
@@ -42,8 +39,7 @@
       "parameter": "hernummer",
       "lang": "hernummer",
       "help": "Hernummer de taxa.",
-      "type": "boolean",
-      "verplicht": false
+      "type": "boolean"
     },
     {
       "parameter": "json",
@@ -58,21 +54,18 @@
       "parameter": "readonly",
       "lang": "readonly",
       "help": "Enkel lezen. Nu worden <aanmaken>, <hernummer> en <skipstructuur> genegeerd.",
-      "type": "boolean",
-      "verplicht": false
+      "type": "boolean"
     },
     {
       "parameter": "talen",
       "lang": "talen",
-      "help": "Lijst, door komma's gescheiden, met talen die in het overzicht mogen staan.",
-      "verplicht": false
+      "help": "Lijst, door komma's gescheiden, met talen die in het overzicht mogen staan."
     },
     {
       "parameter": "wachtwoord",
       "kort": "w",
       "lang": "wachtwoord",
-      "help": "Het wachtwoord van de database gebruikersnaam.",
-      "verplicht": false
+      "help": "Het wachtwoord van de database gebruikersnaam."
     }
   ]
 }

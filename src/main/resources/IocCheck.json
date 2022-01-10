@@ -30,8 +30,7 @@
       "parameter": "wachtwoord",
       "kort": "w",
       "lang": "wachtwoord",
-      "help": "Het wachtwoord van de database gebruikersnaam.",
-      "verplicht": false
+      "help": "Het wachtwoord van de database gebruikersnaam."
     }
   ]
 }

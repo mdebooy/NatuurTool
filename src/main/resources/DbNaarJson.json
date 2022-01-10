@@ -9,8 +9,7 @@
       "parameter": "charsetuit",
       "lang": "charsetuit",
       "help": "De characterset van de uitvoer als deze niet {0} is.",
-      "type": "charset",
-      "verplicht": false
+      "type": "charset"
     },
     {
       "parameter": "dburl",
@@ -43,8 +42,7 @@
       "parameter": "wachtwoord",
       "kort": "w",
       "lang": "wachtwoord",
-      "help": "Het wachtwoord van de database gebruikersnaam.",
-      "verplicht": false
+      "help": "Het wachtwoord van de database gebruikersnaam."
     }
   ]
 }

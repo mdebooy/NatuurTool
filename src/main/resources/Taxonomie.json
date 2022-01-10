@@ -21,21 +21,18 @@
       "parameter": "rangen",
       "kort": "r",
       "lang": "rangen",
-      "help": "Lijst, door komma's gescheiden, met rangen die in de uitvoer moeten komen.",
-      "verplicht": false
+      "help": "Lijst, door komma's gescheiden, met rangen die in de uitvoer moeten komen."
     },
     {
       "parameter": "taal",
       "lang": "taal",
       "help": "Taal van de namen, die naast de latijnse naam staan, als die anders is dan de taal van het systeem ({0}).",
-      "type": "locale",
-      "verplicht": false
+      "type": "locale"
     },
     {
       "parameter": "talen",
       "lang": "talen",
-      "help": "Lijst, door komma's gescheiden, met talen die in het overzicht mogen staan.",
-      "verplicht": false
+      "help": "Lijst, door komma's gescheiden, met talen die in het overzicht mogen staan."
     },
     {
       "parameter": "texbestand",
@@ -50,8 +47,7 @@
       "parameter": "wachtwoord",
       "kort": "w",
       "lang": "wachtwoord",
-      "help": "Het wachtwoord van de database gebruikersnaam.",
-      "verplicht": false
+      "help": "Het wachtwoord van de database gebruikersnaam."
     }
   ]
 }

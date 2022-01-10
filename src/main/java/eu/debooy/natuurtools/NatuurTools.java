@@ -52,10 +52,7 @@ public class NatuurTools extends Batchjob {
   protected static final  String  KEY_SUBRANGEN = "subrangen";
   protected static final  String  KEY_TAXA      = "taxa";
 
-  protected static final  String  LBL_RANGEN          = "label.rangen";
   protected static final  String  LBL_SOORTENONBEKEND = "label.soortenonbekend";
-  protected static final  String  LBL_TALEN           = "label.talen";
-  protected static final  String  LBL_TAXAROOT        = "label.taxaroot";
   protected static final  String  LBL_WACHTWOORD      = "label.wachtwoord";
 
   protected static final  String  MSG_AANMAKEN        = "msg.aanmaken";

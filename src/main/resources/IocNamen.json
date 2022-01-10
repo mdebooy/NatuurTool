@@ -9,15 +9,13 @@
       "parameter": "charsetin",
       "lang": "charsetin",
       "help": "De characterset van de invoer als deze niet {0} is.",
-      "type": "charset",
-      "verplicht": false
+      "type": "charset"
     },
     {
       "parameter": "charsetuit",
       "lang": "charsetuit",
       "help": "De characterset van de uitvoer als deze niet {0} is.",
-      "type": "charset",
-      "verplicht": false
+      "type": "charset"
     },
     {
       "parameter": "iocbestand",
@@ -33,9 +31,8 @@
       "extensie": "json",
       "kort": "j",
       "lang": "jsonbestand",
-      "help": "IOC Namen bestand in JSON-formaat. Als deze parameter afwezig is krijgt het bestand dezelfde naam als --iocbestand.",
-      "type": "bestand",
-      "verplicht": false
+      "help": "IOC Namen bestand in JSON-formaat. Als deze parameter afwezig is krijgt het bestand dezelfde naam als <iocbestand>.",
+      "type": "bestand"
     },
     {
       "parameter": "talen",
