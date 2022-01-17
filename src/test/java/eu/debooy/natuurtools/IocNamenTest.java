@@ -72,12 +72,12 @@ public class IocNamenTest extends BatchTest {
     var args  = new String[] {
       "--" + NatuurTools.PAR_IOCBESTAND + "=" + getTemp() + File.separator
            + BST_CSV,
-      "--" + NatuurTools.PAR_TALEN + "=en,af,ca,zh,z,hr,cs,da,nl,et,fi,fr,de,hu,is,id,it,ja,lv,lt,se,no,pl,pt,ru,sk,sl,es,sv,th,uk"};
+      "--" + NatuurTools.PAR_TALEN + "=en,ca,zh,z,hr,cs,da,nl,fi,fr,de,it,ja,lt,no,pl,pt,ru,sr,sk,es,sv,tr,uk,af,et,hu,is,id,lv,se,sl,th"};
 
     execute(args);
 
     assertEquals("CSV - fouten", 0, err.size());
-    assertEquals("CSV - 12", "33", out.get(11).split(":")[1].trim());
+    assertEquals("CSV - 12", "6", out.get(11).split(":")[1].trim());
     assertEquals("CSV - 13", "2",  out.get(12).split(":")[1].trim());
     assertEquals("CSV - 14", "3",  out.get(13).split(":")[1].trim());
     assertEquals("CSV - 15", "4",  out.get(14).split(":")[1].trim());
