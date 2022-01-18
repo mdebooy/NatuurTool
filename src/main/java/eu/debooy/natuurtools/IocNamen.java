@@ -194,7 +194,6 @@ public class IocNamen extends Batchjob {
   }
 
   private static void verwerkLijn(String[] veld) throws ParseException {
-//    System.out.println("Aantal: " + veld.length + " " + Arrays.toString(veld));
     // Nieuwe Orde
     if (!veld[1].equals(vorigeOrde)) {
       nieuweOrde();
