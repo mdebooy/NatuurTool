@@ -137,7 +137,7 @@ public class Taxonomie extends Batchjob {
       }
       regel.append("}{");
       parent.getTaxonnamen()
-            .stream()
+            .stream().sorted()
             .filter(taxonnaam -> (talen.contains(taxonnaam.getTaal())
                                   || talen.isEmpty()))
             .forEachOrdered(taxonnaam -> regel.append("\\naam{")
