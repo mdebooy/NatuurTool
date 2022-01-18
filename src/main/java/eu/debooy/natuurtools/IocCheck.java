@@ -69,10 +69,13 @@ public class IocCheck extends Batchjob {
                             paramBundle.getBestand(NatuurTools.PAR_JSON,
                                                    BestandConstants.EXT_JSON))
                          .build()) {
-      JSONArray taxa  = (JSONArray) jsonBestand.get(NatuurTools.KEY_TAXA);
-      taxa.forEach(blad ->  zoekSoorten((JSONObject) blad));
+      for (Object taxa :
+              (JSONArray) jsonBestand.read().get(NatuurTools.KEY_SUBRANGEN)) {
+        zoekSoorten((JSONObject) taxa);
+      }
     } catch (BestandException e) {
       DoosUtils.foutNaarScherm(e.getLocalizedMessage());
+      return;
     }
 
     var em  = NatuurTools.getEntityManager(
@@ -110,27 +113,19 @@ public class IocCheck extends Batchjob {
             latijnsenamen.size()));
   }
 
-  private static void setLatijnsenamen(JSONObject tree) {
-    tree.keySet()
-        .stream()
-        .filter(sleutel -> NatuurTools.KEY_LATIJN
-                                      .equalsIgnoreCase(sleutel.toString()))
-        .forEachOrdered(sleutel ->
-            latijnsenamen.add(tree.get(sleutel).toString()));
-  }
-
   private static void zoekSoorten(JSONObject tree) {
-    tree.keySet()
-        .stream()
-        .filter(sleutel -> (tree.get(sleutel) instanceof JSONArray))
-        .forEachOrdered(sleutel -> {
-      if (NatuurTools.KEY_SOORTEN.equals(sleutel)) {
-        ((JSONArray) tree.get(sleutel)).forEach(blad ->
-            setLatijnsenamen((JSONObject) blad));
-      } else {
-        ((JSONArray) tree.get(sleutel)).forEach(blad ->
-            zoekSoorten((JSONObject) blad));
-      }
-    });
+    var boom  = tree.keySet();
+
+    if (boom.contains(NatuurTools.KEY_RANG)
+        && tree.get(NatuurTools.KEY_RANG)
+               .toString().equals(NatuurTools.RANG_SOORT)) {
+      latijnsenamen.add(tree.get(NatuurTools.KEY_LATIJN).toString());
+      return;
+    }
+
+    if (boom.contains(NatuurTools.KEY_SUBRANGEN)) {
+      ((JSONArray) tree.get(NatuurTools.KEY_SUBRANGEN)).forEach(tak ->
+          zoekSoorten((JSONObject) tak));
+    }
   }
 }
