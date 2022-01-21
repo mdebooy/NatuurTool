@@ -144,7 +144,6 @@ public class NatuurTools extends Batchjob {
     tools.forEach(tool -> {
       var parameterBundle = new ParameterBundle.Builder()
                            .setBaseName(tool)
-                           .setClassloader(NatuurTools.class.getClassLoader())
                            .build();
       parameterBundle.help();
       DoosUtils.naarScherm(DoosUtils.stringMetLengte("_", 80, "_"));

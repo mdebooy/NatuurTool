@@ -84,8 +84,6 @@ public class CsvNaarJson extends Batchjob {
   public static void execute(String[] args) {
     setParameterBundle(new ParameterBundle.Builder()
                            .setBaseName(NatuurTools.TOOL_CSVNAARJSON)
-                           .setClassloader(IocCheck.class.getClassLoader())
-                           .setValidator(new ParameterAfwezig())
                            .build());
 
     Banner.printDoosBanner(DoosUtils.nullToEmpty(paramBundle.getBanner()));

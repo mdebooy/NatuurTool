@@ -32,6 +32,7 @@
       "kort": "j",
       "lang": "jsonbestand",
       "help": "IOC Namen bestand in JSON-formaat. Als deze parameter afwezig is krijgt het bestand dezelfde naam als <iocbestand>.",
+      "standaard": "_@iocbestand@_",
       "type": "bestand"
     },
     {

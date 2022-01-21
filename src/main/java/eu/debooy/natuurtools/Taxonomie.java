@@ -54,7 +54,6 @@ public class Taxonomie extends Batchjob {
   public static void execute(String[] args) {
     setParameterBundle(new ParameterBundle.Builder()
                            .setBaseName(NatuurTools.TOOL_TAXONOMIE)
-                           .setClassloader(Taxonomie.class.getClassLoader())
                            .build());
 
     Banner.printDoosBanner(DoosUtils.nullToEmpty(paramBundle.getBanner()));

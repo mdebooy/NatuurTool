@@ -55,7 +55,6 @@ public class DbNaarJson extends Batchjob {
   public static void execute(String[] args) {
     setParameterBundle(new ParameterBundle.Builder()
                            .setBaseName(NatuurTools.TOOL_DBNAARJSON)
-                           .setClassloader(DbNaarJson.class.getClassLoader())
                            .build());
 
     Banner.printDoosBanner(DoosUtils.nullToEmpty(paramBundle.getBanner()));

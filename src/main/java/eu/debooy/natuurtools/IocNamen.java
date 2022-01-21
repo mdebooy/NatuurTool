@@ -71,8 +71,6 @@ public class IocNamen extends Batchjob {
   public static void execute(String[] args) {
     setParameterBundle(new ParameterBundle.Builder()
                            .setBaseName(NatuurTools.TOOL_IOCNAMEN)
-                           .setClassloader(IocNamen.class.getClassLoader())
-                           .setValidator(new ParameterAfwezig())
                            .build());
 
     Banner.printDoosBanner(DoosUtils.nullToEmpty(paramBundle.getBanner()));
