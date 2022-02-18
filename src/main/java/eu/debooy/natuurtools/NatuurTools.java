@@ -23,17 +23,14 @@ import eu.debooy.doosutils.ParameterBundle;
 import eu.debooy.doosutils.access.JsonBestand;
 import eu.debooy.doosutils.exception.BestandException;
 import eu.debooy.natuur.domain.TaxonDto;
-import static eu.debooy.natuur.domain.TaxonDto.PAR_LATIJNSENAAM;
-import static eu.debooy.natuur.domain.TaxonDto.QRY_LATIJNSENAAM;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Properties;
+import java.util.Map;
 import java.util.ResourceBundle;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-import javax.persistence.Persistence;
 import org.json.simple.JSONObject;
 
 
@@ -44,6 +41,8 @@ public class NatuurTools extends Batchjob {
   private static final  ResourceBundle  resourceBundle  =
       ResourceBundle.getBundle("ApplicatieResources", Locale.getDefault());
 
+  protected static final  String  EM_UNITNAME = "natuur";
+
   protected static final  String  KEY_LATIJN    = "latijn";
   protected static final  String  KEY_NAMEN     = "namen";
   protected static final  String  KEY_RANG      = "rang";
@@ -53,7 +52,6 @@ public class NatuurTools extends Batchjob {
   protected static final  String  KEY_TAXA      = "taxa";
 
   protected static final  String  LBL_SOORTENONBEKEND = "label.soortenonbekend";
-  protected static final  String  LBL_WACHTWOORD      = "label.wachtwoord";
 
   protected static final  String  MSG_AANMAKEN        = "msg.aanmaken";
   protected static final  String  MSG_AANTALSOORTEN   = "msg.aantalsoorten";
@@ -64,20 +62,26 @@ public class NatuurTools extends Batchjob {
   protected static final  String  MSG_NIEUW           = "msg.nieuw";
   protected static final  String  MSG_ONBEKEND        = "msg.onbekend";
   protected static final  String  MSG_SKIPSTRUCTUUR   = "msg.skipstructuur";
+  protected static final  String  MSG_TALEN           = "msg.talen";
   protected static final  String  MSG_VERSCHIL        = "msg.verschil";
   protected static final  String  MSG_WIJZIGEN        = "msg.wijzigen";
   protected static final  String  MSG_WIJZIGING       = "msg.wijziging";
 
   protected static final  String  PAR_AANMAAK     = "aanmaak";
+  protected static final  String  PAR_AUTEUR      = "auteur";
   protected static final  String  PAR_BEHOUD      = "behoud";
   protected static final  String  PAR_IOCBESTAND  = "iocbestand";
   protected static final  String  PAR_DBURL       = "dburl";
   protected static final  String  PAR_DBUSER      = "dbuser";
   protected static final  String  PAR_HERNUMMER   = "hernummer";
   protected static final  String  PAR_JSON        = "json";
+  protected static final  String  PAR_KLEUR       = "kleur";
   protected static final  String  PAR_RANGEN      = "rangen";
+  protected static final  String  PAR_SUBTITEL    = "subtitel";
   protected static final  String  PAR_TALEN       = "talen";
   protected static final  String  PAR_TAXAROOT    = "taxaroot";
+  protected static final  String  PAR_TEMPLATE    = "template";
+  protected static final  String  PAR_TITEL       = "titel";
   protected static final  String  PAR_WACHTWOORD  = "wachtwoord";
 
   protected static final  String  QRY_RANG  =
@@ -105,31 +109,9 @@ public class NatuurTools extends Batchjob {
 
   protected NatuurTools() {}
 
-  protected static EntityManager getEntityManager(String dbuser, String dburl) {
-    return getEntityManager(dbuser, dburl, null);
-  }
-
-  protected static EntityManager getEntityManager(String dbuser, String dburl,
-                                                  String wachtwoord) {
-    var props = new Properties();
-    if (null == wachtwoord) {
-      wachtwoord  =
-        DoosUtils.getWachtwoord(MessageFormat.format(
-            resourceBundle.getString(LBL_WACHTWOORD),
-            dbuser, dburl.split("/")[1]));
-    }
-
-    props.put("openjpa.ConnectionURL",      "jdbc:postgresql://" + dburl);
-    props.put("openjpa.ConnectionUserName", dbuser);
-    props.put("openjpa.ConnectionPassword", wachtwoord);
-
-    return Persistence.createEntityManagerFactory("natuur", props)
-                      .createEntityManager();
-  }
-
   protected static TaxonDto getTaxon(String latijnsenaam, EntityManager em) {
-    var query = em.createNamedQuery(QRY_LATIJNSENAAM);
-    query.setParameter(PAR_LATIJNSENAAM, latijnsenaam);
+    var query = em.createNamedQuery(TaxonDto.QRY_LATIJNSENAAM);
+    query.setParameter(TaxonDto.PAR_LATIJNSENAAM, latijnsenaam);
     TaxonDto  resultaat;
     try {
       resultaat = (TaxonDto) query.getSingleResult();
@@ -143,8 +125,8 @@ public class NatuurTools extends Batchjob {
   public static void help() {
     tools.forEach(tool -> {
       var parameterBundle = new ParameterBundle.Builder()
-                           .setBaseName(tool)
-                           .build();
+                                               .setBaseName(tool)
+                                               .build();
       parameterBundle.help();
       DoosUtils.naarScherm(DoosUtils.stringMetLengte("_", 80, "_"));
       DoosUtils.naarScherm();
@@ -189,6 +171,20 @@ public class NatuurTools extends Batchjob {
         DoosUtils.naarScherm();
         break;
     }
+  }
+
+  protected static void printRangtotalen(List<String> rangen,
+                                         Map<String, Integer> totalen) {
+    if (rangen.isEmpty()) {
+      return;
+    }
+
+    DoosUtils.naarScherm();
+    rangen.stream()
+          .filter(rang -> totalen.get(rang) > 0)
+          .forEachOrdered(rang ->
+        DoosUtils.naarScherm(String.format("%6s: %,6d",
+                                           rang, totalen.get(rang))));
   }
 
   protected static void writeJson(String bestand, JSONObject taxa,

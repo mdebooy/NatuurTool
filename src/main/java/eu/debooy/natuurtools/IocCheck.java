@@ -23,6 +23,7 @@ import eu.debooy.doosutils.ParameterBundle;
 import eu.debooy.doosutils.access.BestandConstants;
 import eu.debooy.doosutils.access.JsonBestand;
 import eu.debooy.doosutils.exception.BestandException;
+import eu.debooy.doosutils.percistence.DbConnection;
 import eu.debooy.natuur.domain.DetailDto;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -77,29 +78,34 @@ public class IocCheck extends Batchjob {
       return;
     }
 
-    var em  = NatuurTools.getEntityManager(
-                  paramBundle.getString(NatuurTools.PAR_DBUSER),
-                  paramBundle.getString(NatuurTools.PAR_DBURL),
-                  paramBundle.getString(NatuurTools.PAR_WACHTWOORD));
-
     var onbekend  = 0;
-    for (var detail : em.createQuery(QUERY).getResultList()) {
-      if (!latijnsenamen.contains(((DetailDto) detail).getLatijnsenaam())) {
-        var volgnummer  =
-            DoosUtils.stringMetLengte(((DetailDto) detail).getVolgnummer()
-                                                          .toString(), 8);
-        if (onbekend == 0) {
-          DoosUtils.naarScherm();
-          DoosUtils.naarScherm(
-              resourceBundle.getString(NatuurTools.LBL_SOORTENONBEKEND));
-        }
-        DoosUtils.naarScherm(volgnummer + " "
-                              + ((DetailDto) detail).getLatijnsenaam());
-        onbekend++;
-      }
-    }
+    try (var dbConn =
+        new DbConnection.Builder()
+              .setDbUser(paramBundle.getString(NatuurTools.PAR_DBUSER))
+              .setDbUrl(paramBundle.getString(NatuurTools.PAR_DBURL))
+              .setWachtwoord(paramBundle.getString(NatuurTools.PAR_WACHTWOORD))
+              .setPersistenceUnitName(NatuurTools.EM_UNITNAME)
+              .build()) {
+      var em  = dbConn.getEntityManager();
 
-    em.close();
+      for (var detail : em.createQuery(QUERY).getResultList()) {
+        if (!latijnsenamen.contains(((DetailDto) detail).getLatijnsenaam())) {
+          var volgnummer  =
+              DoosUtils.stringMetLengte(((DetailDto) detail).getVolgnummer()
+                                                            .toString(), 8);
+          if (onbekend == 0) {
+            DoosUtils.naarScherm();
+            DoosUtils.naarScherm(
+                resourceBundle.getString(NatuurTools.LBL_SOORTENONBEKEND));
+          }
+          DoosUtils.naarScherm(volgnummer + " "
+                                + ((DetailDto) detail).getLatijnsenaam());
+          onbekend++;
+        }
+      }
+    } catch (Exception e) {
+      DoosUtils.foutNaarScherm(e.getLocalizedMessage());
+    }
 
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(
@@ -110,6 +116,7 @@ public class IocCheck extends Batchjob {
         MessageFormat.format(
             resourceBundle.getString(NatuurTools.MSG_AANTALSOORTEN),
             latijnsenamen.size()));
+    klaar();
   }
 
   private static void zoekSoorten(JSONObject tree) {

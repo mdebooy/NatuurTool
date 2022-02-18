@@ -6,6 +6,11 @@
   "banner": "Overzicht van de taxa in TEX formaat",
   "parameters": [
     {
+      "parameter": "auteur",
+      "lang": "auteur",
+      "help": "De auteur."
+    },
+    {
       "parameter": "dburl",
       "lang": "dburl",
       "help": "De URL voor de database connectie (localhost:5432/db).",
@@ -16,6 +21,13 @@
       "lang": "dbuser",
       "help": "De database gebruikersnaam.",
       "verplicht": true
+    },
+    {
+      "parameter": "kleur",
+      "kort": "k",
+      "lang": "kleur",
+      "help": "De kleur voor de onderverdelingen in RGB. De standaardkleur is 4E9A06.",
+      "standaard": "4E9A06"
     },
     {
       "parameter": "rangen",
@@ -35,6 +47,18 @@
       "help": "Lijst, door komma's gescheiden, met talen die in het overzicht mogen staan."
     },
     {
+      "parameter": "taxaroot",
+      "lang": "taxaroot",
+      "help": "De 'root' van het overzicht (rang,latijnsenaam)."
+    },
+    {
+      "parameter": "template",
+      "extensie": "tex",
+      "lang": "template",
+      "help": "Een template voor het uitvoer TEX bestand.",
+      "type": "bestand"
+    },
+    {
       "parameter": "texbestand",
       "extensie": "tex",
       "kort": "t",
@@ -42,6 +66,12 @@
       "help": "Een bestand dat verwerkt kan worden door LaTeX.",
       "type": "bestand",
       "verplicht": true
+    },
+    {
+      "parameter": "titel",
+      "lang": "titel",
+      "help": "De titel van het document.",
+      "standaard": "Taxonomie"
     },
     {
       "parameter": "wachtwoord",

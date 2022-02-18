@@ -24,6 +24,7 @@ import eu.debooy.doosutils.access.BestandConstants;
 import eu.debooy.doosutils.access.CsvBestand;
 import eu.debooy.doosutils.components.Message;
 import eu.debooy.doosutils.exception.BestandException;
+import eu.debooy.doosutils.percistence.DbConnection;
 import eu.debooy.natuur.domain.RangDto;
 import eu.debooy.natuur.domain.TaxonDto;
 import java.text.MessageFormat;
@@ -53,10 +54,9 @@ public class CsvNaarJson extends Batchjob {
   private static final  List<String>            rangen      = new ArrayList<>();
   private static final  Map<String, Integer>    totalen     = new HashMap<>();
 
-  private static  EntityManager em;
-  private static  Integer       lijnen      = 0;
-  private static  String        taal        = "";
-  private static  String        vorigeRang  = "";
+  private static  Integer lijnen      = 0;
+  private static  String  taal        = "";
+  private static  String  vorigeRang  = "";
 
   protected CsvNaarJson() {}
 
@@ -95,68 +95,44 @@ public class CsvNaarJson extends Batchjob {
       return;
     }
 
-    em    = NatuurTools.getEntityManager(
-                paramBundle.getString(NatuurTools.PAR_DBUSER),
-                paramBundle.getString(NatuurTools.PAR_DBURL),
-                paramBundle.getString(NatuurTools.PAR_WACHTWOORD));
+    try (var dbConn =
+        new DbConnection.Builder()
+              .setDbUser(paramBundle.getString(NatuurTools.PAR_DBUSER))
+              .setDbUrl(paramBundle.getString(NatuurTools.PAR_DBURL))
+              .setWachtwoord(paramBundle.getString(NatuurTools.PAR_WACHTWOORD))
+              .setPersistenceUnitName(NatuurTools.EM_UNITNAME)
+              .build()) {
+      var em  = dbConn.getEntityManager();
 
-    taal  = paramBundle.getString(PAR_TAAL);
+      taal  = paramBundle.getString(PAR_TAAL);
 
-    var taxoninfo = paramBundle.getString(NatuurTools.PAR_TAXAROOT).split(",");
-    getRangen();
+      var taxoninfo = paramBundle.getString(NatuurTools.PAR_TAXAROOT).split(",");
+      getRangen(em);
 
-    var         namen       = new JSONObject();
-    TaxonDto    parent      = NatuurTools.getTaxon(taxoninfo[1], em);
-    String      root        = parent.getRang();
-    vorigeRang  = root;
+      var         namen       = new JSONObject();
+      TaxonDto    parent      = NatuurTools.getTaxon(taxoninfo[1], em);
+      String      root        = parent.getRang();
+      vorigeRang  = root;
 
-    jsonRang.get(root).put(NatuurTools.KEY_LATIJN, parent.getLatijnsenaam());
-    jsonRang.get(root).put(NatuurTools.KEY_RANG, root);
-    jsonRang.get(root).put(NatuurTools.KEY_SEQ, parent.getVolgnummer());
-    parent.getTaxonnamen().forEach(naam -> namen.put(naam.getTaal(),
-                                                     naam.getNaam()));
-    jsonRang.get(root).put(NatuurTools.KEY_NAMEN, namen);
+      jsonRang.get(root).put(NatuurTools.KEY_LATIJN, parent.getLatijnsenaam());
+      jsonRang.get(root).put(NatuurTools.KEY_RANG, root);
+      jsonRang.get(root).put(NatuurTools.KEY_SEQ, parent.getVolgnummer());
+      parent.getTaxonnamen().forEach(naam -> namen.put(naam.getTaal(),
+                                                       naam.getNaam()));
+      jsonRang.get(root).put(NatuurTools.KEY_NAMEN, namen);
 
-    try (var csvBestand =
-          new CsvBestand.Builder()
-                        .setBestand(
-                            paramBundle.getBestand(PAR_CSVBESTAND,
-                                                   BestandConstants.EXT_CSV))
-                        .setCharset(paramBundle.getString(PAR_CHARSETIN))
-                        .setHeader(false)
-                        .build()) {
-      verwerkCsv(csvBestand);
-    } catch (BestandException | ParseException e) {
+      verwerkCsv();
+
+      samenvoegen(root);
+    } catch (Exception e) {
       DoosUtils.foutNaarScherm(e.getLocalizedMessage());
     }
 
-    try {
-      samenvoegen(root);
-
-      NatuurTools.writeJson(paramBundle.getBestand(PAR_JSONBESTAND,
-                                                   BestandConstants.EXT_JSON),
-                            jsonRang.get(root),
-                            paramBundle.getString(PAR_CHARSETUIT));
-    } catch (ParseException e) {
-      DoosUtils.foutNaarScherm("json: " + e.getLocalizedMessage());
-    }
-
-    em.close();
-
-    DoosUtils.naarScherm();
-    rangen.forEach(rang -> {
-      Integer volgnummer  = totalen.get(rang);
-      if (volgnummer > 0) {
-        DoosUtils.naarScherm(String.format("%6s: %,6d",
-                rang, totalen.get(rang)));
-      }
-    });
+    NatuurTools.printRangtotalen(rangen, totalen);
     DoosUtils.naarScherm(
         MessageFormat.format(resourceBundle.getString(NatuurTools.MSG_LIJNEN),
                              String.format("%,6d", lijnen)));
-    DoosUtils.naarScherm();
-    DoosUtils.naarScherm(getMelding(MSG_KLAAR));
-    DoosUtils.naarScherm();
+    klaar();
   }
 
   private static void genereerRang(String rang, String latijnsenaam)
@@ -171,7 +147,7 @@ public class CsvNaarJson extends Batchjob {
     }
   }
 
-  private static void getRangen() {
+  private static void getRangen(EntityManager em) {
     List<RangDto> ranglijst = em.createQuery(NatuurTools.QRY_RANG)
                                 .getResultList();
 
@@ -252,18 +228,33 @@ public class CsvNaarJson extends Batchjob {
       }
     }
     jsonRangen.get(laatste).clear();
+
+    NatuurTools.writeJson(paramBundle.getBestand(PAR_JSONBESTAND,
+                                                 BestandConstants.EXT_JSON),
+                          jsonRang.get(root),
+                          paramBundle.getString(PAR_CHARSETUIT));
   }
 
-  private static void verwerkCsv(CsvBestand csvBestand)
-      throws BestandException, ParseException {
-    while (csvBestand.hasNext()) {
-      lijnen++;
-      var veld          = csvBestand.next();
-      var rang          = veld[0];
-      var latijnsenaam  = veld[1];
-      var naam          = veld[2];
+  private static void verwerkCsv() throws ParseException {
+    try (var csvBestand =
+          new CsvBestand.Builder()
+                        .setBestand(
+                            paramBundle.getBestand(PAR_CSVBESTAND,
+                                                   BestandConstants.EXT_CSV))
+                        .setCharset(paramBundle.getString(PAR_CHARSETIN))
+                        .setHeader(false)
+                        .build()) {
+      while (csvBestand.hasNext()) {
+        lijnen++;
+        var veld          = csvBestand.next();
+        var rang          = veld[0];
+        var latijnsenaam  = veld[1];
+        var naam          = veld[2];
 
-      verwerkTaxon(rang, latijnsenaam, naam);
+        verwerkTaxon(rang, latijnsenaam, naam);
+      }
+    } catch (BestandException | ParseException e) {
+      DoosUtils.foutNaarScherm(e.getLocalizedMessage());
     }
   }
 

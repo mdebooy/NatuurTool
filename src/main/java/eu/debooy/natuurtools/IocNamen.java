@@ -16,19 +16,25 @@
  */
 package eu.debooy.natuurtools;
 
+import eu.debooy.doos.domain.TaalDto;
+import eu.debooy.doos.domain.TaalnaamDto;
 import eu.debooy.doosutils.Banner;
 import eu.debooy.doosutils.Batchjob;
 import eu.debooy.doosutils.DoosUtils;
 import eu.debooy.doosutils.ParameterBundle;
 import eu.debooy.doosutils.access.CsvBestand;
 import eu.debooy.doosutils.exception.BestandException;
+import eu.debooy.doosutils.percistence.DbConnection;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.TreeSet;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -56,10 +62,13 @@ public class IocNamen extends Batchjob {
                                         totalen         = new HashMap<>();
 
   private static  Integer   sequence      = 0;
-  private static  String[]  taal;
+  private static  String[]  taalkolom;
   private static  String    vorigeFamilie = "";
   private static  String    vorigeOrde    = "";
   private static  String    vorigGeslacht = "";
+
+  private static final  Set<String> taal      = new TreeSet<>();
+  private static final  Set<String> taalnaam  = new TreeSet<>();
 
   protected IocNamen() {}
 
@@ -82,7 +91,10 @@ public class IocNamen extends Batchjob {
       return;
     }
 
-    taal  = paramBundle.getString(NatuurTools.PAR_TALEN).split(",");
+    if (paramBundle.containsArgument(NatuurTools.PAR_TALEN)) {
+      taal.addAll(Set.of(paramBundle.getString(NatuurTools.PAR_TALEN)
+                                    .split(",")));
+    }
     setRangen();
 
     var taxa    = new JSONObject();
@@ -91,6 +103,10 @@ public class IocNamen extends Batchjob {
     NatuurTools.writeJson(paramBundle.getBestand(NatuurTools.PAR_JSON),
                           taxa, paramBundle.getString(PAR_CHARSETUIT));
 
+    var melding =
+        MessageFormat.format(resourceBundle.getString(NatuurTools.MSG_TALEN),
+                             taalnaam).replace("[, ", "[");
+    DoosUtils.naarScherm(melding.indexOf("[") + 1, melding, 80);
     DoosUtils.naarScherm(
         MessageFormat.format(resourceBundle.getString(NatuurTools.MSG_LIJNEN),
                              String.format("%,6d", lijnen)));
@@ -100,9 +116,8 @@ public class IocNamen extends Batchjob {
                                            rang, totalen.get(rang)));
       }
     });
-    DoosUtils.naarScherm();
-    DoosUtils.naarScherm(getMelding(MSG_KLAAR));
-    DoosUtils.naarScherm();
+
+    klaar();
   }
 
   private static void nieuweFamilie() throws ParseException {
@@ -175,20 +190,79 @@ public class IocNamen extends Batchjob {
                         .setHeader(true)
                         .build()) {
 
-      while (csvBestand.hasNext()) {
-        lijnen++;
-        verwerkLijn(csvBestand.next());
-      }
+      taalkolom = Arrays.copyOfRange(csvBestand.getKolomNamen(), 4,
+                                     csvBestand.getKolomNamen().length);
+      verwerkHeader();
 
-      nieuweOrde();
-      taxa.put(NatuurTools.KEY_RANG, NatuurTools.RANG_KLASSE);
-      taxa.put(NatuurTools.KEY_LATIJN, "Aves");
-      taxa.put(NatuurTools.KEY_SUBRANGEN, ordes);
+      if (taalkolom.length > 0) {
+        while (csvBestand.hasNext()) {
+          lijnen++;
+          verwerkLijn(csvBestand.next());
+        }
+
+        nieuweOrde();
+        taxa.put(NatuurTools.KEY_RANG, NatuurTools.RANG_KLASSE);
+        taxa.put(NatuurTools.KEY_LATIJN, "Aves");
+        taxa.put(NatuurTools.KEY_SUBRANGEN, ordes);
+      }
     } catch (BestandException | ParseException e) {
       DoosUtils.foutNaarScherm("csv: " + e.getLocalizedMessage());
     }
 
     return lijnen;
+  }
+
+  private static void verwerkHeader() {
+    if (!paramBundle.containsArgument(NatuurTools.PAR_DBURL)) {
+      taalkolom = paramBundle.getString(NatuurTools.PAR_TALEN).split(",");
+      taalnaam.addAll(Set.of(taalkolom));
+      return;
+    }
+
+    try (var dbConn =
+        new DbConnection.Builder()
+              .setDbUser(paramBundle.getString(NatuurTools.PAR_DBUSER))
+              .setDbUrl(paramBundle.getString(NatuurTools.PAR_DBURL))
+              .setWachtwoord(paramBundle.getString(NatuurTools.PAR_WACHTWOORD))
+              .setPersistenceUnitName(NatuurTools.EM_UNITNAME)
+              .build()) {
+      var csvtaal         = paramBundle.getString(NatuurTools.PAR_TAAL);
+      var em              = dbConn.getEntityManager();
+      var gebruikerstaal  =
+          ((TaalDto)em.createNamedQuery(TaalDto.QRY_TAAL_ISO6391)
+                      .setParameter(TaalDto.PAR_ISO6391,
+                                    Locale.getDefault().getLanguage())
+                      .getSingleResult()).getIso6392t();
+      var naamquery       = em.createNamedQuery(TaalnaamDto.QRY_METTAAL);
+
+      for (var i =0; i < taalkolom.length; i++) {
+        naamquery.setParameter(TaalnaamDto.PAR_TAAL, csvtaal);
+        naamquery.setParameter(TaalnaamDto.PAR_NAAM, taalkolom[i]);
+        var taalnaamDto = naamquery.getResultList();
+        if (taalnaamDto.isEmpty()) {
+          taalkolom[i]  = "";
+        } else {
+          var taalDto = em.find(TaalDto.class,
+                                ((TaalnaamDto)taalnaamDto.get(0)).getTaalId());
+          if (taal.isEmpty()
+              || taal.contains(taalDto.getIso6391())) {
+            taalkolom[i]  = taalDto.getIso6391();
+            if (taalDto.hasTaalnaam(gebruikerstaal)) {
+              taalnaam.add(String.format("%s (%s)",
+                                         taalDto.getNaam(gebruikerstaal),
+                                         taalDto.getIso6391()));
+            } else {
+              taalnaam.add(taalkolom[i]);
+            }
+          } else {
+            taalkolom[i]  = "";
+          }
+        }
+      }
+    } catch (Exception e) {
+      DoosUtils.foutNaarScherm(e.getLocalizedMessage());
+      taalkolom = new String[0];
+    }
   }
 
   private static void verwerkLijn(String[] veld) throws ParseException {
@@ -236,9 +310,10 @@ public class IocNamen extends Batchjob {
              veld[3].substring(0, 1).toUpperCase()
              + veld[3].substring(1).toLowerCase());
 
-    for (var i = 0; i < taal.length; i++) {
-      if (DoosUtils.isNotBlankOrNull(veld[i+4])) {
-        namen.put(taal[i], veld[i+4]);
+    for (var i = 0; i < taalkolom.length; i++) {
+      if (DoosUtils.isNotBlankOrNull(taalkolom[i])
+          && DoosUtils.isNotBlankOrNull(veld[i+4])) {
+        namen.put(taalkolom[i], veld[i+4]);
       }
     }
   }

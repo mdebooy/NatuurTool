@@ -76,13 +76,13 @@ public class IocNamenTest extends BatchTest {
 
     execute(args);
 
-    assertEquals("CSV - fouten", 0, err.size());
-    assertEquals("CSV - 12", "6", out.get(11).split(":")[1].trim());
-    assertEquals("CSV - 13", "2",  out.get(12).split(":")[1].trim());
-    assertEquals("CSV - 14", "3",  out.get(13).split(":")[1].trim());
-    assertEquals("CSV - 15", "4",  out.get(14).split(":")[1].trim());
-    assertEquals("CSV - 16", "6",  out.get(15).split(":")[1].trim());
-    assertTrue("CSV - equals",
+    assertEquals(0, err.size());
+    assertEquals("6", out.get(13).split(":")[1].trim());
+    assertEquals("2",  out.get(14).split(":")[1].trim());
+    assertEquals("3",  out.get(15).split(":")[1].trim());
+    assertEquals("4",  out.get(16).split(":")[1].trim());
+    assertEquals("6",  out.get(17).split(":")[1].trim());
+    assertTrue(
         Bestand.equals(
             Bestand.openInvoerBestand(getTemp() + File.separator
                                       + BST_JSON),
@@ -96,6 +96,6 @@ public class IocNamenTest extends BatchTest {
 
     execute(args);
 
-    assertEquals("Zonder parameters - fouten", 1, err.size());
+    assertEquals(1, err.size());
   }
 }

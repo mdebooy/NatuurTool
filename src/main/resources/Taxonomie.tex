@@ -1,0 +1,233 @@
+\documentclass[onecolumn,a4paper,10pt]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{ctex}
+\usepackage{geometry}
+\usepackage[colorlinks]{hyperref}
+\usepackage{xcolor}
+\usepackage{changepage}
+\usepackage{xifthen}
+\usepackage[explicit]{titlesec}
+\usepackage{framed}
+\usepackage{parskip}
+\usepackage{worldflags}
+\usepackage{polyglossia}
+
+\setmainfont{FreeSerif}
+\setsansfont{FreeSans}
+\setmonofont{FreeMono}
+
+\newfontfamily\thaifont{Norasi}
+\newfontfamily\thaifontsf{Loma}
+
+\setdefaultlanguage{dutch}
+\setotherlanguages{afrikaans,catalan,croatian,czech,danish,english,finnish,%
+french,german,hungarian,icelandic,italian,japanese,malay,norwegian,portuguese,%
+russian,slovak,slovenian,spanish,swedish,thai,turkish,ukrainian,vietnamese}
+
+\definecolor{kleur}{HTML}{@Kleur@}
+
+\colorlet{shadecolor}{kleur!10}
+
+\geometry{
+  paperwidth=210mm,
+  paperheight=296mm,
+  twoside,
+  left=20.8mm,
+  right=15mm,
+  top=20.2mm,
+  marginpar=23mm,
+  headsep=1pc,
+  marginparsep=1em,
+  footskip=9ex
+}
+\geometry{
+  textwidth = 170mm,
+  textheight = 250mm,
+}
+
+% Penalties
+\pretolerance=60
+\tolerance=2000
+\widowpenalty=9999
+\interdisplaylinepenalty=100
+\interfootnotelinepenalty=1000
+\predisplaypenalty=50
+
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4}
+
+\titleformat{\chapter}[display]{\sffamily\color{kleur} \begin {shaded*}\bfseries}{}{-25pt}{\Huge #1\end{shaded*}}
+\titleformat{\section}[display]{\sffamily\color{kleur} \begin {shaded*}\bfseries\hrule}{}{-25pt}{\Large #1\end{shaded*}\vspace{-2em}}
+\titleformat{\subsection}[display]{\sffamily\color{kleur} \begin {shaded*}\bfseries}{}{-25pt}{\large #1\end{shaded*}\vspace{-2em}}
+\titleformat{\subsubsection}[display]{\sffamily\color{kleur} \begin {shaded*}\bfseries}{}{-15pt}{\normalsize #1\end{shaded*}\vspace{-2em}}
+
+\titlespacing*{\section}{1em}{2pt}{2pt}
+\titlespacing*{\subsection}{2em}{2pt}{2pt}
+\titlespacing*{\subsubsection}{4em}{2pt}{2pt}
+
+\newcommand{\onaam}[2][]{
+  \ifthenelse{\isempty{#2}}{\emph{{#1}}}{{#2} (\emph{{#1}})}
+}
+\newcommand{\taxon}[4]{
+%KLasse
+  \ifthenelse{\equal{#1}{kl}}{%
+    \section{\texorpdfstring{\onaam[{#2}]{#3}}{#2}}%
+    \begin{adjustwidth}{2.5em}{}%
+      \ifthenelse{\isempty{#4}}{\vspace{-1.5em}}{{#4} |}%
+    \end{adjustwidth}}{}%
+%ORde
+  \ifthenelse{\equal{#1}{or}}{%
+    \subsection{\texorpdfstring{\onaam[{#2}]{#3}}{#2}}%
+    \begin{adjustwidth}{3.5em}{}%
+      \ifthenelse{\isempty{#4}}{\vspace{-1.5em}}{{#4} |}%
+    \end{adjustwidth}}{}%
+% FAmilie
+  \ifthenelse{\equal{#1}{fa}}{%
+    \subsubsection{\texorpdfstring{\onaam[{#2}]{#3}}{#2}}%
+    \begin{adjustwidth}{4.5em}{}%
+      \ifthenelse{\isempty{#4}}{\vspace{-1.5em}}{{#4} |}%
+    \end{adjustwidth}}{}%
+%GEslacht
+  \ifthenelse{\equal{#1}{ge}}{%
+      \begin{shaded*}%
+    \begin{adjustwidth}{5em}{}%
+        \color{kleur}\onaam[{#2}]{#3}\color{black}%
+      \end{adjustwidth}%
+      \end{shaded*}%
+      \begin{adjustwidth}{5.5em}{}%
+        \ifthenelse{\isempty{#4}}{\vspace{-1.5em}}{{#4} |}%
+    \end{adjustwidth}}{}%
+%SOort
+  \ifthenelse{\equal{#1}{so}}{%
+    \begin{adjustwidth}{6em}{}%
+      \color{kleur}\onaam[{#2}]{#3}\color{black}%
+      \begin{adjustwidth}{0.5em}{}%
+        \ifthenelse{\isempty{#4}}{\vspace{-1.5em}}{{#4} |}%
+      \end{adjustwidth}%
+    \end{adjustwidth}}{}%
+%OnderSOort
+  \ifthenelse{\equal{#1}{oso}}{%
+    \begin{adjustwidth}{7em}{}%
+      \onaam[{#2}]{#3}%
+      \begin{adjustwidth}{0.5em}{}%
+        \ifthenelse{\isempty{#4}}{\vspace{-1.5em}}{{#4} |}%
+      \end{adjustwidth}%
+    \end{adjustwidth}}{}
+}
+\newcommand{\ifequals}[3]{\ifthenelse{\equal{#1}{#2}}{#3}{}}
+\newcommand{\case}[2]{#1 #2}
+\newenvironment{switch}[1]{\renewcommand{\case}{\ifequals{#1}}}{}
+\newcommand{\naam}[2]{
+  \begin{switch}{#1}%
+    \case{af}{| \foreignlanguage{afrikaans}{#2}\,\textsuperscript{(#1)}}%
+    \case{ca}{| \foreignlanguage{catalan}{#2}\,\textsuperscript{(#1)}}%
+    \case{cs}{| \foreignlanguage{czech}{#2}\,\textsuperscript{(#1)}}%
+    \case{da}{| \foreignlanguage{danish}{#2}\,\textsuperscript{(#1)}}%
+    \case{de}{| \foreignlanguage{german}{#2}\,\textsuperscript{(#1)}}%
+    \case{en}{| \foreignlanguage{english}{#2}\,\textsuperscript{(#1)}}%
+    \case{es}{| \foreignlanguage{spanish}{#2}\,\textsuperscript{(#1)}}%
+    \case{et}{| #2\,\textsuperscript{(#1)}}%
+    \case{fi}{| \foreignlanguage{finnish}{#2}\,\textsuperscript{(#1)}}%
+    \case{fr}{| \foreignlanguage{french}{#2}\,\textsuperscript{(#1)}}%
+    \case{hr}{| \foreignlanguage{croatian}{#2}\,\textsuperscript{(#1)}}%
+    \case{hu}{| \foreignlanguage{hungarian}{#2}\,\textsuperscript{(#1)}}%
+    \case{id}{| \foreignlanguage{malay}{#2}\,\textsuperscript{(#1)}}%
+    \case{is}{| \foreignlanguage{icelandic}{#2}\,\textsuperscript{(#1)}}%
+    \case{it}{| \foreignlanguage{italian}{#2}\,\textsuperscript{(#1)}}%
+    \case{ja}{| \foreignlanguage{japanese}{#2}\,\textsuperscript{(#1)}}%
+    \case{lt}{| #2\,\textsuperscript{(#1)}}%
+    \case{lv}{| #2\,\textsuperscript{(#1)}}%
+    \case{nl}{| \foreignlanguage{dutch}{#2}\,\textsuperscript{(#1)}}%
+    \case{no}{| \foreignlanguage{norwegian}{#2}\,\textsuperscript{(#1)}}%
+    \case{pl}{| #2\,\textsuperscript{(#1)}}%
+    \case{pt}{| \foreignlanguage{portuguese}{#2}\,\textsuperscript{(#1)}}%
+    \case{ru}{| \foreignlanguage{russian}{#2}\,\textsuperscript{(#1)}}%
+    \case{se}{| #2\,\textsuperscript{(#1)}}%
+    \case{sk}{| \foreignlanguage{slovak}{#2}\,\textsuperscript{(#1)}}%
+    \case{sl}{| \foreignlanguage{slovenian}{#2}\,\textsuperscript{(#1)}}%
+    \case{sr}{| #2\,\textsuperscript{(#1)}}%
+    \case{sv}{| \foreignlanguage{swedish}{#2}\,\textsuperscript{(#1)}}%
+    \case{th}{| \foreignlanguage{thai}{#2}\,\textsuperscript{(#1)}}%
+    \case{tr}{| \foreignlanguage{turkish}{#2}#2\,\textsuperscript{(#1)}}%
+    \case{uk}{| \foreignlanguage{ukrainian}{#2}\,\textsuperscript{(#1)}}%
+    \case{vi}{| \foreignlanguage{vietnamese}{#2}\,\textsuperscript{(#1)}}%
+    \case{zh}{| #2\,\textsuperscript{(#1)}}%
+  \end{switch}
+}
+
+%Voor report zodat de nummering is als bij article
+\renewcommand\thesection{\arabic{section}}
+
+\hypersetup{
+citecolor=black,
+linkcolor=black,
+pdfauthor={@Auteur@},
+pdftitle={@Titel@},
+pdfsubject={@Subject@},
+pdfkeywords={taxonomie},
+pdfcreator={LaTeX with hyperref package},
+pdfproducer={latex + bibtex + dvips + ps2pdf}}
+
+\pagenumbering{roman}
+
+\flagsdefault[width=0pt,length=12pt,framewidth=0.1mm,framecolor=black]
+
+\begin{document}
+\sffamily
+\raggedbottom
+\title{\color{kleur}\bfseries\Huge \begin{shaded*} \hrule @Titel@ %
+\\[1ex] \large @Subtitel@ %
+\end{shaded*}}
+\author{\color{kleur}@Auteur@}
+\vfill
+\date{\color{kleur}\today{}}
+
+\maketitle
+
+\setcounter{page}{1}
+
+\tableofcontents
+\newpage
+\setcounter{page}{1}
+\pagenumbering{arabic}
+\textsuperscript{(af)} \worldflag{za} Afrikaans,
+\textsuperscript{(ca)} Catalaans (Català),
+\textsuperscript{(cs)} \worldflag{cz} Tsjechisch (česky),
+\textsuperscript{(da)} \worldflag{da} Deens (dansk),
+\textsuperscript{(de)} \worldflag{de} Duits (Deutsch),
+\textsuperscript{(en)} \worldflag{gb} Engels (English),
+\textsuperscript{(es)} \worldflag{es} Spaans (español),
+\textsuperscript{(et)} \worldflag{ee} Estisch (Eesti keel),
+\textsuperscript{(fi)} \worldflag{fi} Fins (suomen kieli),
+\textsuperscript{(fr)} \worldflag{fr} Frans (français),
+\textsuperscript{(hr)} \worldflag{hr} Kroatisch (Hrvatski),
+\textsuperscript{(hu)} \worldflag{hu} Hongaars (Magyar),
+\textsuperscript{(id)} \worldflag{id} Indonesisch (Bahasa Indonesia),
+\textsuperscript{(is)} \worldflag{is} IJslands (Íslenska),
+\textsuperscript{(it)} \worldflag{it} Italiaans (Italiano),
+\textsuperscript{(ja)} \worldflag{jp} Japans (日本語),
+\textsuperscript{(lt)} \worldflag{lt} Litouws (lietuvių kalba),
+\textsuperscript{(lv)} \worldflag{lv} Lets (latviešu valoda),
+\textsuperscript{(nl)} \worldflag{nl} Nederlands,
+\textsuperscript{(no)} \worldflag{no} Noors (Norsk),
+\textsuperscript{(pl)} \worldflag{pl} Pools (język polski),
+\textsuperscript{(pt)} \worldflag{pt} Portugees (Português),
+\textsuperscript{(ru)} \worldflag{ru} Russisch (русский язык),
+\textsuperscript{(se)} Noord-Samisch (Davvisámegiella),
+\textsuperscript{(sk)} \worldflag{sk} Slowaaks (slovenčina),
+\textsuperscript{(sl)} \worldflag{si} Sloveens (slovenščina),
+\textsuperscript{(sr)} \worldflag{rs} Servisch (српски језик),
+\textsuperscript{(sv)} \worldflag{se} Zweeds (Svenska),
+\textsuperscript{(th)} \worldflag{th} Thai (ไทย),
+\textsuperscript{(tr)} \worldflag{tr} Turks (Türkçe),
+\textsuperscript{(uk)} \worldflag{ua} Oekraïens (українська мова),
+\textsuperscript{(vi)} \worldflag{vn} Vietnamees (Tiếng Việt),
+\textsuperscript{(zh)} \worldflag{cn} Chinees (中文)
+
+\newpage
+
+%@Include taxa
+
+\end{document}

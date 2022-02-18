@@ -18,6 +18,16 @@
       "type": "charset"
     },
     {
+      "parameter": "dburl",
+      "lang": "dburl",
+      "help": "De URL voor de database connectie (localhost:5432/db)."
+    },
+    {
+      "parameter": "dbuser",
+      "lang": "dbuser",
+      "help": "De database gebruikersnaam."
+    },
+    {
       "parameter": "iocbestand",
       "extensie": "csv",
       "kort": "i",
@@ -36,10 +46,21 @@
       "type": "bestand"
     },
     {
+      "parameter": "taal",
+      "lang": "taal",
+      "help": "Taal (in ISO-639-2T) van de headers van het <iocbestand>. Standaardtaal is 'eng'.",
+      "standaard": "eng"
+    },
+    {
       "parameter": "talen",
       "lang": "talen",
-      "help": "Lijst, door komma's gescheiden, met talen die in het overzicht mogen staan.",
-      "verplicht": true
+      "help": "Lijst, door komma's gescheiden, met talen die in het overzicht mogen staan."
+    },
+    {
+      "parameter": "wachtwoord",
+      "kort": "w",
+      "lang": "wachtwoord",
+      "help": "Het wachtwoord van de database gebruikersnaam."
     }
   ]
 }

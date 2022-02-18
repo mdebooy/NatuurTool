@@ -21,6 +21,7 @@ import eu.debooy.doosutils.Batchjob;
 import eu.debooy.doosutils.DoosUtils;
 import eu.debooy.doosutils.ParameterBundle;
 import eu.debooy.doosutils.access.BestandConstants;
+import eu.debooy.doosutils.percistence.DbConnection;
 import eu.debooy.natuur.domain.RangDto;
 import eu.debooy.natuur.domain.TaxonDto;
 import static eu.debooy.natuurtools.NatuurTools.QRY_RANG;
@@ -44,8 +45,6 @@ public class DbNaarJson extends Batchjob {
   private static final  List<String>          rangen  = new ArrayList<>();
   private static final  Map<String, Integer>  totalen = new HashMap<>();
 
-  private static  EntityManager em;
-
   protected DbNaarJson() {}
 
   private static void addRang(String rang) {
@@ -66,52 +65,49 @@ public class DbNaarJson extends Batchjob {
       return;
     }
 
-    em  = NatuurTools.getEntityManager(
-              paramBundle.getString(NatuurTools.PAR_DBUSER),
-              paramBundle.getString(NatuurTools.PAR_DBURL),
-              paramBundle.getString(NatuurTools.PAR_WACHTWOORD));
+    try (var dbConn =
+        new DbConnection.Builder()
+              .setDbUser(paramBundle.getString(NatuurTools.PAR_DBUSER))
+              .setDbUrl(paramBundle.getString(NatuurTools.PAR_DBURL))
+              .setWachtwoord(paramBundle.getString(NatuurTools.PAR_WACHTWOORD))
+              .setPersistenceUnitName(NatuurTools.EM_UNITNAME)
+              .build()) {
+      var em  = dbConn.getEntityManager();
 
-    var taxoninfo = paramBundle.getString(NatuurTools.PAR_TAXAROOT).split(",");
-    getRangen();
+      var taxoninfo = paramBundle.getString(NatuurTools.PAR_TAXAROOT)
+                                 .split(",");
+      getRangen(em);
 
-    var namen   = new JSONObject();
-    var parent  = NatuurTools.getTaxon(taxoninfo[1], em);
-    var root    = new JSONObject();
+      var namen   = new JSONObject();
+      var parent  = NatuurTools.getTaxon(taxoninfo[1], em);
+      var root    = new JSONObject();
 
-    root.put(NatuurTools.KEY_LATIJN, parent.getLatijnsenaam());
-    root.put(NatuurTools.KEY_RANG, parent.getRang());
-    root.put(NatuurTools.KEY_SEQ, parent.getVolgnummer());
-    parent.getTaxonnamen().forEach(naam -> namen.put(naam.getTaal(),
-                                                     naam.getNaam()));
-    if (!namen.isEmpty()) {
-      root.put(NatuurTools.KEY_NAMEN, namen);
-    }
-
-    var subRangen = verwerkKinderen(parent.getTaxonId());
-    if (!subRangen.isEmpty()) {
-      root.put(NatuurTools.KEY_SUBRANGEN, subRangen);
-    }
-
-    NatuurTools.writeJson(paramBundle.getBestand(PAR_JSONBESTAND,
-                                                 BestandConstants.EXT_JSON),
-                          root, paramBundle.getString(PAR_CHARSETUIT));
-
-    em.close();
-
-    DoosUtils.naarScherm();
-    rangen.forEach(rang -> {
-      Integer volgnummer  = totalen.get(rang);
-      if (volgnummer > 0) {
-        DoosUtils.naarScherm(String.format("%6s: %,6d",
-                rang, totalen.get(rang)));
+      root.put(NatuurTools.KEY_LATIJN, parent.getLatijnsenaam());
+      root.put(NatuurTools.KEY_RANG, parent.getRang());
+      root.put(NatuurTools.KEY_SEQ, parent.getVolgnummer());
+      parent.getTaxonnamen().forEach(naam -> namen.put(naam.getTaal(),
+                                                       naam.getNaam()));
+      if (!namen.isEmpty()) {
+        root.put(NatuurTools.KEY_NAMEN, namen);
       }
-    });
-    DoosUtils.naarScherm();
-    DoosUtils.naarScherm(getMelding(MSG_KLAAR));
-    DoosUtils.naarScherm();
+
+      var subRangen = verwerkKinderen(parent.getTaxonId(), em);
+      if (!subRangen.isEmpty()) {
+        root.put(NatuurTools.KEY_SUBRANGEN, subRangen);
+      }
+
+      NatuurTools.writeJson(paramBundle.getBestand(PAR_JSONBESTAND,
+                                                   BestandConstants.EXT_JSON),
+                            root, paramBundle.getString(PAR_CHARSETUIT));
+    } catch (Exception e) {
+      DoosUtils.foutNaarScherm(e.getLocalizedMessage());
+    }
+
+    NatuurTools.printRangtotalen(rangen, totalen);
+    klaar();
   }
 
-  private static void getRangen() {
+  private static void getRangen(EntityManager em) {
     List<RangDto> ranglijst = em.createQuery(QRY_RANG).getResultList();
 
     ranglijst.forEach(rang -> {
@@ -120,7 +116,7 @@ public class DbNaarJson extends Batchjob {
     });
   }
 
-  private static JSONArray verwerkKinderen(Long parentId) {
+  private static JSONArray verwerkKinderen(Long parentId, EntityManager em) {
     var jsonRangen  = new JSONArray();
     var query       = em.createNamedQuery(TaxonDto.QRY_KINDEREN);
     query.setParameter(TaxonDto.PAR_OUDER, parentId);
@@ -143,7 +139,7 @@ public class DbNaarJson extends Batchjob {
       if (!namen.isEmpty()) {
         jsonRang.put(NatuurTools.KEY_NAMEN, namen);
       }
-      JSONArray subRangen = verwerkKinderen(taxon.getTaxonId());
+      JSONArray subRangen = verwerkKinderen(taxon.getTaxonId(), em);
       if (!subRangen.isEmpty()) {
         jsonRang.put(NatuurTools.KEY_SUBRANGEN, subRangen);
       }

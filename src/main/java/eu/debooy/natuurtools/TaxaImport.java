@@ -24,6 +24,7 @@ import eu.debooy.doosutils.access.BestandConstants;
 import eu.debooy.doosutils.access.JsonBestand;
 import eu.debooy.doosutils.components.Message;
 import eu.debooy.doosutils.exception.BestandException;
+import eu.debooy.doosutils.percistence.DbConnection;
 import eu.debooy.natuur.domain.RangDto;
 import eu.debooy.natuur.domain.TaxonDto;
 import static eu.debooy.natuur.domain.TaxonDto.PAR_LATIJNSENAAM;
@@ -88,51 +89,29 @@ public class TaxaImport extends Batchjob {
       Collections.sort(talen);
     }
 
-    em  = NatuurTools.getEntityManager(
-              paramBundle.getString(NatuurTools.PAR_DBUSER),
-              paramBundle.getString(NatuurTools.PAR_DBURL),
-              paramBundle.getString(NatuurTools.PAR_WACHTWOORD));
+    String  latijnsenaam  = "?";
 
-    getRangen();
-    setSwitches();
+    try (var dbConn =
+        new DbConnection.Builder()
+              .setDbUser(paramBundle.getString(NatuurTools.PAR_DBUSER))
+              .setDbUrl(paramBundle.getString(NatuurTools.PAR_DBURL))
+              .setWachtwoord(paramBundle.getString(NatuurTools.PAR_WACHTWOORD))
+              .setPersistenceUnitName(NatuurTools.EM_UNITNAME)
+              .build()) {
+      em  = dbConn.getEntityManager();
 
-    var latijnsenaam  = "?";
+      getRangen();
+      setSwitches();
 
-    try (var jsonBestand   =
-          new JsonBestand.Builder()
-                         .setBestand(
-                             paramBundle.getBestand(NatuurTools.PAR_JSON,
-                                                    BestandConstants.EXT_JSON))
-                         .setCharset(paramBundle.getString(PAR_CHARSETIN))
-                         .build()) {
-      latijnsenaam    = jsonBestand.read().get(NatuurTools.KEY_LATIJN)
-                                          .toString();
-      var   rang      = jsonBestand.read().get(NatuurTools.KEY_RANG)
-                                          .toString();
-      Long  parentId  = getTaxon(latijnsenaam, 0L, 0, rang).getTaxonId();
-      for (Object taxa :
-              (JSONArray) jsonBestand.read().get(NatuurTools.KEY_SUBRANGEN)) {
-        verwerkRang(parentId, (JSONObject) taxa);
-      }
-    } catch (BestandException e) {
+      latijnsenaam  = verwerkBestand();
+    } catch (Exception e) {
       DoosUtils.foutNaarScherm(e.getLocalizedMessage());
     }
 
-    em.close();
-
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(latijnsenaam);
-    DoosUtils.naarScherm();
-    rangen.forEach(rang -> {
-      Integer volgnummer  = totalen.get(rang);
-      if (volgnummer > 0) {
-        DoosUtils.naarScherm(String.format("%6s: %,6d",
-                rang, totalen.get(rang)));
-      }
-    });
-    DoosUtils.naarScherm();
-    DoosUtils.naarScherm(getMelding(MSG_KLAAR));
-    DoosUtils.naarScherm();
+    NatuurTools.printRangtotalen(rangen, totalen);
+    klaar();
   }
 
   private static void addRang(String rang) {
@@ -308,7 +287,7 @@ public class TaxaImport extends Batchjob {
 
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(resourceBundle.getString(NatuurTools.MSG_WIJZIGEN));
-    if (behoud) {
+    if (!behoud) {
       DoosUtils.naarScherm(resourceBundle
                               .getString(NatuurTools.MSG_SKIPSTRUCTUUR));
     }
@@ -355,6 +334,32 @@ public class TaxaImport extends Batchjob {
     } else {
       printMessages(fouten);
     }
+  }
+
+  private static String verwerkBestand() {
+    var latijnsenaam  = "?";
+
+    try (var jsonBestand   =
+          new JsonBestand.Builder()
+                         .setBestand(
+                             paramBundle.getBestand(NatuurTools.PAR_JSON,
+                                                    BestandConstants.EXT_JSON))
+                         .setCharset(paramBundle.getString(PAR_CHARSETIN))
+                         .build()) {
+      latijnsenaam    = jsonBestand.read().get(NatuurTools.KEY_LATIJN)
+                                          .toString();
+      var   rang      = jsonBestand.read().get(NatuurTools.KEY_RANG)
+                                          .toString();
+      Long  parentId  = getTaxon(latijnsenaam, 0L, 0, rang).getTaxonId();
+      for (Object taxa :
+              (JSONArray) jsonBestand.read().get(NatuurTools.KEY_SUBRANGEN)) {
+        verwerkRang(parentId, (JSONObject) taxa);
+      }
+    } catch (BestandException e) {
+      DoosUtils.foutNaarScherm(e.getLocalizedMessage());
+    }
+
+    return latijnsenaam;
   }
 
   private static void verwerkRang(Long parentId, JSONObject json) {
