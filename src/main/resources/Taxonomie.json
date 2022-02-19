@@ -26,7 +26,7 @@
       "parameter": "kleur",
       "kort": "k",
       "lang": "kleur",
-      "help": "De kleur voor de onderverdelingen in RGB. De standaardkleur is 4E9A06.",
+      "help": "De kleur voor de onderverdelingen in RGB. De standaardkleur is {0}.",
       "standaard": "4E9A06"
     },
     {
@@ -77,7 +77,7 @@
       "parameter": "wachtwoord",
       "kort": "w",
       "lang": "wachtwoord",
-      "help": "Het wachtwoord van de database gebruikersnaam."
+      "help": "Het wachtwoord van de database gebruiker."
     }
   ]
 }

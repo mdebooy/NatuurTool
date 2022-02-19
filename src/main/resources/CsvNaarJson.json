@@ -43,7 +43,7 @@
       "extensie": "json",
       "kort": "j",
       "lang": "jsonbestand",
-      "help": "IOC Namen bestand in JSON-formaat. Als deze parameter afwezig is krijgt het bestand dezelfde naam als --csvbestand.",
+      "help": "IOC Namen bestand in JSON-formaat. Als deze parameter afwezig is krijgt het bestand dezelfde naam als <csvbestand>.",
       "standaard": "_@csvbestand@_",
       "type": "bestand"
     },
@@ -63,7 +63,7 @@
       "parameter": "wachtwoord",
       "kort": "w",
       "lang": "wachtwoord",
-      "help": "Het wachtwoord van de database gebruikersnaam."
+      "help": "Het wachtwoord van de database gebruiker."
     }
   ]
 }

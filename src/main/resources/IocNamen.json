@@ -20,7 +20,7 @@
     {
       "parameter": "dburl",
       "lang": "dburl",
-      "help": "De URL voor de database connectie (localhost:5432/db)."
+      "help": "De URL voor de database connectie (localhost:5432/db). De taalkodes worden dan, met behulp van de header van het <iocbestand>, uit de database gehaald. De <talen> parameter wordt dan enkel gebruikt om enkel die talen in het <jsonbestand> te zetten."
     },
     {
       "parameter": "dbuser",
@@ -46,21 +46,27 @@
       "type": "bestand"
     },
     {
+      "parameter": "perrang",
+      "lang": "perrang",
+      "help": "Volgnummers per rang.",
+      "type": "boolean"
+    },
+    {
       "parameter": "taal",
       "lang": "taal",
-      "help": "Taal (in ISO-639-2T) van de headers van het <iocbestand>. Standaardtaal is 'eng'.",
+      "help": "Taal (in ISO-639-2T) van de headers van het <iocbestand>. Standaardtaal is \"{0}\".",
       "standaard": "eng"
     },
     {
       "parameter": "talen",
       "lang": "talen",
-      "help": "Lijst, door komma's gescheiden, met talen die in het overzicht mogen staan."
+      "help": "Lijst, door komma's gescheiden, met talen die in het overzicht mogen staan. Zonder <dburl> moeten ze in de juiste volgorde staan van het <iocbestand> waarbij bij een ''lege'' taal de kolom wordt overgeslagen."
     },
     {
       "parameter": "wachtwoord",
       "kort": "w",
       "lang": "wachtwoord",
-      "help": "Het wachtwoord van de database gebruikersnaam."
+      "help": "Het wachtwoord van de database gebruiker."
     }
   ]
 }
