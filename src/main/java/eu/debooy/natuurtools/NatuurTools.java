@@ -76,6 +76,7 @@ public class NatuurTools extends Batchjob {
   protected static final  String  PAR_HERNUMMER   = "hernummer";
   protected static final  String  PAR_JSON        = "json";
   protected static final  String  PAR_KLEUR       = "kleur";
+  protected static final  String  PAR_PERRANG     = "perrang";
   protected static final  String  PAR_RANGEN      = "rangen";
   protected static final  String  PAR_SUBTITEL    = "subtitel";
   protected static final  String  PAR_TALEN       = "talen";

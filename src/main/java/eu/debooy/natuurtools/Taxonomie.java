@@ -161,13 +161,13 @@ public class Taxonomie extends Batchjob {
       params.put("@Subject@",
                  String.format("%s (%s)",
                                parent.getTaxonnaam(
-                                   paramBundle.getString(NatuurTools.PAR_TAAL))
+                                   paramBundle.getString(PAR_TAAL))
                                      .getNaam(),
                                parent.getLatijnsenaam()));
       params.put("@Subtitel@",
                  String.format("%s (\\textit{%s})",
                                parent.getTaxonnaam(
-                                   paramBundle.getString(NatuurTools.PAR_TAAL))
+                                   paramBundle.getString(PAR_TAAL))
                                      .getNaam(),
                                parent.getLatijnsenaam()));
     } else {
@@ -237,11 +237,10 @@ public class Taxonomie extends Batchjob {
                                    TekstBestand texBestand)
       throws BestandException {
     var afgekeurd = 0;
-//    params.entrySet().forEach(action);
-    for (var param : params.keySet()) {
-      if (regel.contains(param)) {
-        if (DoosUtils.isNotBlankOrNull(params.get(param))) {
-          regel = regel.replace(param, params.get(param));
+    for (var param : params.entrySet()) {
+      if (regel.contains(param.getKey())) {
+        if (DoosUtils.isNotBlankOrNull(param.getValue())) {
+          regel = regel.replace(param.getKey(), param.getValue());
         } else {
           afgekeurd++;
         }

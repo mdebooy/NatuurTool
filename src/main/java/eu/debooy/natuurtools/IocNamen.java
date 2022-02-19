@@ -61,6 +61,7 @@ public class IocNamen extends Batchjob {
   private static final  Map<String, Integer>
                                         totalen         = new HashMap<>();
 
+  private static  boolean   perRang       = false;
   private static  Integer   sequence      = 0;
   private static  String[]  taalkolom;
   private static  String    vorigeFamilie = "";
@@ -91,6 +92,7 @@ public class IocNamen extends Batchjob {
       return;
     }
 
+    perRang = paramBundle.getBoolean(NatuurTools.PAR_PERRANG);
     if (paramBundle.containsArgument(NatuurTools.PAR_TALEN)) {
       taal.addAll(Set.of(paramBundle.getString(NatuurTools.PAR_TALEN)
                                     .split(",")));
@@ -156,6 +158,14 @@ public class IocNamen extends Batchjob {
     }
   }
 
+  private static int getVolgnummer(String rang) {
+    if (!perRang) {
+      return sequence;
+    }
+
+    return totalen.get(rang);
+  }
+
   private static void nieuwGeslacht() throws ParseException {
     nieuweSoort();
     if (!geslacht.isEmpty()) {
@@ -167,7 +177,6 @@ public class IocNamen extends Batchjob {
       geslachten.add(parser.parse(geslacht.toString()));
       geslacht.clear();
     }
-
   }
 
   private static void setRangen() {
@@ -226,7 +235,7 @@ public class IocNamen extends Batchjob {
               .setWachtwoord(paramBundle.getString(NatuurTools.PAR_WACHTWOORD))
               .setPersistenceUnitName(NatuurTools.EM_UNITNAME)
               .build()) {
-      var csvtaal         = paramBundle.getString(NatuurTools.PAR_TAAL);
+      var csvtaal         = paramBundle.getString(PAR_TAAL);
       var em              = dbConn.getEntityManager();
       var gebruikerstaal  =
           ((TaalDto)em.createNamedQuery(TaalDto.QRY_TAAL_ISO6391)
@@ -239,24 +248,26 @@ public class IocNamen extends Batchjob {
         naamquery.setParameter(TaalnaamDto.PAR_TAAL, csvtaal);
         naamquery.setParameter(TaalnaamDto.PAR_NAAM, taalkolom[i]);
         var taalnaamDto = naamquery.getResultList();
+
         if (taalnaamDto.isEmpty()) {
           taalkolom[i]  = "";
-        } else {
-          var taalDto = em.find(TaalDto.class,
-                                ((TaalnaamDto)taalnaamDto.get(0)).getTaalId());
-          if (taal.isEmpty()
-              || taal.contains(taalDto.getIso6391())) {
-            taalkolom[i]  = taalDto.getIso6391();
-            if (taalDto.hasTaalnaam(gebruikerstaal)) {
-              taalnaam.add(String.format("%s (%s)",
-                                         taalDto.getNaam(gebruikerstaal),
-                                         taalDto.getIso6391()));
-            } else {
-              taalnaam.add(taalkolom[i]);
-            }
+          continue;
+        }
+
+        var taalDto = em.find(TaalDto.class,
+                              ((TaalnaamDto)taalnaamDto.get(0)).getTaalId());
+        if (taal.isEmpty()
+            || taal.contains(taalDto.getIso6391())) {
+          taalkolom[i]  = taalDto.getIso6391();
+          if (taalDto.hasTaalnaam(gebruikerstaal)) {
+            taalnaam.add(String.format("%s (%s)",
+                                       taalDto.getNaam(gebruikerstaal),
+                                       taalDto.getIso6391()));
           } else {
-            taalkolom[i]  = "";
+            taalnaam.add(taalkolom[i]);
           }
+        } else {
+          taalkolom[i]  = "";
         }
       }
     } catch (Exception e) {
@@ -270,7 +281,7 @@ public class IocNamen extends Batchjob {
     if (!veld[1].equals(vorigeOrde)) {
       nieuweOrde();
       addRang(NatuurTools.RANG_ORDE);
-      orde.put(NatuurTools.KEY_SEQ, sequence);
+      orde.put(NatuurTools.KEY_SEQ, getVolgnummer(NatuurTools.RANG_ORDE));
       orde.put(NatuurTools.KEY_RANG, NatuurTools.RANG_ORDE);
       orde.put(NatuurTools.KEY_LATIJN,
                veld[1].substring(0, 1).toUpperCase()
@@ -281,7 +292,7 @@ public class IocNamen extends Batchjob {
     if (!veld[2].equals(vorigeFamilie)) {
       nieuweFamilie();
       addRang(NatuurTools.RANG_FAMILIE);
-      familie.put(NatuurTools.KEY_SEQ, sequence);
+      familie.put(NatuurTools.KEY_SEQ, getVolgnummer(NatuurTools.RANG_FAMILIE));
       familie.put(NatuurTools.KEY_RANG, NatuurTools.RANG_FAMILIE);
       familie.put(NatuurTools.KEY_LATIJN,
                veld[2].substring(0, 1).toUpperCase()
@@ -295,7 +306,8 @@ public class IocNamen extends Batchjob {
     if (!naam.equals(vorigGeslacht)) {
       nieuwGeslacht();
       addRang(NatuurTools.RANG_GESLACHT);
-      geslacht.put(NatuurTools.KEY_SEQ, sequence);
+      geslacht.put(NatuurTools.KEY_SEQ,
+                   getVolgnummer(NatuurTools.RANG_GESLACHT));
       geslacht.put(NatuurTools.KEY_RANG, NatuurTools.RANG_GESLACHT);
       geslacht.put(NatuurTools.KEY_LATIJN,
                naam.substring(0, 1).toUpperCase()
@@ -304,7 +316,7 @@ public class IocNamen extends Batchjob {
     }
     nieuweSoort();
     addRang(NatuurTools.RANG_SOORT);
-    soort.put(NatuurTools.KEY_SEQ, sequence);
+    soort.put(NatuurTools.KEY_SEQ, getVolgnummer(NatuurTools.RANG_SOORT));
     soort.put(NatuurTools.KEY_RANG, NatuurTools.RANG_SOORT);
     soort.put(NatuurTools.KEY_LATIJN,
              veld[3].substring(0, 1).toUpperCase()

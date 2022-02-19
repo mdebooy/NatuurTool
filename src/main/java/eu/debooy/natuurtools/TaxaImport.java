@@ -89,7 +89,7 @@ public class TaxaImport extends Batchjob {
       Collections.sort(talen);
     }
 
-    String  latijnsenaam  = "?";
+    var latijnsenaam  = "?";
 
     try (var dbConn =
         new DbConnection.Builder()
