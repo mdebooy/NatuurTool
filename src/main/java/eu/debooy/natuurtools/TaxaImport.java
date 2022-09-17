@@ -27,8 +27,6 @@ import eu.debooy.doosutils.exception.BestandException;
 import eu.debooy.doosutils.percistence.DbConnection;
 import eu.debooy.natuur.domain.RangDto;
 import eu.debooy.natuur.domain.TaxonDto;
-import static eu.debooy.natuur.domain.TaxonDto.PAR_LATIJNSENAAM;
-import static eu.debooy.natuur.domain.TaxonDto.QRY_LATIJNSENAAM;
 import eu.debooy.natuur.domain.TaxonnaamDto;
 import eu.debooy.natuur.validator.TaxonValidator;
 import eu.debooy.natuur.validator.TaxonnaamValidator;
@@ -236,8 +234,8 @@ public class TaxaImport extends Batchjob {
 
   private static TaxonDto getTaxon(String latijnsenaam, Long parentId,
                                    Integer volgnummer, String rang) {
-    var query = em.createNamedQuery(QRY_LATIJNSENAAM);
-    query.setParameter(PAR_LATIJNSENAAM, latijnsenaam);
+    var query = em.createNamedQuery(TaxonDto.QRY_LATIJNSENAAM);
+    query.setParameter(TaxonDto.PAR_LATIJNSENAAM, latijnsenaam);
     TaxonDto  resultaat;
     try {
       resultaat = (TaxonDto) query.getSingleResult();
