@@ -46,6 +46,7 @@ public class Taxonomie extends Batchjob {
   private static final  String      QRY_ROOT      =
       "select t from TaxonDto t where t.parentId is null "
           + "order by t.rang, t.volgnummer";
+  private static final  String      UITGESTORVEN  = "†";
 
   private static final  Map<String, String> prefix  = new HashMap<>();
   private static final  List<String>        rangen  = new ArrayList<>();
@@ -184,13 +185,17 @@ public class Taxonomie extends Batchjob {
     if (rangen.isEmpty()
         || rangen.contains(parent.getRang())) {
       DoosUtils.naarScherm(prefix.get(parent.getRang()) + " " + parent.getRang()
-                            + " " + parent.getLatijnsenaam());
+                            + " " + parent.getLatijnsenaam()
+                            + (parent.isUitgestorven() ? " " + UITGESTORVEN
+                                                       : ""));
       var regel   = new StringBuilder();
       var naam    = parent.getNaam(paramBundle.getString(PAR_TAAL));
       var latijn  = parent.getLatijnsenaam();
       regel.append("\\taxon{")
            .append(parent.getRang()).append("}{")
-           .append(latijn).append("}{");
+           .append(latijn)
+           .append(parent.isUitgestorven() ? " " + UITGESTORVEN : "")
+           .append("}{");
       if (!naam.equals(latijn)) {
         regel.append(naam);
       }
