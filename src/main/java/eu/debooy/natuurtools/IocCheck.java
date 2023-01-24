@@ -41,8 +41,10 @@ public class IocCheck extends Batchjob {
   private static final  ResourceBundle  resourceBundle  =
       ResourceBundle.getBundle("ApplicatieResources", Locale.getDefault());
 
+  private static final  String  PAR_KLASSE  = "klasse";
+
   private static final  String  QUERY =
-      "select d from DetailDto d where d.parentLatijnsenaam='Aves' "
+      "select d from DetailDto d where d.parentLatijnsenaam='%s' "
           + "and d.rang='so' order by d.volgnummer";
 
   protected static  List<String>  latijnsenamen = new ArrayList<>();
@@ -78,6 +80,8 @@ public class IocCheck extends Batchjob {
       return;
     }
 
+    var taal  = paramBundle.getString(PAR_TAAL);
+
     var onbekend  = 0;
     try (var dbConn =
         new DbConnection.Builder()
@@ -88,18 +92,22 @@ public class IocCheck extends Batchjob {
               .build()) {
       var em  = dbConn.getEntityManager();
 
-      for (var detail : em.createQuery(QUERY).getResultList()) {
-        if (!latijnsenamen.contains(((DetailDto) detail).getLatijnsenaam())) {
-          var volgnummer  =
-              DoosUtils.stringMetLengte(((DetailDto) detail).getVolgnummer()
-                                                            .toString(), 8);
+      for (var detail : em.createQuery(String.format(
+                                          QUERY,
+                                          paramBundle.getString(PAR_KLASSE)))
+                          .getResultList()) {
+        var detailDto = (DetailDto) detail;
+        if (!latijnsenamen.contains(detailDto.getLatijnsenaam())) {
           if (onbekend == 0) {
             DoosUtils.naarScherm();
-            DoosUtils.naarScherm(
-                resourceBundle.getString(NatuurTools.LBL_SOORTENONBEKEND));
+            DoosUtils.naarScherm(MessageFormat.format(
+                resourceBundle.getString(NatuurTools.LBL_SOORTENONBEKEND),
+                paramBundle.getString(PAR_KLASSE)));
           }
-          DoosUtils.naarScherm(volgnummer + " "
-                                + ((DetailDto) detail).getLatijnsenaam());
+          DoosUtils.naarScherm(String.format("%8d %s - %s",
+                                             detailDto.getVolgnummer(),
+                                             detailDto.getLatijnsenaam(),
+                                             detailDto.getNaam(taal)));
           onbekend++;
         }
       }

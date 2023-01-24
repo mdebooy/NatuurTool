@@ -27,6 +27,18 @@
       "verplicht": true
     },
     {
+      "parameter": "klasse",
+      "lang": "klasse",
+      "help": "De latijnse naam van de klasse. De standaardklasse is {0}.",
+      "standaard": "Aves"
+    },
+    {
+      "parameter": "taal",
+      "lang": "taal",
+      "help": "Taal van de namen, die naast de latijnse naam staan, als die anders is dan de taal van het systeem ({0}).",
+      "type": "locale"
+    },
+    {
       "parameter": "wachtwoord",
       "kort": "w",
       "lang": "wachtwoord",
