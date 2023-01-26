@@ -34,6 +34,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -59,6 +60,8 @@ public class IocNamen extends Batchjob {
   private static final  JSONObject      soort           = new JSONObject();
   private static final  JSONArray       soorten         = new JSONArray();
   private static final  Map<String, Integer>
+                                        taaltotalen     = new HashMap<>();
+  private static final  Map<String, Integer>
                                         totalen         = new HashMap<>();
 
   private static  boolean   perRang       = false;
@@ -68,14 +71,22 @@ public class IocNamen extends Batchjob {
   private static  String    vorigeOrde    = "";
   private static  String    vorigGeslacht = "";
 
-  private static final  Set<String> taal      = new TreeSet<>();
-  private static final  Set<String> taalnaam  = new TreeSet<>();
+  private static final  Set<String>         taal      = new TreeSet<>();
+  private static final  Map<String, String> taalnaam  = new TreeMap<>();
 
   protected IocNamen() {}
 
   private static void addRang(String rang) {
     totalen.put(rang, totalen.get(rang)+1);
     sequence++;
+  }
+
+  private static void addTaal(String taal) {
+    if (!taaltotalen.containsKey(taal)) {
+      taaltotalen.put(taal, 0);
+    }
+
+    taaltotalen.put(taal, taaltotalen.get(taal)+1);
   }
 
   public static void execute(String[] args) {
@@ -109,17 +120,52 @@ public class IocNamen extends Batchjob {
         MessageFormat.format(resourceBundle.getString(NatuurTools.MSG_TALEN),
                              taalnaam).replace("[, ", "[");
     DoosUtils.naarScherm(melding.indexOf("[") + 1, melding, 80);
+    DoosUtils.naarScherm();
     DoosUtils.naarScherm(
         MessageFormat.format(resourceBundle.getString(NatuurTools.MSG_LIJNEN),
-                             String.format("%,6d", lijnen)));
+                             String.format("%,9d", lijnen)));
     rangen.forEach(rang -> {
       if (totalen.get(rang) > 0) {
-        DoosUtils.naarScherm(String.format("%6s: %,6d",
+        DoosUtils.naarScherm(String.format("%6s : %,9d",
                                            rang, totalen.get(rang)));
+      }
+    });
+    DoosUtils.naarScherm();
+    DoosUtils.naarScherm(String.format("%25s   %9s",
+                      resourceBundle.getString(NatuurTools.LBL_TALEN),
+                      resourceBundle.getString(NatuurTools.LBL_AANTAL)));
+    DoosUtils.naarScherm(DoosUtils.stringMetLengte("-", 37, "-"));
+    taalnaam.forEach((k, v) -> {
+      if (taaltotalen.containsKey(k)) {
+        var totaal  = taaltotalen.get(k);
+        if (totaal > 0) {
+          DoosUtils.naarScherm(String.format("%25s : %,9d", v, totaal));
+        }
       }
     });
 
     klaar();
+  }
+
+  private static int getVolgnummer(String rang) {
+    if (!perRang) {
+      return sequence;
+    }
+
+    return totalen.get(rang);
+  }
+
+  private static void nieuwGeslacht() throws ParseException {
+    nieuweSoort();
+    if (!geslacht.isEmpty()) {
+      if (!soorten.isEmpty()) {
+        geslacht.put(NatuurTools.KEY_SUBRANGEN,
+                     parser.parse(soorten.toString()));
+        soorten.clear();
+      }
+      geslachten.add(parser.parse(geslacht.toString()));
+      geslacht.clear();
+    }
   }
 
   private static void nieuweFamilie() throws ParseException {
@@ -155,27 +201,6 @@ public class IocNamen extends Batchjob {
       }
       soorten.add(parser.parse(soort.toString()));
       soort.clear();
-    }
-  }
-
-  private static int getVolgnummer(String rang) {
-    if (!perRang) {
-      return sequence;
-    }
-
-    return totalen.get(rang);
-  }
-
-  private static void nieuwGeslacht() throws ParseException {
-    nieuweSoort();
-    if (!geslacht.isEmpty()) {
-      if (!soorten.isEmpty()) {
-        geslacht.put(NatuurTools.KEY_SUBRANGEN,
-                     parser.parse(soorten.toString()));
-        soorten.clear();
-      }
-      geslachten.add(parser.parse(geslacht.toString()));
-      geslacht.clear();
     }
   }
 
@@ -224,7 +249,9 @@ public class IocNamen extends Batchjob {
   private static void verwerkHeader() {
     if (!paramBundle.containsArgument(NatuurTools.PAR_DBURL)) {
       taalkolom = paramBundle.getString(NatuurTools.PAR_TALEN).split(",");
-      taalnaam.addAll(Set.of(taalkolom));
+      for (var element : taalkolom) {
+        taalnaam.put(element, element);
+      }
       return;
     }
 
@@ -238,10 +265,10 @@ public class IocNamen extends Batchjob {
       var csvtaal         = paramBundle.getString(PAR_TAAL);
       var em              = dbConn.getEntityManager();
       var gebruikerstaal  =
-          ((TaalDto)em.createNamedQuery(TaalDto.QRY_TAAL_ISO6391)
-                      .setParameter(TaalDto.PAR_ISO6391,
-                                    Locale.getDefault().getLanguage())
-                      .getSingleResult()).getIso6392t();
+          ((TaalDto)  em.createNamedQuery(TaalDto.QRY_TAAL_ISO6391)
+                        .setParameter(TaalDto.PAR_ISO6391,
+                                      Locale.getDefault().getLanguage())
+                        .getSingleResult()).getIso6392t();
       var naamquery       = em.createNamedQuery(TaalnaamDto.QRY_METTAAL);
 
       for (var i =0; i < taalkolom.length; i++) {
@@ -260,11 +287,12 @@ public class IocNamen extends Batchjob {
             || taal.contains(taalDto.getIso6391())) {
           taalkolom[i]  = taalDto.getIso6391();
           if (taalDto.hasTaalnaam(gebruikerstaal)) {
-            taalnaam.add(String.format("%s (%s)",
+            taalnaam.put(taalDto.getIso6391(),
+                         String.format("%s (%s)",
                                        taalDto.getNaam(gebruikerstaal),
                                        taalDto.getIso6391()));
           } else {
-            taalnaam.add(taalkolom[i]);
+            taalnaam.put(taalkolom[i], taalkolom[i]);
           }
         } else {
           taalkolom[i]  = "";
@@ -326,6 +354,7 @@ public class IocNamen extends Batchjob {
       if (DoosUtils.isNotBlankOrNull(taalkolom[i])
           && DoosUtils.isNotBlankOrNull(veld[i+4])) {
         namen.put(taalkolom[i], veld[i+4]);
+        addTaal(taalkolom[i]);
       }
     }
   }

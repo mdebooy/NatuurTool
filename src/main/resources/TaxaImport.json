@@ -57,6 +57,12 @@
       "type": "boolean"
     },
     {
+      "parameter": "taal",
+      "lang": "taal",
+      "help": "Taal van de namen, die naast de latijnse naam staan, als die anders is dan de taal van het systeem ({0}).",
+      "type": "locale"
+    },
+    {
       "parameter": "talen",
       "lang": "talen",
       "help": "Lijst, door komma's gescheiden, met talen die in het overzicht mogen staan."

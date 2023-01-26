@@ -76,12 +76,12 @@ public class IocNamenTest extends BatchTest {
 
     execute(args);
 
-    assertEquals(0, err.size());
-    assertEquals("6", out.get(13).split(":")[1].trim());
-    assertEquals("2",  out.get(14).split(":")[1].trim());
-    assertEquals("3",  out.get(15).split(":")[1].trim());
-    assertEquals("4",  out.get(16).split(":")[1].trim());
-    assertEquals("6",  out.get(17).split(":")[1].trim());
+    assertEquals(0,   err.size());
+    assertEquals("6", out.get(16).split(":")[1].trim());
+    assertEquals("2", out.get(17).split(":")[1].trim());
+    assertEquals("3", out.get(18).split(":")[1].trim());
+    assertEquals("4", out.get(19).split(":")[1].trim());
+    assertEquals("6", out.get(20).split(":")[1].trim());
     assertTrue(
         Bestand.equals(
             Bestand.openInvoerBestand(getTemp() + File.separator

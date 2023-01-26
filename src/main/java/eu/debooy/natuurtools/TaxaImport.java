@@ -16,6 +16,7 @@
  */
 package eu.debooy.natuurtools;
 
+import eu.debooy.doos.domain.TaalDto;
 import eu.debooy.doosutils.Banner;
 import eu.debooy.doosutils.Batchjob;
 import eu.debooy.doosutils.DoosUtils;
@@ -23,6 +24,7 @@ import eu.debooy.doosutils.ParameterBundle;
 import eu.debooy.doosutils.access.BestandConstants;
 import eu.debooy.doosutils.access.JsonBestand;
 import eu.debooy.doosutils.components.Message;
+import eu.debooy.doosutils.errorhandling.exception.ObjectNotFoundException;
 import eu.debooy.doosutils.exception.BestandException;
 import eu.debooy.doosutils.percistence.DbConnection;
 import eu.debooy.natuur.domain.RangDto;
@@ -52,12 +54,16 @@ public class TaxaImport extends Batchjob {
   private static final  ResourceBundle  resourceBundle  =
       ResourceBundle.getBundle("ApplicatieResources", Locale.getDefault());
 
-  protected static final  Long  ONBEKEND  = -1L;
+  protected static final  Long  ONBEKEND      = -1L;
 
-  private static final  Map<String, String>   prefix  = new HashMap<>();
-  private static final  List<String>          rangen  = new ArrayList<>();
-  private static final  List<String>          talen   = new ArrayList<>();
-  private static final  Map<String, Integer>  totalen = new HashMap<>();
+  protected static final  String  QRY_TALEN =
+      "select distinct t.taal from natuur.taxonnamen t";
+
+  private static final  Map<String, Totalen>  namen     = new HashMap<>();
+  private static final  Map<String, String>   prefix    = new HashMap<>();
+  private static final  List<String>          rangen    = new ArrayList<>();
+  private static final  List<String>          talen     = new ArrayList<>();
+  private static final  Map<String, Totalen>  totalen   = new HashMap<>();
 
   private static  boolean       aanmaak   = false;
   private static  boolean       behoud    = false;
@@ -84,10 +90,9 @@ public class TaxaImport extends Batchjob {
     if (paramBundle.containsParameter(NatuurTools.PAR_TALEN)) {
       talen.addAll(Arrays.asList(paramBundle.getString(NatuurTools.PAR_TALEN)
                                             .split(",")));
-      Collections.sort(talen);
     }
 
-    var latijnsenaam  = "?";
+    String  latijnsenaam;
 
     try (var dbConn =
         new DbConnection.Builder()
@@ -100,20 +105,69 @@ public class TaxaImport extends Batchjob {
 
       getRangen();
       setSwitches();
+      getTalen();
 
       latijnsenaam  = verwerkBestand();
     } catch (Exception e) {
       DoosUtils.foutNaarScherm(e.getLocalizedMessage());
+      return;
     }
+
+    Collections.sort(talen);
 
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(latijnsenaam);
-    NatuurTools.printRangtotalen(rangen, totalen);
+    NatuurTools.printTotalen(
+        String.format("%15s  %9s %9s %9s",
+                      resourceBundle.getString(NatuurTools.LBL_RANGEN),
+                      resourceBundle.getString(NatuurTools.LBL_AANTAL),
+                      resourceBundle.getString(NatuurTools.LBL_UPDATE),
+                      resourceBundle.getString(NatuurTools.LBL_NIEUW)),
+        rangen, totalen);
+    NatuurTools.printTotalen(
+        String.format("%25s  %9s %9s %9s",
+                      resourceBundle.getString(NatuurTools.LBL_TALEN),
+                      resourceBundle.getString(NatuurTools.LBL_AANTAL),
+                      resourceBundle.getString(NatuurTools.LBL_UPDATE),
+                      resourceBundle.getString(NatuurTools.LBL_NIEUW)),
+        talen, namen);
     klaar();
   }
 
   private static void addRang(String rang) {
-    totalen.put(rang, totalen.get(rang) + 1);
+    totalen.get(rang).addAantal();
+  }
+
+  private static void addTaal(String taal) {
+    if (!namen.containsKey(taal)) {
+      initTaal(taal);
+    }
+
+    namen.get(taal).addAantal();
+  }
+
+  private static void addNieuweRang(String rang) {
+    totalen.get(rang).addNieuw();
+  }
+
+  private static void addNieuweTaal(String taal) {
+    if (!namen.containsKey(taal)) {
+      initTaal(taal);
+    }
+
+    namen.get(taal).addNieuw();
+  }
+
+  private static void addUpdateRang(String rang) {
+    totalen.get(rang).addUpdate();
+  }
+
+  private static void addUpdateTaal(String taal) {
+    if (!namen.containsKey(taal)) {
+      initTaal(taal);
+    }
+
+    namen.get(taal).addUpdate();
   }
 
   private static void addTaxon(TaxonDto taxon) {
@@ -127,6 +181,7 @@ public class TaxaImport extends Batchjob {
       em.getTransaction().begin();
       em.persist(taxon);
       em.getTransaction().commit();
+      addNieuweRang(taxon.getRang());
     } else {
       printMessages(fouten);
     }
@@ -143,6 +198,7 @@ public class TaxaImport extends Batchjob {
       em.getTransaction().begin();
       em.persist(taxonnaam);
       em.getTransaction().commit();
+      addNieuweTaal(taxonnaam.getTaal());
     } else {
       printMessages(fouten);
     }
@@ -172,6 +228,7 @@ public class TaxaImport extends Batchjob {
                     prefix.get(taxon.getRang()) + "    ",
                     resourceBundle.getString(NatuurTools.MSG_HIERARCHIE),
                     verandering.toString().trim()));
+      addUpdateRang(taxon.getRang());
     }
   }
 
@@ -206,6 +263,7 @@ public class TaxaImport extends Batchjob {
           taxonnaamDto.setTaxonId(taxon.getTaxonId());
           addTaxonnaam(taxonnaamDto);
         }
+        addTaal(taxonnaamDto.getTaal());
       }
     }
 
@@ -220,7 +278,14 @@ public class TaxaImport extends Batchjob {
     });
   }
 
+  private static void getAanwezigeTalen() {
+    em.createNativeQuery(QRY_TALEN)
+      .getResultList()
+      .forEach(aanwezigetaal -> talen.add((String) aanwezigetaal));
+  }
+
   private static void getRangen() {
+    var           taal      = paramBundle.getString(NatuurTools.PAR_TAAL);
     List<RangDto> ranglijst =
         em.createQuery(NatuurTools.QRY_RANG).getResultList();
 
@@ -228,8 +293,33 @@ public class TaxaImport extends Batchjob {
       prefix.put(rang.getRang(),
                  DoosUtils.stringMetLengte("", rang.getNiveau().intValue()));
       rangen.add(rang.getRang());
-      totalen.put(rang.getRang(), 0);
+      totalen.put(rang.getRang(), new Totalen(rang.getNaam(taal), 15));
     });
+  }
+
+  private static void getTalen() {
+    if (talen.isEmpty()) {
+      getAanwezigeTalen();
+    }
+
+    var taal      = paramBundle.getString(PAR_TAAL);
+    var iso6392t  =
+        ((TaalDto)  em.createNamedQuery(TaalDto.QRY_TAAL_ISO6391)
+                      .setParameter(TaalDto.PAR_ISO6391, taal)
+                      .getSingleResult()).getIso6392t();
+
+    for (var iso6391 : talen) {
+      try {
+        var taalnaam  =
+          ((TaalDto)  em.createNamedQuery(TaalDto.QRY_TAAL_ISO6391)
+                        .setParameter(TaalDto.PAR_ISO6391, iso6391)
+                        .getSingleResult()).getTaalnaam(iso6392t).getNaam();
+        namen.put(iso6391,
+                  new Totalen(String.format("%s (%s)", taalnaam, iso6391), 25));
+      } catch(ObjectNotFoundException e) {
+        DoosUtils.foutNaarScherm(e.getLocalizedMessage());
+      }
+    }
   }
 
   private static TaxonDto getTaxon(String latijnsenaam, Long parentId,
@@ -257,6 +347,14 @@ public class TaxaImport extends Batchjob {
     }
 
     return resultaat;
+  }
+
+  protected static void initTaal(String taal) {
+    namen.put(taal, new Totalen(taal, 25));
+
+    if (!talen.contains(taal)) {
+      talen.add(taal);
+    }
   }
 
   protected static boolean isTaalValid(String taal) {
@@ -322,13 +420,14 @@ public class TaxaImport extends Batchjob {
       return;
     }
 
-    List<Message>  fouten  = TaxonnaamValidator.valideer(taxonnaam);
+    var fouten  = TaxonnaamValidator.valideer(taxonnaam);
 
     if (fouten.isEmpty()) {
       em.getTransaction().begin();
       TaxonnaamDto  updated = em.merge(taxonnaam);
       em.persist(updated);
       em.getTransaction().commit();
+      addUpdateTaal(taxonnaam.getTaal());
     } else {
       printMessages(fouten);
     }

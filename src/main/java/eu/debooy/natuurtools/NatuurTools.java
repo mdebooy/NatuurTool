@@ -51,7 +51,12 @@ public class NatuurTools extends Batchjob {
   protected static final  String  KEY_SUBRANGEN = "subrangen";
   protected static final  String  KEY_TAXA      = "taxa";
 
+  protected static final  String  LBL_AANTAL          = "label.aantal";
+  protected static final  String  LBL_NIEUW           = "label.nieuw";
+  protected static final  String  LBL_RANGEN          = "label.rangen";
   protected static final  String  LBL_SOORTENONBEKEND = "label.soortenonbekend";
+  protected static final  String  LBL_TALEN           = "label.talen";
+  protected static final  String  LBL_UPDATE          = "label.gewijzigd";
 
   protected static final  String  MSG_AANMAKEN        = "msg.aanmaken";
   protected static final  String  MSG_AANTALSOORTEN   = "msg.aantalsoorten";
@@ -186,6 +191,25 @@ public class NatuurTools extends Batchjob {
           .forEachOrdered(rang ->
         DoosUtils.naarScherm(String.format("%6s: %,6d",
                                            rang, totalen.get(rang))));
+  }
+
+  protected static void printTotalen(String header, List<String> volgorde,
+                                         Map<String, Totalen> totalen) {
+    if (volgorde.isEmpty()) {
+      return;
+    }
+
+    DoosUtils.naarScherm();
+    DoosUtils.naarScherm(header);
+    DoosUtils.naarScherm(DoosUtils.stringMetLengte("-", header.length(), "-"));
+    for (var element : volgorde) {
+      if (totalen.containsKey(element)) {
+        var totaal  = totalen.get(element);
+        if (totaal.getAantal() > 0) {
+          DoosUtils.naarScherm(totalen.get(element).toString());
+        }
+      }
+    }
   }
 
   protected static void writeJson(String bestand, JSONObject taxa,
