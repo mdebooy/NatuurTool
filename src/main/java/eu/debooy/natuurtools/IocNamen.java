@@ -82,10 +82,7 @@ public class IocNamen extends Batchjob {
   }
 
   private static void addTaal(String taal) {
-    if (!taaltotalen.containsKey(taal)) {
-      taaltotalen.put(taal, 0);
-    }
-
+    taaltotalen.computeIfAbsent(taal, k -> 0);
     taaltotalen.put(taal, taaltotalen.get(taal)+1);
   }
 

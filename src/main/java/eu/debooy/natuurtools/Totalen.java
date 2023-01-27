@@ -57,8 +57,12 @@ public class Totalen {
     return aantal;
   }
 
-  public Integer getGewijzigd() {
+  public Integer getUpdate() {
     return update;
+  }
+
+  public String getLabel() {
+    return label;
   }
 
   public Integer getLengte() {

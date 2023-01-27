@@ -285,7 +285,7 @@ public class TaxaImport extends Batchjob {
   }
 
   private static void getRangen() {
-    var           taal      = paramBundle.getString(NatuurTools.PAR_TAAL);
+    var           taal      = paramBundle.getString(PAR_TAAL);
     List<RangDto> ranglijst =
         em.createQuery(NatuurTools.QRY_RANG).getResultList();
 
