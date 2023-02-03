@@ -51,6 +51,12 @@
       "verplicht": true
     },
     {
+      "parameter": "metondersoort",
+      "lang": "metondersoort",
+      "help": "Ook de ontbrekende ondersoorten toevoegen.",
+      "type": "boolean"
+    },
+    {
       "parameter": "readonly",
       "lang": "readonly",
       "help": "Enkel lezen. Nu worden <aanmaken>, <hernummer> en <skipstructuur> genegeerd.",

@@ -1,6 +1,6 @@
 {
   "_jar": "NatuurTools.jar",
-  "_prefixlengte": 18,
+  "_prefixlengte": 20,
   "applicatie": "IocNamen",
   "help": "Converteer een CSV bestand met IOC Namen naar een JSON-bestand.",
   "banner": "IOC Namen, CSV naar JSON",
@@ -20,7 +20,7 @@
     {
       "parameter": "dburl",
       "lang": "dburl",
-      "help": "De URL voor de database connectie (localhost:5432/db). De taalkodes worden dan, met behulp van de header van het <iocbestand>, uit de database gehaald. De <talen> parameter wordt dan enkel gebruikt om enkel die talen in het <jsonbestand> te zetten."
+      "help": "De URL voor de database connectie (localhost:5432/db). De taalkodes worden dan, met behulp van de header van het <iocnamen>, uit de database gehaald. De <talen> parameter wordt dan enkel gebruikt om enkel die talen in het <jsonbestand> te zetten."
     },
     {
       "parameter": "dbuser",
@@ -28,10 +28,19 @@
       "help": "De database gebruikersnaam."
     },
     {
-      "parameter": "iocbestand",
+      "parameter": "iocnamen",
       "extensie": "csv",
-      "kort": "i",
-      "lang": "iocbestand",
+      "kort": "n",
+      "lang": "iocnamen",
+      "help": "IOC Namen bestand in CSV-formaat.",
+      "type": "bestand",
+      "verplicht": true
+    },
+    {
+      "parameter": "iocstructuur",
+      "extensie": "csv",
+      "kort": "s",
+      "lang": "iocstructuur",
       "help": "IOC Namen bestand in CSV-formaat.",
       "type": "bestand",
       "verplicht": true
@@ -41,8 +50,8 @@
       "extensie": "json",
       "kort": "j",
       "lang": "jsonbestand",
-      "help": "IOC Namen bestand in JSON-formaat. Als deze parameter afwezig is krijgt het bestand dezelfde naam als <iocbestand>.",
-      "standaard": "_@iocbestand@_",
+      "help": "IOC Namen bestand in JSON-formaat. Als deze parameter afwezig is krijgt het bestand dezelfde naam als <iocnamen>.",
+      "standaard": "_@iocnamen@_",
       "type": "bestand"
     },
     {
