@@ -37,13 +37,14 @@ public class IocNamenTest extends BatchTest {
   protected static final  ClassLoader CLASSLOADER =
       IocNamenTest.class.getClassLoader();
 
-  private static final  String  BST_CSV   = "MultilingIOC.csv";
-  private static final  String  BST_JSON  = "MultilingIOC.json";
+  private static final  String  BST_CSV     = "MultilingIOC.csv";
+  private static final  String  BST_JSON    = "MultilingIOC.json";
+  private static final  String  BST_MASTER  = "MasterIOC.csv";
 
   @AfterClass
   public static void afterClass() {
     verwijderBestanden(getTemp() + File.separator,
-                       new String[] {BST_CSV, BST_JSON});
+                       new String[] {BST_CSV, BST_JSON, BST_MASTER});
   }
 
   @BeforeClass
@@ -55,6 +56,8 @@ public class IocNamenTest extends BatchTest {
     try {
       kopieerBestand(CLASSLOADER, BST_CSV,
                      getTemp() + File.separator + BST_CSV);
+      kopieerBestand(CLASSLOADER, BST_MASTER,
+                     getTemp() + File.separator + BST_MASTER);
     } catch (IOException e) {
       System.out.println(e.getLocalizedMessage());
       throw new BestandException(e);
@@ -70,18 +73,21 @@ public class IocNamenTest extends BatchTest {
   @Test
   public void testCsv() throws BestandException, IOException {
     var args  = new String[] {
-      "--" + NatuurTools.PAR_IOCBESTAND + "=" + getTemp() + File.separator
+      "--" + NatuurTools.PAR_IOCNAMEN + "=" + getTemp() + File.separator
            + BST_CSV,
-      "--" + NatuurTools.PAR_TALEN + "=en,ca,zh,z,hr,cs,da,nl,fi,fr,de,it,ja,lt,no,pl,pt,ru,sr,sk,es,sv,tr,uk,af,et,hu,is,id,lv,se,sl,th"};
+      "--" + NatuurTools.PAR_IOCSTRUCTUUR + "=" + getTemp() + File.separator
+           + BST_MASTER,
+      "--" + NatuurTools.PAR_TALEN + "=en,ca,zh,z,hr,cs,da,nl,fi,fr,de,it,ja,lt,no,pl,pt,ru,sr,sk,es,sv,tr,uk,af,et,hu,is,id,lv,se,sl,th",
+      "--taal" + "=en"};
 
     execute(args);
 
-    assertEquals(0,   err.size());
-    assertEquals("6", out.get(16).split(":")[1].trim());
-    assertEquals("2", out.get(17).split(":")[1].trim());
-    assertEquals("3", out.get(18).split(":")[1].trim());
-    assertEquals("4", out.get(19).split(":")[1].trim());
-    assertEquals("6", out.get(20).split(":")[1].trim());
+    assertEquals(0,    err.size());
+    assertEquals("15", out.get(16).split(":")[1].trim());
+    assertEquals("2",  out.get(17).split(":")[1].trim());
+    assertEquals("3",  out.get(18).split(":")[1].trim());
+    assertEquals("4",  out.get(19).split(":")[1].trim());
+    assertEquals("6",  out.get(20).split(":")[1].trim());
     assertTrue(
         Bestand.equals(
             Bestand.openInvoerBestand(getTemp() + File.separator

@@ -43,13 +43,14 @@ public class NatuurTools extends Batchjob {
 
   protected static final  String  EM_UNITNAME = "natuur";
 
-  protected static final  String  KEY_LATIJN    = "latijn";
-  protected static final  String  KEY_NAMEN     = "namen";
-  protected static final  String  KEY_RANG      = "rang";
-  protected static final  String  KEY_SEQ       = "seq";
-  protected static final  String  KEY_SOORTEN   = "soorten";
-  protected static final  String  KEY_SUBRANGEN = "subrangen";
-  protected static final  String  KEY_TAXA      = "taxa";
+  protected static final  String  KEY_LATIJN        = "latijn";
+  protected static final  String  KEY_NAMEN         = "namen";
+  protected static final  String  KEY_RANG          = "rang";
+  protected static final  String  KEY_SEQ           = "seq";
+  protected static final  String  KEY_SOORTEN       = "soorten";
+  protected static final  String  KEY_SUBRANGEN     = "subrangen";
+  protected static final  String  KEY_TAXA          = "taxa";
+  protected static final  String  KEY_UITGESTORVEN  = "uitgestorven";
 
   protected static final  String  LBL_AANTAL          = "label.aantal";
   protected static final  String  LBL_NIEUW           = "label.nieuw";
@@ -64,6 +65,7 @@ public class NatuurTools extends Batchjob {
   protected static final  String  MSG_HERNUMMER       = "msg.hernummer";
   protected static final  String  MSG_HIERARCHIE      = "msg.hierarchie";
   protected static final  String  MSG_LIJNEN          = "msg.lijnen";
+  protected static final  String  MSG_METONDERSOORTEN = "msg.metondersoorten";
   protected static final  String  MSG_NIEUW           = "msg.nieuw";
   protected static final  String  MSG_ONBEKEND        = "msg.onbekend";
   protected static final  String  MSG_SKIPSTRUCTUUR   = "msg.skipstructuur";
@@ -72,23 +74,25 @@ public class NatuurTools extends Batchjob {
   protected static final  String  MSG_WIJZIGEN        = "msg.wijzigen";
   protected static final  String  MSG_WIJZIGING       = "msg.wijziging";
 
-  protected static final  String  PAR_AANMAAK     = "aanmaak";
-  protected static final  String  PAR_AUTEUR      = "auteur";
-  protected static final  String  PAR_BEHOUD      = "behoud";
-  protected static final  String  PAR_IOCBESTAND  = "iocbestand";
-  protected static final  String  PAR_DBURL       = "dburl";
-  protected static final  String  PAR_DBUSER      = "dbuser";
-  protected static final  String  PAR_HERNUMMER   = "hernummer";
-  protected static final  String  PAR_JSON        = "json";
-  protected static final  String  PAR_KLEUR       = "kleur";
-  protected static final  String  PAR_PERRANG     = "perrang";
-  protected static final  String  PAR_RANGEN      = "rangen";
-  protected static final  String  PAR_SUBTITEL    = "subtitel";
-  protected static final  String  PAR_TALEN       = "talen";
-  protected static final  String  PAR_TAXAROOT    = "taxaroot";
-  protected static final  String  PAR_TEMPLATE    = "template";
-  protected static final  String  PAR_TITEL       = "titel";
-  protected static final  String  PAR_WACHTWOORD  = "wachtwoord";
+  protected static final  String  PAR_AANMAAK       = "aanmaak";
+  protected static final  String  PAR_AUTEUR        = "auteur";
+  protected static final  String  PAR_BEHOUD        = "behoud";
+  protected static final  String  PAR_IOCNAMEN      = "iocnamen";
+  protected static final  String  PAR_IOCSTRUCTUUR  = "iocstructuur";
+  protected static final  String  PAR_DBURL         = "dburl";
+  protected static final  String  PAR_DBUSER        = "dbuser";
+  protected static final  String  PAR_HERNUMMER     = "hernummer";
+  protected static final  String  PAR_JSON          = "json";
+  protected static final  String  PAR_KLEUR         = "kleur";
+  protected static final  String  PAR_METONDERSOORT = "metondersoort";
+  protected static final  String  PAR_PERRANG       = "perrang";
+  protected static final  String  PAR_RANGEN        = "rangen";
+  protected static final  String  PAR_SUBTITEL      = "subtitel";
+  protected static final  String  PAR_TALEN         = "talen";
+  protected static final  String  PAR_TAXAROOT      = "taxaroot";
+  protected static final  String  PAR_TEMPLATE      = "template";
+  protected static final  String  PAR_TITEL         = "titel";
+  protected static final  String  PAR_WACHTWOORD    = "wachtwoord";
 
   protected static final  String  QRY_RANG  =
       "select r from RangDto r order by r.niveau";
@@ -108,6 +112,8 @@ public class NatuurTools extends Batchjob {
   protected static final  String  TOOL_TAXONOMIE    = "Taxonomie";
 
   protected static final  String  TXT_BANNER  = "help.natuurtools";
+
+  protected static  final String  UITGESTORVEN  = " †";
 
   protected static final  List<String>  tools =
       Arrays.asList(TOOL_DBNAARJSON, TOOL_CSVNAARJSON, TOOL_IOCCHECK,

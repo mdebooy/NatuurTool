@@ -68,8 +68,9 @@ public class TaxaImport extends Batchjob {
   private static  boolean       aanmaak   = false;
   private static  boolean       behoud    = false;
   private static  EntityManager em;
-  private static  boolean       hernummer = false;
-  private static  boolean       readonly  = false;
+  private static  boolean       hernummer       = false;
+  private static  boolean       metondersoorten = false;
+  private static  boolean       readonly        = false;
 
   protected TaxaImport() {}
 
@@ -171,7 +172,12 @@ public class TaxaImport extends Batchjob {
   }
 
   private static void addTaxon(TaxonDto taxon) {
-    if (readonly || !aanmaak) {
+    if (readonly || !aanmaak ) {
+      return;
+    }
+
+    if (!metondersoorten
+        && taxon.getRang().equals(NatuurTools.RANG_ONDERSOORT)) {
       return;
     }
 
@@ -205,30 +211,30 @@ public class TaxaImport extends Batchjob {
   }
 
   private static void controleerHierarchie(TaxonDto taxon, Long parentId,
-                                           Integer volgnummer) {
+                                           Integer volgnummer,
+                                           Boolean uitgestorven) {
     if (readonly) {
       return;
     }
 
     var verandering = new StringBuilder();
     if (!behoud && !parentId.equals(taxon.getParentId())) {
-      verandering.append("parentId: ").append(taxon.getParentId())
+      verandering.append(" parentId: ").append(taxon.getParentId())
                  .append(" - > ").append(parentId).append(" ");
       taxon.setParentId(parentId);
     }
     if (!volgnummer.equals(taxon.getVolgnummer()) && hernummer) {
-      verandering.append("volgnummer: ").append(taxon.getVolgnummer())
+      verandering.append(" volgnummer: ").append(taxon.getVolgnummer())
                  .append(" - > ").append(volgnummer);
       taxon.setVolgnummer(volgnummer);
     }
+    if (!uitgestorven.equals(taxon.isUitgestorven())) {
+      verandering.append(" uitgestorven: ").append(taxon.isUitgestorven())
+                 .append(" - > ").append(uitgestorven);
+      taxon.setUitgestorven(uitgestorven);
+    }
     if (verandering.length() > 0) {
-      setTaxon(taxon);
-      DoosUtils.naarScherm(MessageFormat.format(
-                    resourceBundle.getString(NatuurTools.MSG_WIJZIGING),
-                    prefix.get(taxon.getRang()) + "    ",
-                    resourceBundle.getString(NatuurTools.MSG_HIERARCHIE),
-                    verandering.toString().trim()));
-      addUpdateRang(taxon.getRang());
+      setTaxon(taxon, verandering);
     }
   }
 
@@ -272,7 +278,7 @@ public class TaxaImport extends Batchjob {
         DoosUtils.foutNaarScherm(
             MessageFormat.format(
                 resourceBundle.getString(NatuurTools.MSG_ONBEKEND),
-                prefix.get(taxon.getRang()) + "   ", dto.getTaal(),
+                prefix.get(taxon.getRang()) + "    ", dto.getTaal(),
                 dto.getNaam()));
       }
     });
@@ -377,9 +383,10 @@ public class TaxaImport extends Batchjob {
       return;
     }
 
-    aanmaak   = paramBundle.getBoolean(NatuurTools.PAR_AANMAAK);
-    behoud    = paramBundle.getBoolean(NatuurTools.PAR_BEHOUD);
-    hernummer = paramBundle.getBoolean(NatuurTools.PAR_HERNUMMER);
+    aanmaak         = paramBundle.getBoolean(NatuurTools.PAR_AANMAAK);
+    behoud          = paramBundle.getBoolean(NatuurTools.PAR_BEHOUD);
+    hernummer       = paramBundle.getBoolean(NatuurTools.PAR_HERNUMMER);
+    metondersoorten = paramBundle.getBoolean(NatuurTools.PAR_METONDERSOORT);
 
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(resourceBundle.getString(NatuurTools.MSG_WIJZIGEN));
@@ -395,11 +402,15 @@ public class TaxaImport extends Batchjob {
       DoosUtils.naarScherm(resourceBundle
                               .getString(NatuurTools.MSG_HERNUMMER));
     }
+    if (metondersoorten) {
+      DoosUtils.naarScherm(resourceBundle
+                              .getString(NatuurTools.MSG_METONDERSOORTEN));
+    }
     DoosUtils.naarScherm();
   }
 
-  private static void setTaxon(TaxonDto taxon) {
-    if (readonly) {
+  private static void setTaxon(TaxonDto taxon, StringBuilder verandering) {
+    if (readonly || taxon.getParentId() == -1) {
       return;
     }
 
@@ -410,6 +421,12 @@ public class TaxaImport extends Batchjob {
       TaxonDto  updated = em.merge(taxon);
       em.persist(updated);
       em.getTransaction().commit();
+      DoosUtils.naarScherm(MessageFormat.format(
+                    resourceBundle.getString(NatuurTools.MSG_WIJZIGING),
+                    prefix.get(taxon.getRang()) + "    ",
+                    resourceBundle.getString(NatuurTools.MSG_HIERARCHIE),
+                    verandering.toString().trim()));
+      addUpdateRang(taxon.getRang());
     } else {
       printMessages(fouten);
     }
@@ -464,9 +481,10 @@ public class TaxaImport extends Batchjob {
     var rang          = json.get(NatuurTools.KEY_RANG).toString();
     var seq           =
         Integer.valueOf(json.get(NatuurTools.KEY_SEQ).toString());
+    var uitgestorven  = (Boolean) json.get(NatuurTools.KEY_UITGESTORVEN);
 
     TaxonDto  taxon = getTaxon(latijnsenaam, parentId, seq, rang);
-    controleerHierarchie(taxon, parentId, seq);
+    controleerHierarchie(taxon, parentId, seq, uitgestorven);
 
     if (null == taxon.getTaxonId()) {
       return;
