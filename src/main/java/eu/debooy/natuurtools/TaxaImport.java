@@ -54,7 +54,8 @@ public class TaxaImport extends Batchjob {
   private static final  ResourceBundle  resourceBundle  =
       ResourceBundle.getBundle("ApplicatieResources", Locale.getDefault());
 
-  protected static final  Long  ONBEKEND      = -1L;
+  protected static final  Long    ONBEKEND  = -1L;
+  protected static final  String  WORDT     = " -> ";
 
   protected static final  String  QRY_TALEN =
       "select distinct t.taal from natuur.taxonnamen t";
@@ -220,17 +221,17 @@ public class TaxaImport extends Batchjob {
     var verandering = new StringBuilder();
     if (!behoud && !parentId.equals(taxon.getParentId())) {
       verandering.append(" parentId: ").append(taxon.getParentId())
-                 .append(" - > ").append(parentId).append(" ");
+                 .append(WORDT).append(parentId).append(" ");
       taxon.setParentId(parentId);
     }
     if (!volgnummer.equals(taxon.getVolgnummer()) && hernummer) {
       verandering.append(" volgnummer: ").append(taxon.getVolgnummer())
-                 .append(" - > ").append(volgnummer);
+                 .append(WORDT).append(volgnummer);
       taxon.setVolgnummer(volgnummer);
     }
     if (!uitgestorven.equals(taxon.isUitgestorven())) {
       verandering.append(" uitgestorven: ").append(taxon.isUitgestorven())
-                 .append(" - > ").append(uitgestorven);
+                 .append(WORDT).append(uitgestorven);
       taxon.setUitgestorven(uitgestorven);
     }
     if (verandering.length() > 0) {

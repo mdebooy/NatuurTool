@@ -36,6 +36,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import javax.persistence.EntityManager;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -69,8 +70,6 @@ public class IocNamen extends Batchjob {
   private static  boolean   perRang       = false;
   private static  Integer   sequence      = 0;
   private static  String[]  taalkolom;
-  private static  String    vorigeFamilie = "";
-  private static  String    vorigeOrde    = "";
   private static  String    vorigGeslacht = "";
   private static  String    vorigeSoort   = "";
 
@@ -232,13 +231,42 @@ public class IocNamen extends Batchjob {
     }
   }
 
+  private static String taalUitDatabase(String csvtaal, String gebruikerstaal,
+                                        List<TaalnaamDto> taalnaamDto, int i,
+                                        EntityManager em) {
+    var taalDto = em.find(TaalDto.class, taalnaamDto.get(0).getTaalId());
+    if (taalDto.getIso6392t().equals(csvtaal)) {
+      strtaal = taalDto.getIso6391();
+    }
+    if (taal.isEmpty()
+        || taal.contains(taalDto.getIso6391())) {
+      taalkolom[i]  = taalDto.getIso6391();
+      if (taalDto.hasTaalnaam(gebruikerstaal)) {
+        taalnaam.put(taalDto.getIso6391(),
+                     String.format("%s (%s)",
+                                   taalDto.getNaam(gebruikerstaal),
+                                   taalDto.getIso6391()));
+      } else {
+        taalnaam.put(taalkolom[i], taalkolom[i]);
+      }
+    } else {
+      taalkolom[i]  = "";
+    }
+
+    return csvtaal;
+  }
+
+  private static void talenUitParameter() {
+    strtaal   = paramBundle.getString(PAR_TAAL);
+    taalkolom = paramBundle.getString(NatuurTools.PAR_TALEN).split(",");
+    for (var element : taalkolom) {
+      taalnaam.put(element, element);
+    }
+  }
+
   private static void verwerkHeader() {
     if (!paramBundle.containsArgument(NatuurTools.PAR_DBURL)) {
-      strtaal   = paramBundle.getString(PAR_TAAL);
-      taalkolom = paramBundle.getString(NatuurTools.PAR_TALEN).split(",");
-      for (var element : taalkolom) {
-        taalnaam.put(element, element);
-      }
+      talenUitParameter();
       return;
     }
 
@@ -265,28 +293,10 @@ public class IocNamen extends Batchjob {
 
         if (taalnaamDto.isEmpty()) {
           taalkolom[i]  = "";
-          continue;
+        } else {
+          taalUitDatabase(csvtaal, gebruikerstaal, taalnaamDto, i, em);
         }
 
-        var taalDto = em.find(TaalDto.class,
-                              ((TaalnaamDto)taalnaamDto.get(0)).getTaalId());
-        if (taalDto.getIso6392t().equals(csvtaal)) {
-          strtaal = taalDto.getIso6391();
-        }
-        if (taal.isEmpty()
-            || taal.contains(taalDto.getIso6391())) {
-          taalkolom[i]  = taalDto.getIso6391();
-          if (taalDto.hasTaalnaam(gebruikerstaal)) {
-            taalnaam.put(taalDto.getIso6391(),
-                         String.format("%s (%s)",
-                                       taalDto.getNaam(gebruikerstaal),
-                                       taalDto.getIso6391()));
-          } else {
-            taalnaam.put(taalkolom[i], taalkolom[i]);
-          }
-        } else {
-          taalkolom[i]  = "";
-        }
       }
     } catch (Exception e) {
       DoosUtils.foutNaarScherm(e.getLocalizedMessage());
@@ -368,20 +378,18 @@ public class IocNamen extends Batchjob {
     if (DoosUtils.isNotBlankOrNull(veld[0])) {
       nieuweOrde();
       addRang(NatuurTools.RANG_ORDE);
-      vorigeOrde  = setLatijnsenaam(veld[0]);
       orde.put(NatuurTools.KEY_SEQ, getVolgnummer(NatuurTools.RANG_ORDE));
       orde.put(NatuurTools.KEY_RANG, NatuurTools.RANG_ORDE);
-      orde.put(NatuurTools.KEY_LATIJN, vorigeOrde);
+      orde.put(NatuurTools.KEY_LATIJN, setLatijnsenaam(veld[0]));
       orde.put(NatuurTools.KEY_UITGESTORVEN, isUitgestorven(veld[0]));
     }
     // Nieuwe familie
     if (DoosUtils.isNotBlankOrNull(veld[1])) {
       nieuweFamilie();
       addRang(NatuurTools.RANG_FAMILIE);
-      vorigeFamilie = setLatijnsenaam(veld[1]);
       familie.put(NatuurTools.KEY_SEQ, getVolgnummer(NatuurTools.RANG_FAMILIE));
       familie.put(NatuurTools.KEY_RANG, NatuurTools.RANG_FAMILIE);
-      familie.put(NatuurTools.KEY_LATIJN, vorigeFamilie);
+      familie.put(NatuurTools.KEY_LATIJN, setLatijnsenaam(veld[1]));
       familie.put(NatuurTools.KEY_UITGESTORVEN, isUitgestorven(veld[1]));
       if (DoosUtils.isNotBlankOrNull(veld[2])) {
         var namen = new JSONObject();
