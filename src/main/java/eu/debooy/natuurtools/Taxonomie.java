@@ -16,8 +16,8 @@
  */
 package eu.debooy.natuurtools;
 
-import eu.debooy.doosutils.Banner;
 import eu.debooy.doosutils.Batchjob;
+import eu.debooy.doosutils.DoosBanner;
 import eu.debooy.doosutils.DoosUtils;
 import eu.debooy.doosutils.ParameterBundle;
 import eu.debooy.doosutils.access.BestandConstants;
@@ -76,16 +76,14 @@ public class Taxonomie extends Batchjob {
   }
 
   public static void execute(String[] args) {
-    setParameterBundle(new ParameterBundle.Builder()
+    setParameterBundle(
+        new ParameterBundle.Builder()
+                           .setArgs(args)
+                           .setBanner(new DoosBanner())
                            .setBaseName(NatuurTools.TOOL_TAXONOMIE)
                            .build());
 
-    Banner.printDoosBanner(DoosUtils.nullToEmpty(paramBundle.getBanner()));
-
-    if (!paramBundle.isValid()
-        || !paramBundle.setArgs(args)) {
-      help();
-      printFouten();
+    if (!paramBundle.isValid()) {
       return;
     }
 
