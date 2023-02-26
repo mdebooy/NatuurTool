@@ -126,6 +126,10 @@ public class Taxonomie extends Batchjob {
     klaar();
   }
 
+  private static String getLatexNaam(String naam) {
+    return naam.replaceAll("&", "\\\\&");
+  }
+
   private static TaxonDto getParent(EntityManager em) {
     var parent  = new TaxonDto();
     if (paramBundle.containsArgument(NatuurTools.PAR_TAXAROOT)) {
@@ -159,15 +163,17 @@ public class Taxonomie extends Batchjob {
     if (null != parent.getTaxonId()) {
       params.put("@Subject@",
                  String.format("%s (%s)",
-                               parent.getTaxonnaam(
+                               getLatexNaam(
+                                  parent.getTaxonnaam(
                                    paramBundle.getString(PAR_TAAL))
-                                     .getNaam(),
+                                     .getNaam()),
                                parent.getLatijnsenaam()));
       params.put("@Subtitel@",
                  String.format("%s (\\textit{%s})",
-                               parent.getTaxonnaam(
+                               getLatexNaam(
+                                  parent.getTaxonnaam(
                                    paramBundle.getString(PAR_TAAL))
-                                     .getNaam(),
+                                     .getNaam()),
                                parent.getLatijnsenaam()));
     } else {
       params.put("@Subject@", params.get("@Titel@"));
@@ -187,7 +193,8 @@ public class Taxonomie extends Batchjob {
                             + (parent.isUitgestorven() ? " " + UITGESTORVEN
                                                        : ""));
       var regel   = new StringBuilder();
-      var naam    = parent.getNaam(paramBundle.getString(PAR_TAAL));
+      var naam    =
+          getLatexNaam(parent.getNaam(paramBundle.getString(PAR_TAAL)));
       var latijn  = parent.getLatijnsenaam();
       regel.append("\\taxon{")
            .append(parent.getRang()).append("}{")
@@ -202,11 +209,12 @@ public class Taxonomie extends Batchjob {
             .stream().sorted()
             .filter(taxonnaam -> (talen.contains(taxonnaam.getTaal())
                                   || talen.isEmpty()))
-            .forEachOrdered(taxonnaam -> regel.append("\\naam{")
-                                              .append(taxonnaam.getTaal())
-                                              .append("}{")
-                                              .append(taxonnaam.getNaam())
-                                              .append("}"));
+            .forEachOrdered(taxonnaam ->
+                regel.append("\\naam{")
+                     .append(taxonnaam.getTaal())
+                     .append("}{")
+                     .append(getLatexNaam(taxonnaam.getNaam()))
+                     .append("}"));
       texBestand.write(regel.append("}").toString());
     }
 
