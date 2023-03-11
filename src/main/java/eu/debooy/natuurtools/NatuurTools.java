@@ -16,9 +16,10 @@
  */
 package eu.debooy.natuurtools;
 
-import eu.debooy.doosutils.Banner;
 import eu.debooy.doosutils.Batchjob;
+import eu.debooy.doosutils.DoosBanner;
 import eu.debooy.doosutils.DoosUtils;
+import eu.debooy.doosutils.IBanner;
 import eu.debooy.doosutils.ParameterBundle;
 import eu.debooy.doosutils.access.JsonBestand;
 import eu.debooy.doosutils.exception.BestandException;
@@ -40,6 +41,8 @@ import org.json.simple.JSONObject;
 public class NatuurTools extends Batchjob {
   private static final  ResourceBundle  resourceBundle  =
       ResourceBundle.getBundle("ApplicatieResources", Locale.getDefault());
+
+  private static final  IBanner banner  = new DoosBanner();
 
   protected static final  String  EM_UNITNAME = "natuur";
 
@@ -147,7 +150,7 @@ public class NatuurTools extends Batchjob {
 
   public static void main(String[] args) {
     if (args.length == 0) {
-      Banner.printDoosBanner(resourceBundle.getString(TXT_BANNER));
+      banner.print(resourceBundle.getString(TXT_BANNER));
       help();
       return;
     }
@@ -163,11 +166,11 @@ public class NatuurTools extends Batchjob {
       case "csvnaarjson":
         CsvNaarJson.execute(commandoArgs);
         break;
-      case "iocnamen":
-        IocNamen.execute(commandoArgs);
-        break;
       case "ioccheck":
         IocCheck.execute(commandoArgs);
+        break;
+      case "iocnamen":
+        IocNamen.execute(commandoArgs);
         break;
       case "taxaimport":
         TaxaImport.execute(commandoArgs);
@@ -176,7 +179,7 @@ public class NatuurTools extends Batchjob {
         Taxonomie.execute(commandoArgs);
         break;
       default:
-        Banner.printDoosBanner(resourceBundle.getString(TXT_BANNER));
+        banner.print(resourceBundle.getString(TXT_BANNER));
         help();
         DoosUtils.foutNaarScherm(
             MessageFormat.format(getMelding(ERR_TOOLONBEKEND), commando));

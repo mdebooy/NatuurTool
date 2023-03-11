@@ -127,7 +127,7 @@ public class Taxonomie extends Batchjob {
   }
 
   private static String getLatexNaam(String naam) {
-    return naam.replaceAll("&", "\\\\&");
+    return naam.replace("&", "\\\\&");
   }
 
   private static TaxonDto getParent(EntityManager em) {
