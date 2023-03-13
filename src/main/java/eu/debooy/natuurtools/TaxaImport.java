@@ -72,6 +72,7 @@ public class TaxaImport extends Batchjob {
   private static  boolean       hernummer       = false;
   private static  boolean       metondersoorten = false;
   private static  boolean       readonly        = false;
+  private static  boolean       talenParameter  = false;
 
   protected TaxaImport() {}
 
@@ -90,6 +91,7 @@ public class TaxaImport extends Batchjob {
     if (paramBundle.containsParameter(NatuurTools.PAR_TALEN)) {
       talen.addAll(Arrays.asList(paramBundle.getString(NatuurTools.PAR_TALEN)
                                             .split(",")));
+      talenParameter  = true;
     }
 
     String  latijnsenaam;
@@ -363,7 +365,7 @@ public class TaxaImport extends Batchjob {
   }
 
   protected static boolean isTaalValid(String taal) {
-    return talen.isEmpty() || talen.contains(taal);
+    return !talenParameter || talen.contains(taal);
   }
 
   protected static void printMessages(List<Message> fouten) {
