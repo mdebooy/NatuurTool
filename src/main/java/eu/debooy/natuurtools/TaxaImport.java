@@ -70,6 +70,7 @@ public class TaxaImport extends Batchjob {
   private static  boolean       behoud    = false;
   private static  EntityManager em;
   private static  boolean       hernummer       = false;
+  private static  String        iso6392t;
   private static  boolean       metondersoorten = false;
   private static  boolean       readonly        = false;
   private static  boolean       talenParameter  = false;
@@ -104,6 +105,13 @@ public class TaxaImport extends Batchjob {
               .setPersistenceUnitName(NatuurTools.EM_UNITNAME)
               .build()) {
       em  = dbConn.getEntityManager();
+
+
+      iso6392t  =
+          ((TaalDto)  em.createNamedQuery(TaalDto.QRY_TAAL_ISO6391)
+                        .setParameter(TaalDto.PAR_ISO6391,
+                                      paramBundle.getString(PAR_TAAL))
+                        .getSingleResult()).getIso6392t();
 
       getRangen();
       setSwitches();
@@ -309,23 +317,8 @@ public class TaxaImport extends Batchjob {
       getAanwezigeTalen();
     }
 
-    var taal      = paramBundle.getString(PAR_TAAL);
-    var iso6392t  =
-        ((TaalDto)  em.createNamedQuery(TaalDto.QRY_TAAL_ISO6391)
-                      .setParameter(TaalDto.PAR_ISO6391, taal)
-                      .getSingleResult()).getIso6392t();
-
     for (var iso6391 : talen) {
-      try {
-        var taalnaam  =
-          ((TaalDto)  em.createNamedQuery(TaalDto.QRY_TAAL_ISO6391)
-                        .setParameter(TaalDto.PAR_ISO6391, iso6391)
-                        .getSingleResult()).getTaalnaam(iso6392t).getNaam();
-        namen.put(iso6391,
-                  new Totalen(String.format("%s (%s)", taalnaam, iso6391), 25));
-      } catch(ObjectNotFoundException e) {
-        DoosUtils.foutNaarScherm(e.getLocalizedMessage());
-      }
+      initTaal(iso6391);
     }
   }
 
@@ -357,7 +350,20 @@ public class TaxaImport extends Batchjob {
   }
 
   protected static void initTaal(String taal) {
-    namen.put(taal, new Totalen(taal, 25));
+    var taalnaam  = taal;
+
+    try {
+      taalnaam    =
+          ((TaalDto)  em.createNamedQuery(TaalDto.QRY_TAAL_ISO6391)
+                        .setParameter(TaalDto.PAR_ISO6391, taal)
+                        .getSingleResult()).getTaalnaam(iso6392t).getNaam();
+
+    } catch(ObjectNotFoundException e) {
+      DoosUtils.foutNaarScherm(e.getLocalizedMessage());
+    }
+
+    namen.put(taal,
+              new Totalen(String.format("%s (%s)", taalnaam, taal), 25));
 
     if (!talen.contains(taal)) {
       talen.add(taal);
