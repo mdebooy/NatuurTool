@@ -220,7 +220,7 @@ public class TaxaImport extends Batchjob {
   }
 
   private static void controleerHierarchie(TaxonDto taxon, Long parentId,
-                                           Integer volgnummer,
+                                           Long volgnummer,
                                            Boolean uitgestorven) {
     if (readonly) {
       return;
@@ -323,7 +323,7 @@ public class TaxaImport extends Batchjob {
   }
 
   private static TaxonDto getTaxon(String latijnsenaam, Long parentId,
-                                   Integer volgnummer, String rang) {
+                                   Long volgnummer, String rang) {
     var query = em.createNamedQuery(TaxonDto.QRY_LATIJNSENAAM);
     query.setParameter(TaxonDto.PAR_LATIJNSENAAM, latijnsenaam);
     TaxonDto  resultaat;
@@ -471,7 +471,7 @@ public class TaxaImport extends Batchjob {
                                           .toString();
       var   rang      = jsonBestand.read().get(NatuurTools.KEY_RANG)
                                           .toString();
-      Long  parentId  = getTaxon(latijnsenaam, 0L, 0, rang).getTaxonId();
+      var   parentId  = getTaxon(latijnsenaam, 0L, 0L, rang).getTaxonId();
       for (Object taxa :
               (JSONArray) jsonBestand.read().get(NatuurTools.KEY_SUBRANGEN)) {
         verwerkRang(parentId, (JSONObject) taxa);
@@ -487,7 +487,7 @@ public class TaxaImport extends Batchjob {
     var latijnsenaam  = json.get(NatuurTools.KEY_LATIJN).toString();
     var rang          = json.get(NatuurTools.KEY_RANG).toString();
     var seq           =
-        Integer.valueOf(json.get(NatuurTools.KEY_SEQ).toString());
+        Long.valueOf(json.get(NatuurTools.KEY_SEQ).toString());
     var uitgestorven  = (Boolean) json.get(NatuurTools.KEY_UITGESTORVEN);
 
     TaxonDto  taxon = getTaxon(latijnsenaam, parentId, seq, rang);
