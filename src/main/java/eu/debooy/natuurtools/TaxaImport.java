@@ -484,11 +484,17 @@ public class TaxaImport extends Batchjob {
   }
 
   private static void verwerkRang(Long parentId, JSONObject json) {
+    Boolean uitgestorven;
+
     var latijnsenaam  = json.get(NatuurTools.KEY_LATIJN).toString();
     var rang          = json.get(NatuurTools.KEY_RANG).toString();
     var seq           =
         Long.valueOf(json.get(NatuurTools.KEY_SEQ).toString());
-    var uitgestorven  = (Boolean) json.get(NatuurTools.KEY_UITGESTORVEN);
+    if (json.containsKey(NatuurTools.KEY_UITGESTORVEN)) {
+      uitgestorven    = (Boolean) json.get(NatuurTools.KEY_UITGESTORVEN);
+    } else {
+      uitgestorven    = Boolean.FALSE;
+    }
 
     TaxonDto  taxon = getTaxon(latijnsenaam, parentId, seq, rang);
     controleerHierarchie(taxon, parentId, seq, uitgestorven);
