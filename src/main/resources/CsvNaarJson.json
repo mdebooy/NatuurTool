@@ -54,7 +54,7 @@
       "type": "locale"
     },
     {
-      "parameter": "taxa",
+      "parameter": "taxaroot",
       "lang": "taxaroot",
       "help": "De 'root' van het invoerbestand (rang,latijnsenaam).",
       "verplicht": true
