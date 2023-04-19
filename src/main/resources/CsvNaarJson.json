@@ -22,7 +22,7 @@
       "extensie": "csv",
       "kort": "c",
       "lang": "csvbestand",
-      "help": "IOC Namen bestand in JSON-formaat.",
+      "help": "Een namen bestand in CSV-formaat (rang,latijnsenaam,naam). ",
       "type": "bestand",
       "verplicht": true
     },
@@ -39,7 +39,7 @@
       "verplicht": true
     },
     {
-      "parameter": "json",
+      "parameter": "jsonbestand",
       "extensie": "json",
       "kort": "j",
       "lang": "jsonbestand",

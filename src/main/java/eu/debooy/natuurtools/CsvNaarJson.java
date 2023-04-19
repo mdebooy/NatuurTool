@@ -128,9 +128,14 @@ public class CsvNaarJson extends Batchjob {
     }
 
     NatuurTools.printRangtotalen(rangen, totalen);
+    DoosUtils.naarScherm();
     DoosUtils.naarScherm(
         MessageFormat.format(resourceBundle.getString(NatuurTools.MSG_LIJNEN),
                              String.format("%,6d", lijnen)));
+    DoosUtils.naarScherm(
+        MessageFormat.format(resourceBundle.getString(NatuurTools.MSG_UITVOER),
+                             paramBundle.getBestand(PAR_JSONBESTAND,
+                                                BestandConstants.EXT_JSON)));
     klaar();
   }
 

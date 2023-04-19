@@ -73,6 +73,7 @@ public class NatuurTools extends Batchjob {
   protected static final  String  MSG_ONBEKEND        = "msg.onbekend";
   protected static final  String  MSG_SKIPSTRUCTUUR   = "msg.skipstructuur";
   protected static final  String  MSG_TALEN           = "msg.talen";
+  protected static final  String  MSG_UITVOER         = "msg.uitvoer";
   protected static final  String  MSG_VERSCHIL        = "msg.verschil";
   protected static final  String  MSG_WIJZIGEN        = "msg.wijzigen";
   protected static final  String  MSG_WIJZIGING       = "msg.wijziging";
@@ -198,7 +199,7 @@ public class NatuurTools extends Batchjob {
     rangen.stream()
           .filter(rang -> totalen.get(rang) > 0)
           .forEachOrdered(rang ->
-        DoosUtils.naarScherm(String.format("%6s: %,6d",
+        DoosUtils.naarScherm(String.format("%7s: %,6d",
                                            rang, totalen.get(rang))));
   }
 
