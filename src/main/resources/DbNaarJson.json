@@ -24,7 +24,7 @@
       "verplicht": true
     },
     {
-      "parameter": "json",
+      "parameter": "jsonbestand",
       "extensie": "json",
       "kort": "j",
       "lang": "jsonbestand",
