@@ -2,7 +2,7 @@
   "_jar": "NatuurTools.jar",
   "_prefixlengte": 18,
   "applicatie": "DbNaarJson",
-  "help": "Haal een 'taxa-tak' uit de database en zet die in een JSON-bestand.",
+  "help": "Haal een ''taxa-tak'' uit de database en zet die in een JSON-bestand.",
   "banner": "Taxa vanuit de database naar JSON",
   "parameters": [
     {
@@ -35,7 +35,7 @@
     {
       "parameter": "taxaroot",
       "lang": "taxaroot",
-      "help": "De 'root' van het invoerbestand (rang,latijnsenaam).",
+      "help": "De ''root'' van het invoerbestand (rang,latijnsenaam).",
       "verplicht": true
     },
     {

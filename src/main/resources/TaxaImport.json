@@ -14,7 +14,7 @@
     {
       "parameter": "behoud",
       "lang": "behoudstructuur",
-      "help": "Veranderen van de parenttaxon. PAS OP dit kan tussenrangen 'uitschakelen'.",
+      "help": "Veranderen van de parenttaxon. PAS OP dit kan tussenrangen ''uitschakelen''.",
       "type": "boolean"
     },
     {
@@ -71,7 +71,7 @@
     {
       "parameter": "talen",
       "lang": "talen",
-      "help": "Lijst, door komma's gescheiden, met talen die in het overzicht mogen staan."
+      "help": "Lijst, door komma''s gescheiden, met talen die in het overzicht mogen staan."
     },
     {
       "parameter": "wachtwoord",

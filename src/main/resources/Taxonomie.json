@@ -33,7 +33,8 @@
       "parameter": "rangen",
       "kort": "r",
       "lang": "rangen",
-      "help": "Lijst, door komma's gescheiden, met rangen die in de uitvoer moeten komen."
+      "help": "Lijst, door komma''s gescheiden, met rangen die in de uitvoer moeten komen. De standaardrangen zijn {0}.",
+      "standaard": "kl,or,fa,ge,so"
     },
     {
       "parameter": "taal",
@@ -44,12 +45,12 @@
     {
       "parameter": "talen",
       "lang": "talen",
-      "help": "Lijst, door komma's gescheiden, met talen die in het overzicht mogen staan."
+      "help": "Lijst, door komma''s gescheiden, met talen die in het overzicht mogen staan."
     },
     {
       "parameter": "taxaroot",
       "lang": "taxaroot",
-      "help": "De 'root' van het overzicht (rang,latijnsenaam)."
+      "help": "De ''root'' van het overzicht (rang,latijnsenaam)."
     },
     {
       "parameter": "template",

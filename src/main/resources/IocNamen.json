@@ -69,7 +69,7 @@
     {
       "parameter": "talen",
       "lang": "talen",
-      "help": "Lijst, door komma's gescheiden, met talen die in het overzicht mogen staan. Zonder <dburl> moeten ze in de juiste volgorde staan van het <iocbestand> waarbij bij een ''lege'' taal de kolom wordt overgeslagen."
+      "help": "Lijst, door komma''s gescheiden, met talen die in het overzicht mogen staan. Zonder <dburl> moeten ze in de juiste volgorde staan van het <iocbestand> waarbij bij een ''lege'' taal de kolom wordt overgeslagen."
     },
     {
       "parameter": "wachtwoord",
