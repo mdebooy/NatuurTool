@@ -196,7 +196,7 @@ public class Taxonomie extends Batchjob {
       var naam    =
           getLatexNaam(parent.getNaam(paramBundle.getString(PAR_TAAL)));
       var latijn  = parent.getLatijnsenaam();
-      regel.append("\\taxon{")
+      regel.append("\\begin{samepage}\\taxon{")
            .append(parent.getRang()).append("}{")
            .append(latijn)
            .append(parent.isUitgestorven() ? " " + UITGESTORVEN : "")
@@ -215,7 +215,7 @@ public class Taxonomie extends Batchjob {
                      .append("}{")
                      .append(getLatexNaam(taxonnaam.getNaam()))
                      .append("}"));
-      texBestand.write(regel.append("}").toString());
+      texBestand.write(regel.append("}\\end{samepage}").toString());
     }
 
     var query = em.createNamedQuery(TaxonDto.QRY_KINDEREN);
