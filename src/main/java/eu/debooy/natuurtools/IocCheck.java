@@ -16,7 +16,9 @@
  */
 package eu.debooy.natuurtools;
 
+import eu.debooy.doos.domain.TaalDto;
 import eu.debooy.doosutils.Batchjob;
+import static eu.debooy.doosutils.Batchjob.PAR_TAAL;
 import eu.debooy.doosutils.DoosBanner;
 import eu.debooy.doosutils.DoosUtils;
 import eu.debooy.doosutils.ParameterBundle;
@@ -78,8 +80,6 @@ public class IocCheck extends Batchjob {
       return;
     }
 
-    var taal  = paramBundle.getString(PAR_TAAL);
-
     var onbekend  = 0;
     try (var dbConn =
         new DbConnection.Builder()
@@ -89,6 +89,15 @@ public class IocCheck extends Batchjob {
               .setPersistenceUnitName(NatuurTools.EM_UNITNAME)
               .build()) {
       var em  = dbConn.getEntityManager();
+
+      var taal  = paramBundle.getString(PAR_TAAL);
+      if (taal.length() == 2) {
+        taal  = ((TaalDto)  em.createNamedQuery(TaalDto.QRY_TAAL_ISO6391)
+                              .setParameter(TaalDto.PAR_ISO6391,
+                                            paramBundle.getString(PAR_TAAL))
+                              .getSingleResult()).getIso6392t();
+
+      }
 
       for (var detail : em.createQuery(String.format(
                                           QUERY,

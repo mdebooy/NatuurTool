@@ -125,49 +125,50 @@
 \newenvironment{switch}[1]{\renewcommand{\case}{\ifequals{#1}}}{}
 \newcommand{\naam}[2]{
   \begin{switch}{#1}%
-    \case{af}{| \foreignlanguage{afrikaans}{#2}\,\textsuperscript{(#1)}}%
-    \case{ar}{| \foreignlanguage{arabic}{#2}\,\textsuperscript{(#1)}}%
-    \case{be}{| \foreignlanguage{belarusian}{#2}\,\textsuperscript{(#1)}}%
-    \case{bg}{| \foreignlanguage{bulgarian}{#2}\,\textsuperscript{(#1)}}%
-    \case{ca}{| \foreignlanguage{catalan}{#2}\,\textsuperscript{(#1)}}%
-    \case{cs}{| \foreignlanguage{czech}{#2}\,\textsuperscript{(#1)}}%
-    \case{da}{| \foreignlanguage{danish}{#2}\,\textsuperscript{(#1)}}%
-    \case{de}{| \foreignlanguage{german}{#2}\,\textsuperscript{(#1)}}%
-    \case{el}{| \foreignlanguage{greek}{#2}\,\textsuperscript{(#1)}}%
-    \case{en}{| \foreignlanguage{english}{#2}\,\textsuperscript{(#1)}}%
-    \case{es}{| \foreignlanguage{spanish}{#2}\,\textsuperscript{(#1)}}%
-    \case{et}{| \foreignlanguage{estonian}{#2}\,\textsuperscript{(#1)}}%
-    \case{fa}{| \foreignlanguage{persian}{#2}\,\textsuperscript{(#1)}}%
-    \case{fi}{| \foreignlanguage{finnish}{#2}\,\textsuperscript{(#1)}}%
-    \case{fr}{| \foreignlanguage{french}{#2}\,\textsuperscript{(#1)}}%
-    \case{he}{| \foreignlanguage{hebrew}{#2}\,\textsuperscript{(#1)}}%
-    \case{hr}{| \foreignlanguage{croatian}{#2}\,\textsuperscript{(#1)}}%
-    \case{hu}{| \foreignlanguage{hungarian}{#2}\,\textsuperscript{(#1)}}%
-    \case{id}{| \foreignlanguage{malay}{#2}\,\textsuperscript{(#1)}}%
-    \case{is}{| \foreignlanguage{icelandic}{#2}\,\textsuperscript{(#1)}}%
-    \case{it}{| \foreignlanguage{italian}{#2}\,\textsuperscript{(#1)}}%
-    \case{ja}{| \foreignlanguage{japanese}{#2}\,\textsuperscript{(#1)}}%
-    \case{ko}{| \foreignlanguage{korean}{#2}\,\textsuperscript{(#1)}}%
-    \case{lt}{| \foreignlanguage{lithuanian}{#2}\,\textsuperscript{(#1)}}%
-    \case{lv}{| \foreignlanguage{latvian}{#2}\,\textsuperscript{(#1)}}%
-    \case{mk}{| \foreignlanguage{macedonian}{#2}\,\textsuperscript{(#1)}}%
-    \case{ml}{| \foreignlanguage{malayalam}{#2}\,\textsuperscript{(#1)}}%
-    \case{nl}{| \foreignlanguage{dutch}{#2}\,\textsuperscript{(#1)}}%
-    \case{no}{| \foreignlanguage{norwegian}{#2}\,\textsuperscript{(#1)}}%
-    \case{pl}{| \foreignlanguage{polish}{#2}\,\textsuperscript{(#1)}}%
-    \case{pt}{| \foreignlanguage{portuguese}{#2}\,\textsuperscript{(#1)}}%
-    \case{ro}{| \foreignlanguage{romanian}{#2}\,\textsuperscript{(#1)}}%
-    \case{ru}{| \foreignlanguage{russian}{#2}\,\textsuperscript{(#1)}}%
-    \case{se}{| \foreignlanguage{samin}{#2}\,\textsuperscript{(#1)}}%
-    \case{sk}{| \foreignlanguage{slovak}{#2}\,\textsuperscript{(#1)}}%
-    \case{sl}{| \foreignlanguage{slovenian}{#2}\,\textsuperscript{(#1)}}%
-    \case{sr}{| \foreignlanguage{serbian}{#2}\,\textsuperscript{(#1)}}%
-    \case{sv}{| \foreignlanguage{swedish}{#2}\,\textsuperscript{(#1)}}%
-    \case{th}{| \foreignlanguage{thai}{#2}\,\textsuperscript{(#1)}}%
-    \case{tr}{| \foreignlanguage{turkish}{#2}\,\textsuperscript{(#1)}}%
-    \case{uk}{| \foreignlanguage{ukrainian}{#2}\,\textsuperscript{(#1)}}%
-    \case{vi}{| \foreignlanguage{vietnamese}{#2}\,\textsuperscript{(#1)}}%
-    \case{zh}{| \foreignlanguage{chinese}{#2}\,\textsuperscript{(#1)}}%
+    \case{afr}{| \foreignlanguage{afrikaans}{#2}\,\textsuperscript{(#1)}}%
+    \case{ara}{| \foreignlanguage{arabic}{#2}\,\textsuperscript{(#1)}}%
+    \case{bel}{| \foreignlanguage{belarusian}{#2}\,\textsuperscript{(#1)}}%
+    \case{bul}{| \foreignlanguage{bulgarian}{#2}\,\textsuperscript{(#1)}}%
+    \case{cat}{| \foreignlanguage{catalan}{#2}\,\textsuperscript{(#1)}}%
+    \case{ces}{| \foreignlanguage{czech}{#2}\,\textsuperscript{(#1)}}%
+    \case{dan}{| \foreignlanguage{danish}{#2}\,\textsuperscript{(#1)}}%
+    \case{deu}{| \foreignlanguage{german}{#2}\,\textsuperscript{(#1)}}%
+    \case{ell}{| \foreignlanguage{greek}{#2}\,\textsuperscript{(#1)}}%
+    \case{eng}{| \foreignlanguage{english}{#2}\,\textsuperscript{(#1)}}%
+    \case{est}{| \foreignlanguage{estonian}{#2}\,\textsuperscript{(#1)}}%
+    \case{fas}{| \foreignlanguage{persian}{#2}\,\textsuperscript{(#1)}}%
+    \case{fin}{| \foreignlanguage{finnish}{#2}\,\textsuperscript{(#1)}}%
+    \case{fra}{| \foreignlanguage{french}{#2}\,\textsuperscript{(#1)}}%
+    \case{fry}{| \foreignlanguage{dutch}{#2}\,\textsuperscript{(#1)}}%
+    \case{heb}{| \foreignlanguage{hebrew}{#2}\,\textsuperscript{(#1)}}%
+    \case{hrv}{| \foreignlanguage{croatian}{#2}\,\textsuperscript{(#1)}}%
+    \case{hun}{| \foreignlanguage{hungarian}{#2}\,\textsuperscript{(#1)}}%
+    \case{ind}{| \foreignlanguage{malay}{#2}\,\textsuperscript{(#1)}}%
+    \case{isl}{| \foreignlanguage{icelandic}{#2}\,\textsuperscript{(#1)}}%
+    \case{ita}{| \foreignlanguage{italian}{#2}\,\textsuperscript{(#1)}}%
+    \case{jpn}{| \foreignlanguage{japanese}{#2}\,\textsuperscript{(#1)}}%
+    \case{kor}{| \foreignlanguage{korean}{#2}\,\textsuperscript{(#1)}}%
+    \case{lav}{| \foreignlanguage{latvian}{#2}\,\textsuperscript{(#1)}}%
+    \case{lit}{| \foreignlanguage{lithuanian}{#2}\,\textsuperscript{(#1)}}%
+    \case{mal}{| \foreignlanguage{malayalam}{#2}\,\textsuperscript{(#1)}}%
+    \case{mkd}{| \foreignlanguage{macedonian}{#2}\,\textsuperscript{(#1)}}%
+    \case{nld}{| \foreignlanguage{dutch}{#2}\,\textsuperscript{(#1)}}%
+    \case{nor}{| \foreignlanguage{norwegian}{#2}\,\textsuperscript{(#1)}}%
+    \case{pol}{| \foreignlanguage{polish}{#2}\,\textsuperscript{(#1)}}%
+    \case{por}{| \foreignlanguage{portuguese}{#2}\,\textsuperscript{(#1)}}%
+    \case{ron}{| \foreignlanguage{romanian}{#2}\,\textsuperscript{(#1)}}%
+    \case{rus}{| \foreignlanguage{russian}{#2}\,\textsuperscript{(#1)}}%
+    \case{slk}{| \foreignlanguage{slovak}{#2}\,\textsuperscript{(#1)}}%
+    \case{slv}{| \foreignlanguage{slovenian}{#2}\,\textsuperscript{(#1)}}%
+    \case{sme}{| \foreignlanguage{samin}{#2}\,\textsuperscript{(#1)}}%
+    \case{spa}{| \foreignlanguage{spanish}{#2}\,\textsuperscript{(#1)}}%
+    \case{srp}{| \foreignlanguage{serbian}{#2}\,\textsuperscript{(#1)}}%
+    \case{swe}{| \foreignlanguage{swedish}{#2}\,\textsuperscript{(#1)}}%
+    \case{tha}{| \foreignlanguage{thai}{#2}\,\textsuperscript{(#1)}}%
+    \case{tur}{| \foreignlanguage{turkish}{#2}\,\textsuperscript{(#1)}}%
+    \case{ukr}{| \foreignlanguage{ukrainian}{#2}\,\textsuperscript{(#1)}}%
+    \case{vie}{| \foreignlanguage{vietnamese}{#2}\,\textsuperscript{(#1)}}%
+    \case{zho}{| \foreignlanguage{chinese}{#2}\,\textsuperscript{(#1)}}%
   \end{switch}
 }
 
@@ -205,49 +206,50 @@ pdfproducer={latex + bibtex + dvips + ps2pdf}}
 \newpage
 \setcounter{page}{1}
 \pagenumbering{arabic}
-\textsuperscript{(af)} \worldflag{za} Afrikaans,
-\textsuperscript{(ar)} Arabisch (\foreignlanguage{arabic}{العربية}),
-\textsuperscript{(be)} \worldflag{by} Wit-Russisch (\foreignlanguage{belarusian}{Беларуская}),
-\textsuperscript{(bg)} \worldflag{bg} Bulgaars (\foreignlanguage{bulgarian}{български език}),
-\textsuperscript{(ca)} Catalaans (\foreignlanguage{catalan}{Català}),
-\textsuperscript{(cs)} \worldflag{cz} Tsjechisch (\foreignlanguage{czech}{česky}),
-\textsuperscript{(da)} \worldflag{da} Deens (\foreignlanguage{danish}{dansk}),
-\textsuperscript{(de)} \worldflag{de} Duits (\foreignlanguage{german}{Deutsch}),
-\textsuperscript{(el)} \worldflag{gr} Grieks (\foreignlanguage{greek}{Ελληνικά}),
-\textsuperscript{(en)} \worldflag{gb} Engels (\foreignlanguage{english}{English}),
-\textsuperscript{(es)} \worldflag{es} Spaans (\foreignlanguage{spanish}{español}),
-\textsuperscript{(et)} \worldflag{ee} Estisch (\foreignlanguage{estonian}{Eesti keel}),
-\textsuperscript{(fa)} \worldflag{ir} Perzisch (\foreignlanguage{persian}{فارسی}),
-\textsuperscript{(fi)} \worldflag{fi} Fins (\foreignlanguage{finnish}{suomen kieli}),
-\textsuperscript{(fr)} \worldflag{fr} Frans (\foreignlanguage{french}{français}),
-\textsuperscript{(he)} \worldflag{il} Hebreeuws (\foreignlanguage{hebrew}{עברית}),
-\textsuperscript{(hr)} \worldflag{hr} Kroatisch (\foreignlanguage{croatian}{Hrvatski}),
-\textsuperscript{(hu)} \worldflag{hu} Hongaars (\foreignlanguage{hungarian}{Magyar}),
-\textsuperscript{(id)} \worldflag{id} Indonesisch (\foreignlanguage{malay}{Bahasa Indonesia}),
-\textsuperscript{(is)} \worldflag{is} IJslands (\foreignlanguage{icelandic}{Íslenska}),
-\textsuperscript{(it)} \worldflag{it} Italiaans (\foreignlanguage{italian}{Italiano}),
-\textsuperscript{(ja)} \worldflag{jp} Japans (\foreignlanguage{japanese}{日本語}),
-\textsuperscript{(ko)} \worldflag{kr} Koreaans (\foreignlanguage{korean}{한국어}),
-\textsuperscript{(lt)} \worldflag{lt} Litouws (\foreignlanguage{lithuanian}{lietuvių kalba}),
-\textsuperscript{(lv)} \worldflag{lv} Lets (\foreignlanguage{latvian}{latviešu valoda}),
-\textsuperscript{(mk)} Macedonisch (\foreignlanguage{macedonian}{македонски јазик}),
-\textsuperscript{(ml)} Malayalam (\foreignlanguage{malayalam}{മലയാളം}),
-\textsuperscript{(nl)} \worldflag{nl} Nederlands,
-\textsuperscript{(no)} \worldflag{no} Noors (\foreignlanguage{norwegian}{Norsk}),
-\textsuperscript{(pl)} \worldflag{pl} Pools (\foreignlanguage{polish}{język polski}),
-\textsuperscript{(pt)} \worldflag{pt} Portugees (\foreignlanguage{portuguese}{Português}),
-\textsuperscript{(ro)} \worldflag{ro} Roemeens (\foreignlanguage{romanian}{Română}),
-\textsuperscript{(ru)} \worldflag{ru} Russisch (\foreignlanguage{russian}{русский язык}),
-\textsuperscript{(se)} Noord-Samisch (\foreignlanguage{samin}{Davvisámegiella}),
-\textsuperscript{(sk)} \worldflag{sk} Slowaaks (\foreignlanguage{slovak}{slovenčina}),
-\textsuperscript{(sl)} \worldflag{si} Sloveens (\foreignlanguage{slovenian}{slovenščina}),
-\textsuperscript{(sr)} \worldflag{rs} Servisch (\foreignlanguage{serbian}{српски језик}),
-\textsuperscript{(sv)} \worldflag{se} Zweeds (\foreignlanguage{swedish}{Svenska}),
-\textsuperscript{(th)} \worldflag{th} Thai (\foreignlanguage{thai}{ไทย}),
-\textsuperscript{(tr)} \worldflag{tr} Turks (\foreignlanguage{turkish}{Türkçe}),
-\textsuperscript{(uk)} \worldflag{ua} Oekraïens (\foreignlanguage{ukrainian}{українська мова}),
-\textsuperscript{(vi)} \worldflag{vn} Vietnamees (\foreignlanguage{vietnamese}{Tiếng Việt}),
-\textsuperscript{(zh)} \worldflag{cn} Chinees (\foreignlanguage{chinese}{中文})
+\textsuperscript{(afr)} \worldflag{za} Afrikaans,
+\textsuperscript{(arq)} Arabisch (\foreignlanguage{arabic}{العربية}),
+\textsuperscript{(bel)} \worldflag{by} Wit-Russisch (\foreignlanguage{belarusian}{Беларуская}),
+\textsuperscript{(bul)} \worldflag{bg} Bulgaars (\foreignlanguage{bulgarian}{български}),
+\textsuperscript{(cat)} Catalaans (\foreignlanguage{catalan}{Català}),
+\textsuperscript{(ces)} \worldflag{cz} Tsjechisch (\foreignlanguage{czech}{česky}),
+\textsuperscript{(dan)} \worldflag{dk} Deens (\foreignlanguage{danish}{dansk}),
+\textsuperscript{(deu)} \worldflag{de} Duits (\foreignlanguage{german}{Deutsch}),
+\textsuperscript{(ell)} \worldflag{gr} Grieks (\foreignlanguage{greek}{Ελληνικά}),
+\textsuperscript{(eng)} \worldflag{gb} Engels (\foreignlanguage{english}{English}),
+\textsuperscript{(est)} \worldflag{ee} Estisch (\foreignlanguage{estonian}{Eesti}),
+\textsuperscript{(fas)} \worldflag{ir} Perzisch (\foreignlanguage{persian}{فارسی}),
+\textsuperscript{(fin)} \worldflag{fi} Fins (\foreignlanguage{finnish}{suomi}),
+\textsuperscript{(fra)} \worldflag{fr} Frans (\foreignlanguage{french}{français}),
+\textsuperscript{(fry)} Fries (Frysk),
+\textsuperscript{(heb)} \worldflag{il} Hebreeuws (\foreignlanguage{hebrew}{עברית}),
+\textsuperscript{(hrv)} \worldflag{hr} Kroatisch (\foreignlanguage{croatian}{Hrvatski}),
+\textsuperscript{(hun)} \worldflag{hu} Hongaars (\foreignlanguage{hungarian}{Magyar}),
+\textsuperscript{(ind)} \worldflag{id} Indonesisch (\foreignlanguage{malay}{Bahasa Indonesia}),
+\textsuperscript{(isl)} \worldflag{is} IJslands (\foreignlanguage{icelandic}{Íslenska}),
+\textsuperscript{(ita)} \worldflag{it} Italiaans (\foreignlanguage{italian}{Italiano}),
+\textsuperscript{(jpn)} \worldflag{jp} Japans (\foreignlanguage{japanese}{日本語}),
+\textsuperscript{(kor)} \worldflag{kr} Koreaans (\foreignlanguage{korean}{한국어}),
+\textsuperscript{(lav)} \worldflag{lv} Lets (\foreignlanguage{latvian}{latviešu}),
+\textsuperscript{(lit)} \worldflag{lt} Litouws (\foreignlanguage{lithuanian}{lietuvių}),
+\textsuperscript{(mal)} Malayalam (\foreignlanguage{malayalam}{മലയാളം}),
+\textsuperscript{(mkd)} Macedonisch (\foreignlanguage{macedonian}{македонски}),
+\textsuperscript{(nld)} \worldflag{nl} Nederlands,
+\textsuperscript{(nor)} \worldflag{no} Noors (\foreignlanguage{norwegian}{Norsk}),
+\textsuperscript{(pol)} \worldflag{pl} Pools (\foreignlanguage{polish}{język polski}),
+\textsuperscript{(por)} \worldflag{pt} Portugees (\foreignlanguage{portuguese}{Português}),
+\textsuperscript{(ron)} \worldflag{ro} Roemeens (\foreignlanguage{romanian}{Română}),
+\textsuperscript{(rus)} \worldflag{ru} Russisch (\foreignlanguage{russian}{русский}),
+\textsuperscript{(slk)} \worldflag{sk} Slowaaks (\foreignlanguage{slovak}{slovenčina}),
+\textsuperscript{(sme)} Noord-Samisch (\foreignlanguage{samin}{Davvisámegiella}),
+\textsuperscript{(spa)} \worldflag{es} Spaans (\foreignlanguage{spanish}{español}),
+\textsuperscript{(srp)} \worldflag{rs} Servisch (\foreignlanguage{serbian}{српски}),
+\textsuperscript{(svl)} \worldflag{si} Sloveens (\foreignlanguage{slovenian}{slovenščina}),
+\textsuperscript{(swe)} \worldflag{se} Zweeds (\foreignlanguage{swedish}{Svenska}),
+\textsuperscript{(tha)} \worldflag{th} Thai (\foreignlanguage{thai}{ไทย}),
+\textsuperscript{(tur)} \worldflag{tr} Turks (\foreignlanguage{turkish}{Türkçe}),
+\textsuperscript{(ukr)} \worldflag{ua} Oekraïens (\foreignlanguage{ukrainian}{українська}),
+\textsuperscript{(vie)} \worldflag{vn} Vietnamees (\foreignlanguage{vietnamese}{Tiếng Việt}),
+\textsuperscript{(zho)} \worldflag{cn} Chinees (\foreignlanguage{chinese}{中文})
 
 \newpage
 

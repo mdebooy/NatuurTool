@@ -234,16 +234,16 @@ public class IocNamen extends Batchjob {
                                         EntityManager em) {
     var taalDto = em.find(TaalDto.class, taalnaamDto.get(0).getTaalId());
     if (taalDto.getIso6392t().equals(csvtaal)) {
-      strtaal = taalDto.getIso6391();
+      strtaal = taalDto.getIso6392t();
     }
     if (taal.isEmpty()
-        || taal.contains(taalDto.getIso6391())) {
-      taalkolom[i]  = taalDto.getIso6391();
+        || taal.contains(taalDto.getIso6392t())) {
+      taalkolom[i]  = taalDto.getIso6392t();
       if (taalDto.hasTaalnaam(gebruikerstaal)) {
-        taalnaam.put(taalDto.getIso6391(),
+        taalnaam.put(taalDto.getIso6392t(),
                      String.format("%s (%s)",
                                    taalDto.getNaam(gebruikerstaal),
-                                   taalDto.getIso6391()));
+                                   taalDto.getIso6392t()));
       } else {
         taalnaam.put(taalkolom[i], taalkolom[i]);
       }

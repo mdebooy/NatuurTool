@@ -354,8 +354,8 @@ public class TaxaImport extends Batchjob {
 
     try {
       taalnaam    =
-          ((TaalDto)  em.createNamedQuery(TaalDto.QRY_TAAL_ISO6391)
-                        .setParameter(TaalDto.PAR_ISO6391, taal)
+          ((TaalDto)  em.createNamedQuery(TaalDto.QRY_TAAL_ISO6392T)
+                        .setParameter(TaalDto.PAR_ISO6392T, taal)
                         .getSingleResult()).getTaalnaam(iso6392t).getNaam();
 
     } catch(ObjectNotFoundException e) {
