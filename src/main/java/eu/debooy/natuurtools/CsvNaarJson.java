@@ -18,7 +18,6 @@ package eu.debooy.natuurtools;
 
 import eu.debooy.doos.domain.TaalDto;
 import eu.debooy.doosutils.Batchjob;
-import static eu.debooy.doosutils.Batchjob.PAR_TAAL;
 import eu.debooy.doosutils.DoosBanner;
 import eu.debooy.doosutils.DoosUtils;
 import eu.debooy.doosutils.ParameterBundle;
@@ -104,11 +103,11 @@ public class CsvNaarJson extends Batchjob {
               .build()) {
       var em  = dbConn.getEntityManager();
 
-      taal  = paramBundle.getString(PAR_TAAL);
+      taal  = paramBundle.getString(Batchjob.PAR_TAAL);
       if (taal.length() == 2) {
         taal  = ((TaalDto)  em.createNamedQuery(TaalDto.QRY_TAAL_ISO6391)
                               .setParameter(TaalDto.PAR_ISO6391,
-                                            paramBundle.getString(PAR_TAAL))
+                                            paramBundle.getString(Batchjob.PAR_TAAL))
                               .getSingleResult()).getIso6392t();
 
       }
