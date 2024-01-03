@@ -16,6 +16,7 @@
  */
 package eu.debooy.natuurtools;
 
+import eu.debooy.doos.domain.TaalDto;
 import eu.debooy.doosutils.Batchjob;
 import eu.debooy.doosutils.DoosBanner;
 import eu.debooy.doosutils.DoosUtils;
@@ -51,6 +52,8 @@ public class Taxonomie extends Batchjob {
   private static final  Map<String, String> prefix  = new HashMap<>();
   private static final  List<String>        rangen  = new ArrayList<>();
   private static final  List<String>        talen   = new ArrayList<>();
+
+  private static  String  taal    = "";
 
   protected Taxonomie() {}
 
@@ -115,7 +118,11 @@ public class Taxonomie extends Batchjob {
                                                 BestandConstants.EXT_TEX))
                             .setCharset(BestandConstants.UTF8)
                             .build()) {
-      var em = dbConn.getEntityManager();
+      var em  = dbConn.getEntityManager();
+      taal    = ((TaalDto)  em.createNamedQuery(TaalDto.QRY_TAAL_ISO6391)
+                              .setParameter(TaalDto.PAR_ISO6391,
+                                  paramBundle.getString(Batchjob.PAR_TAAL))
+                              .getSingleResult()).getIso6392t();
 
       getRangen(em);
       verwerkTemplate(texBestand, em);
@@ -163,17 +170,13 @@ public class Taxonomie extends Batchjob {
     if (null != parent.getTaxonId()) {
       params.put("@Subject@",
                  String.format("%s (%s)",
-                               getLatexNaam(
-                                  parent.getTaxonnaam(
-                                   paramBundle.getString(PAR_TAAL))
-                                     .getNaam()),
+                               getLatexNaam(parent.getTaxonnaam(taal)
+                                                  .getNaam()),
                                parent.getLatijnsenaam()));
       params.put("@Subtitel@",
                  String.format("%s (\\textit{%s})",
-                               getLatexNaam(
-                                  parent.getTaxonnaam(
-                                   paramBundle.getString(PAR_TAAL))
-                                     .getNaam()),
+                               getLatexNaam(parent.getTaxonnaam(taal)
+                                                  .getNaam()),
                                parent.getLatijnsenaam()));
     } else {
       params.put("@Subject@", params.get("@Titel@"));
@@ -194,7 +197,7 @@ public class Taxonomie extends Batchjob {
                                                        : ""));
       var regel   = new StringBuilder();
       var naam    =
-          getLatexNaam(parent.getNaam(paramBundle.getString(PAR_TAAL)));
+          getLatexNaam(parent.getNaam(taal));
       var latijn  = parent.getLatijnsenaam();
       regel.append("\\begin{samepage}\\taxon{")
            .append(parent.getRang()).append("}{")

@@ -96,7 +96,6 @@ public class IocCheck extends Batchjob {
                               .setParameter(TaalDto.PAR_ISO6391,
                                             paramBundle.getString(PAR_TAAL))
                               .getSingleResult()).getIso6392t();
-
       }
 
       for (var detail : em.createQuery(String.format(
