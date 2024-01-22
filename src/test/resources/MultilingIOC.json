@@ -57,7 +57,7 @@
                     "tr": "Devekuşu"
                   },
                   "rang": "so",
-                  "seq": 4
+                  "seq": 60000004
                 },
                 {
                   "latijn": "Struthio molybdophanes",
@@ -90,16 +90,16 @@
                     "tr": "Somali Devekuşu"
                   },
                   "rang": "so",
-                  "seq": 5
+                  "seq": 60000005
                 }
               ],
-              "seq": 3
+              "seq": 60000003
             }
           ],
-          "seq": 2
+          "seq": 60000002
         }
       ],
-      "seq": 1
+      "seq": 60000001
     },
     {
       "latijn": "Anseriformes",
@@ -151,10 +151,10 @@
                     "tr": "Boynuzlu Figankazı"
                   },
                   "rang": "so",
-                  "seq": 9
+                  "seq": 60000009
                 }
               ],
-              "seq": 8
+              "seq": 60000008
             },
             {
               "latijn": "Chauna",
@@ -193,7 +193,7 @@
                     "tr": "Ak Yüzlü Figankazı"
                   },
                   "rang": "so",
-                  "seq": 11
+                  "seq": 60000011
                 },
                 {
                   "latijn": "Chauna torquata",
@@ -227,13 +227,13 @@
                     "tr": "Kolyeli Figankazı"
                   },
                   "rang": "so",
-                  "seq": 12
+                  "seq": 60000012
                 }
               ],
-              "seq": 10
+              "seq": 60000010
             }
           ],
-          "seq": 7
+          "seq": 60000007
         },
         {
           "latijn": "Anseranatidae",
@@ -281,16 +281,16 @@
                     "tr": "Saksağankazı"
                   },
                   "rang": "so",
-                  "seq": 15
+                  "seq": 60000015
                 }
               ],
-              "seq": 14
+              "seq": 60000014
             }
           ],
-          "seq": 13
+          "seq": 60000013
         }
       ],
-      "seq": 6
+      "seq": 60000006
     }
   ]
 }

@@ -73,7 +73,7 @@
     <dependency>
       <groupId>eu.debooy.doosutils</groupId>
       <artifactId>doosutils-core</artifactId>
-      <version>2.1.4</version>
+      <version>2.1.5-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>eu.debooy.doosutils</groupId>
@@ -83,7 +83,7 @@
     <dependency>
       <groupId>eu.debooy.doosutils</groupId>
       <artifactId>doosutils-persistence</artifactId>
-      <version>2.2.5</version>
+      <version>2.2.6-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>eu.debooy.doosutils</groupId>

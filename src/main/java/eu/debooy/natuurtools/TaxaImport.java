@@ -66,8 +66,8 @@ public class TaxaImport extends Batchjob {
   private static final  List<String>          talen     = new ArrayList<>();
   private static final  Map<String, Totalen>  totalen   = new HashMap<>();
 
-  private static  boolean       aanmaak   = false;
-  private static  boolean       behoud    = false;
+  private static  boolean       aanmaak         = false;
+  private static  boolean       behoud          = false;
   private static  EntityManager em;
   private static  boolean       hernummer       = false;
   private static  String        iso6392t;

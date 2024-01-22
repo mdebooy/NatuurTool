@@ -28,6 +28,12 @@
       "help": "De database gebruikersnaam."
     },
     {
+      "parameter": "factor",
+      "lang": "factor",
+      "help": "Waarde waarmee het volgnummer van de klasse moet mee worden vermenigvuldigd om als startwaarde voor het volgnummer te worden gebruikt.",
+      "type": "integer"
+    },
+    {
       "parameter": "iocnamen",
       "extensie": "csv",
       "kort": "n",
@@ -53,6 +59,13 @@
       "help": "IOC Namen bestand in JSON-formaat. Als deze parameter afwezig is krijgt het bestand dezelfde naam als <iocnamen>.",
       "standaard": "_@iocnamen@_",
       "type": "bestand"
+    },
+    {
+      "parameter": "klassevolgnummer",
+      "lang": "klassevolgnummer",
+      "help": "Het volgnummer van de klasse als de database niet gebruikt wordt. De standaardwaarde is {0}.",
+      "standaard": 6,
+      "type": "integer"
     },
     {
       "parameter": "perrang",

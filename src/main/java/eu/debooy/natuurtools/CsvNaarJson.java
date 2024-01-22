@@ -107,7 +107,7 @@ public class CsvNaarJson extends Batchjob {
       if (taal.length() == 2) {
         taal  = ((TaalDto)  em.createNamedQuery(TaalDto.QRY_TAAL_ISO6391)
                               .setParameter(TaalDto.PAR_ISO6391,
-                                            paramBundle.getString(Batchjob.PAR_TAAL))
+                                    paramBundle.getString(Batchjob.PAR_TAAL))
                               .getSingleResult()).getIso6392t();
 
       }
@@ -195,7 +195,7 @@ public class CsvNaarJson extends Batchjob {
 
   protected static String naarRangen(String rang, String laatste)
       throws ParseException {
-    for (Object subrang : (JSONArray) jsonRangen.get(laatste)) {
+    for (Object subrang : jsonRangen.get(laatste)) {
       jsonRangen.get(rang).add(parser.parse(subrang.toString()));
     }
     jsonRangen.get(laatste).clear();
@@ -235,7 +235,7 @@ public class CsvNaarJson extends Batchjob {
       jsonRang.get(root).put(NatuurTools.KEY_SUBRANGEN,
                              parser.parse(jsonRangen.get(laatste).toString()));
     } else {
-      for (Object subrang : (JSONArray) jsonRangen.get(laatste)) {
+      for (Object subrang : jsonRangen.get(laatste)) {
         jsonRangen.get(root).add(parser.parse(subrang.toString()));
       }
     }

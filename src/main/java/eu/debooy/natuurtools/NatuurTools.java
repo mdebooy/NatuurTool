@@ -78,25 +78,27 @@ public class NatuurTools extends Batchjob {
   protected static final  String  MSG_WIJZIGEN        = "msg.wijzigen";
   protected static final  String  MSG_WIJZIGING       = "msg.wijziging";
 
-  protected static final  String  PAR_AANMAAK       = "aanmaak";
-  protected static final  String  PAR_AUTEUR        = "auteur";
-  protected static final  String  PAR_BEHOUD        = "behoud";
-  protected static final  String  PAR_IOCNAMEN      = "iocnamen";
-  protected static final  String  PAR_IOCSTRUCTUUR  = "iocstructuur";
-  protected static final  String  PAR_DBURL         = "dburl";
-  protected static final  String  PAR_DBUSER        = "dbuser";
-  protected static final  String  PAR_HERNUMMER     = "hernummer";
-  protected static final  String  PAR_JSON          = "json";
-  protected static final  String  PAR_KLEUR         = "kleur";
-  protected static final  String  PAR_METONDERSOORT = "metondersoort";
-  protected static final  String  PAR_PERRANG       = "perrang";
-  protected static final  String  PAR_RANGEN        = "rangen";
-  protected static final  String  PAR_SUBTITEL      = "subtitel";
-  protected static final  String  PAR_TALEN         = "talen";
-  protected static final  String  PAR_TAXAROOT      = "taxaroot";
-  protected static final  String  PAR_TEMPLATE      = "template";
-  protected static final  String  PAR_TITEL         = "titel";
-  protected static final  String  PAR_WACHTWOORD    = "wachtwoord";
+  protected static final  String  PAR_AANMAAK           = "aanmaak";
+  protected static final  String  PAR_AUTEUR            = "auteur";
+  protected static final  String  PAR_BEHOUD            = "behoud";
+  protected static final  String  PAR_IOCNAMEN          = "iocnamen";
+  protected static final  String  PAR_IOCSTRUCTUUR      = "iocstructuur";
+  protected static final  String  PAR_DBURL             = "dburl";
+  protected static final  String  PAR_DBUSER            = "dbuser";
+  protected static final  String  PAR_FACTOR            = "factor";
+  protected static final  String  PAR_HERNUMMER         = "hernummer";
+  protected static final  String  PAR_JSON              = "json";
+  protected static final  String  PAR_KLASSEVOLGNUMMER  = "klassevolgnummer";
+  protected static final  String  PAR_KLEUR             = "kleur";
+  protected static final  String  PAR_METONDERSOORT     = "metondersoort";
+  protected static final  String  PAR_PERRANG           = "perrang";
+  protected static final  String  PAR_RANGEN            = "rangen";
+  protected static final  String  PAR_SUBTITEL          = "subtitel";
+  protected static final  String  PAR_TALEN             = "talen";
+  protected static final  String  PAR_TAXAROOT          = "taxaroot";
+  protected static final  String  PAR_TEMPLATE          = "template";
+  protected static final  String  PAR_TITEL             = "titel";
+  protected static final  String  PAR_WACHTWOORD        = "wachtwoord";
 
   protected static final  String  QRY_RANG  =
       "select r from RangDto r order by r.niveau";
@@ -161,11 +163,11 @@ public class NatuurTools extends Batchjob {
     System.arraycopy(args, 1, commandoArgs, 0, args.length-1);
 
     switch (commando.toLowerCase()) {
-      case "dbnaarjson":
-        DbNaarJson.execute(commandoArgs);
-        break;
       case "csvnaarjson":
         CsvNaarJson.execute(commandoArgs);
+        break;
+      case "dbnaarjson":
+        DbNaarJson.execute(commandoArgs);
         break;
       case "ioccheck":
         IocCheck.execute(commandoArgs);

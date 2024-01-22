@@ -25,6 +25,8 @@ import eu.debooy.doosutils.ParameterBundle;
 import eu.debooy.doosutils.access.CsvBestand;
 import eu.debooy.doosutils.exception.BestandException;
 import eu.debooy.doosutils.percistence.DbConnection;
+import eu.debooy.natuur.NatuurConstants;
+import eu.debooy.natuur.domain.TaxonDto;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,9 +68,10 @@ public class IocNamen extends Batchjob {
   private static final  Map<String, Integer>
                                         totalen         = new HashMap<>();
 
-  private static  String    strtaal       = "";
+  private static  Integer   factor        = NatuurConstants.VOLGNUMMERFACTOR;
   private static  boolean   perRang       = false;
   private static  Integer   sequence      = 0;
+  private static  String    strtaal       = "";
   private static  String[]  taalkolom;
   private static  String    vorigGeslacht = "";
   private static  String    vorigeSoort   = "";
@@ -107,6 +110,10 @@ public class IocNamen extends Batchjob {
                                     .split(",")));
     }
     setRangen();
+
+    if (paramBundle.containsArgument(NatuurTools.PAR_FACTOR)) {
+      factor  = paramBundle.getInteger(NatuurTools.PAR_FACTOR);
+    }
 
     var taxa    = new JSONObject();
     verwerkNamen();
@@ -265,6 +272,8 @@ public class IocNamen extends Batchjob {
   private static void verwerkHeader() {
     if (!paramBundle.containsArgument(NatuurTools.PAR_DBURL)) {
       talenUitParameter();
+      sequence  = factor
+                    * paramBundle.getInteger(NatuurTools.PAR_KLASSEVOLGNUMMER);
       return;
     }
 
@@ -277,6 +286,12 @@ public class IocNamen extends Batchjob {
               .build()) {
       var csvtaal         = paramBundle.getString(PAR_TAAL);
       var em              = dbConn.getEntityManager();
+
+      var query           = em.createNamedQuery(TaxonDto.QRY_LATIJNSENAAM);
+      query.setParameter(TaxonDto.PAR_LATIJNSENAAM, NatuurConstants.LAT_VOGELS);
+      var klasse          = (TaxonDto) query.getSingleResult();
+      sequence            = factor * klasse.getVolgnummer().intValue();
+
       var gebruikerstaal  =
           ((TaalDto)  em.createNamedQuery(TaalDto.QRY_TAAL_ISO6391)
                         .setParameter(TaalDto.PAR_ISO6391,
@@ -359,7 +374,7 @@ public class IocNamen extends Batchjob {
 
       nieuweOrde();
       taxa.put(NatuurTools.KEY_RANG, NatuurTools.RANG_KLASSE);
-      taxa.put(NatuurTools.KEY_LATIJN, "Aves");
+      taxa.put(NatuurTools.KEY_LATIJN, NatuurConstants.LAT_VOGELS);
       taxa.put(NatuurTools.KEY_SUBRANGEN, ordes);
     } catch (BestandException | ParseException e) {
       DoosUtils.foutNaarScherm(String.format("%s: %s",

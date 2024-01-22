@@ -18,7 +18,6 @@ package eu.debooy.natuurtools;
 
 import eu.debooy.doos.domain.TaalDto;
 import eu.debooy.doosutils.Batchjob;
-import static eu.debooy.doosutils.Batchjob.PAR_TAAL;
 import eu.debooy.doosutils.DoosBanner;
 import eu.debooy.doosutils.DoosUtils;
 import eu.debooy.doosutils.ParameterBundle;
