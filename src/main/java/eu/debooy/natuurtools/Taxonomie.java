@@ -25,6 +25,7 @@ import eu.debooy.doosutils.access.BestandConstants;
 import eu.debooy.doosutils.access.TekstBestand;
 import eu.debooy.doosutils.exception.BestandException;
 import eu.debooy.doosutils.percistence.DbConnection;
+import eu.debooy.natuur.NatuurUtils;
 import eu.debooy.natuur.domain.RangDto;
 import eu.debooy.natuur.domain.TaxonDto;
 import java.util.ArrayList;
@@ -47,7 +48,6 @@ public class Taxonomie extends Batchjob {
   private static final  String      QRY_ROOT      =
       "select t from TaxonDto t where t.parentId is null "
           + "order by t.rang, t.volgnummer";
-  private static final  String      UITGESTORVEN  = "†";
 
   private static final  Map<String, String> prefix  = new HashMap<>();
   private static final  List<String>        rangen  = new ArrayList<>();
@@ -192,17 +192,16 @@ public class Taxonomie extends Batchjob {
     if (rangen.isEmpty()
         || rangen.contains(parent.getRang())) {
       DoosUtils.naarScherm(prefix.get(parent.getRang()) + " " + parent.getRang()
-                            + " " + parent.getLatijnsenaam()
-                            + (parent.isUitgestorven() ? " " + UITGESTORVEN
-                                                       : ""));
+                            + " " + NatuurUtils
+                                .getLatijnsenaam(parent.getLatijnsenaam(),
+                                                 parent.isUitgestorven()));
       var regel   = new StringBuilder();
       var naam    =
           getLatexNaam(parent.getNaam(taal));
       var latijn  = parent.getLatijnsenaam();
       regel.append("\\begin{samepage}\\taxon{")
            .append(parent.getRang()).append("}{")
-           .append(latijn)
-           .append(parent.isUitgestorven() ? " " + UITGESTORVEN : "")
+           .append(NatuurUtils.getLatijnsenaam(latijn, parent.isUitgestorven()))
            .append("}{");
       if (!naam.equals(latijn)) {
         regel.append(naam);

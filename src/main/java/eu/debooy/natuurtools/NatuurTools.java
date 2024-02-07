@@ -119,8 +119,6 @@ public class NatuurTools extends Batchjob {
 
   protected static final  String  TXT_BANNER  = "help.natuurtools";
 
-  protected static  final String  UITGESTORVEN  = " †";
-
   protected static final  List<String>  tools =
       Arrays.asList(TOOL_DBNAARJSON, TOOL_CSVNAARJSON, TOOL_IOCCHECK,
                     TOOL_IOCNAMEN, TOOL_TAXAIMPORT, TOOL_TAXONOMIE);

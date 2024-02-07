@@ -162,7 +162,7 @@ public class IocNamen extends Batchjob {
   }
 
   private static Boolean isUitgestorven(String latijnsenaam) {
-    return latijnsenaam.endsWith(NatuurTools.UITGESTORVEN.trim());
+    return latijnsenaam.endsWith(NatuurConstants.UITGESTORVEN);
   }
 
   private static void nieuwGeslacht() throws ParseException {
@@ -222,7 +222,7 @@ public class IocNamen extends Batchjob {
   private static String setLatijnsenaam(String latijnsenaam) {
     return (latijnsenaam.substring(0, 1).toUpperCase()
             + latijnsenaam.substring(1).toLowerCase())
-                .replaceAll(NatuurTools.UITGESTORVEN.trim(), "").trim();
+                .replaceAll(NatuurConstants.UITGESTORVEN, "").trim();
   }
 
   private static void setRangen() {
