@@ -24,10 +24,10 @@ import org.junit.Test;
 /**
  * @author booymar
  */
-public class IocCheckTest extends BatchTest {
+public class JsonCheckTest extends BatchTest {
   protected void execute(String[] args) {
     before();
-    IocCheck.execute(args);
+    JsonCheck.execute(args);
     after();
   }
 

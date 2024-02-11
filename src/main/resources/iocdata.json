@@ -1,9 +1,9 @@
 {
   "_jar": "NatuurTools.jar",
   "_prefixlengte": 20,
-  "applicatie": "IocNamen",
-  "help": "Converteer een CSV bestand met IOC Namen naar een JSON-bestand.",
-  "banner": "IOC Namen, CSV naar JSON",
+  "applicatie": "IocData",
+  "help": "Converteer de bestanden van het IOC naar een JSON-bestand.",
+  "banner": "IOC-data, CSV naar JSON",
   "parameters": [
     {
       "parameter": "charsetin",

@@ -104,19 +104,19 @@ public class NatuurTools extends Batchjob {
   protected static final  String  QRY_RANG  =
       "select r from RangDto r order by r.niveau";
 
-  protected static final  String  TOOL_ASMDATA      = "AsmData";
-  protected static final  String  TOOL_DBNAARJSON   = "DbNaarJson";
-  protected static final  String  TOOL_CSVNAARJSON  = "CsvNaarJson";
-  protected static final  String  TOOL_IOCCHECK     = "IocCheck";
-  protected static final  String  TOOL_IOCNAMEN     = "IocNamen";
-  protected static final  String  TOOL_TAXAIMPORT   = "TaxaImport";
-  protected static final  String  TOOL_TAXONOMIE    = "Taxonomie";
+  protected static final  String  TOOL_CSVNAARJSON  = "csvnaarjson";
+  protected static final  String  TOOL_DBNAARJSON   = "dbnaarjson";
+  protected static final  String  TOOL_IOCDATA      = "iocdata";
+  protected static final  String  TOOL_JSONCHECK    = "jsoncheck";
+  protected static final  String  TOOL_MDDDATA      = "mdddata";
+  protected static final  String  TOOL_TAXAIMPORT   = "taxaimport";
+  protected static final  String  TOOL_TAXONOMIE    = "taxonomie";
 
   protected static final  String  TXT_BANNER  = "help.natuurtools";
 
   protected static final  List<String>  tools =
-      Arrays.asList(TOOL_ASMDATA, TOOL_DBNAARJSON, TOOL_CSVNAARJSON,
-                    TOOL_IOCCHECK, TOOL_IOCNAMEN, TOOL_TAXAIMPORT,
+      Arrays.asList(TOOL_CSVNAARJSON, TOOL_DBNAARJSON, TOOL_IOCDATA,
+                    TOOL_JSONCHECK, TOOL_MDDDATA, TOOL_TAXAIMPORT,
                     TOOL_TAXONOMIE);
 
   protected NatuurTools() {}
@@ -157,25 +157,25 @@ public class NatuurTools extends Batchjob {
     System.arraycopy(args, 1, commandoArgs, 0, args.length-1);
 
     switch (commando.toLowerCase()) {
-      case "asmdata":
-        AsmData.execute(commandoArgs);
-        break;
-      case "csvnaarjson":
+      case TOOL_CSVNAARJSON:
         CsvNaarJson.execute(commandoArgs);
         break;
-      case "dbnaarjson":
+      case TOOL_DBNAARJSON:
         DbNaarJson.execute(commandoArgs);
         break;
-      case "ioccheck":
-        IocCheck.execute(commandoArgs);
+      case TOOL_IOCDATA:
+        IocData.execute(commandoArgs);
         break;
-      case "iocnamen":
-        IocNamen.execute(commandoArgs);
+      case TOOL_JSONCHECK:
+        JsonCheck.execute(commandoArgs);
         break;
-      case "taxaimport":
+      case TOOL_MDDDATA:
+        MddData.execute(commandoArgs);
+        break;
+      case TOOL_TAXAIMPORT:
         TaxaImport.execute(commandoArgs);
         break;
-      case "taxonomie":
+      case TOOL_TAXONOMIE:
         Taxonomie.execute(commandoArgs);
         break;
       default:

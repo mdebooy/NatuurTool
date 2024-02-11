@@ -39,7 +39,7 @@ import org.json.simple.JSONObject;
 /**
  * @author Marco de Booij
  */
-public class IocCheck extends Batchjob {
+public class JsonCheck extends Batchjob {
   private static final  ResourceBundle  resourceBundle  =
       ResourceBundle.getBundle("ApplicatieResources", Locale.getDefault());
 
@@ -51,14 +51,14 @@ public class IocCheck extends Batchjob {
 
   protected static  List<String>  latijnsenamen = new ArrayList<>();
 
-  protected IocCheck() {}
+  protected JsonCheck() {}
 
   public static void execute(String[] args) {
     setParameterBundle(
         new ParameterBundle.Builder()
                            .setArgs(args)
                            .setBanner(new DoosBanner())
-                           .setBaseName(NatuurTools.TOOL_IOCCHECK)
+                           .setBaseName(NatuurTools.TOOL_JSONCHECK)
                            .build());
 
     if (!paramBundle.isValid()) {

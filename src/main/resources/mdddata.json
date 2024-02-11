@@ -1,9 +1,9 @@
 {
   "_jar": "NatuurTools.jar",
   "_prefixlengte": 20,
-  "applicatie": "AsmData",
-  "help": "Converteer een ASM-bestand in JSON formaat naar een JSON-bestand.",
-  "banner": "Asm-bestand naar JSON",
+  "applicatie": "MddData",
+  "help": "Converteer het bestand van de 'Mammal Diversity Database' naar een JSON-bestand.",
+  "banner": "MDD-data naar JSON",
   "parameters": [
     {
       "parameter": "charsetin",
@@ -34,15 +34,6 @@
       "type": "integer"
     },
     {
-      "parameter": "asmbestand",
-      "extensie": "json",
-      "kort": "a",
-      "lang": "asmbestand",
-      "help": "ASM-bestand in JSON-formaat.",
-      "type": "bestand",
-      "verplicht": true
-    },
-    {
       "parameter": "json",
       "extensie": "json",
       "kort": "j",
@@ -57,6 +48,15 @@
       "help": "Het volgnummer van de klasse als de database niet gebruikt wordt. De standaardwaarde is {0}.",
       "standaard": 7,
       "type": "integer"
+    },
+    {
+      "parameter": "mddbestand",
+      "extensie": "json",
+      "kort": "a",
+      "lang": "mddbestand",
+      "help": "MDD-bestand in JSON-formaat.",
+      "type": "bestand",
+      "verplicht": true
     },
     {
       "parameter": "perrang",

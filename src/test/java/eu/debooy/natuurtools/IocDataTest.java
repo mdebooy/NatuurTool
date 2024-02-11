@@ -33,9 +33,9 @@ import org.junit.Test;
 /**
  * @author Marco de Booij
  */
-public class IocNamenTest extends BatchTest {
+public class IocDataTest extends BatchTest {
   protected static final  ClassLoader CLASSLOADER =
-      IocNamenTest.class.getClassLoader();
+      IocDataTest.class.getClassLoader();
 
   private static final  String  BST_CSV     = "MultilingIOC.csv";
   private static final  String  BST_JSON    = "MultilingIOC.json";
@@ -66,7 +66,7 @@ public class IocNamenTest extends BatchTest {
 
   protected void execute(String[] args) {
     before();
-    IocNamen.execute(args);
+    IocData.execute(args);
     after();
   }
 
@@ -92,8 +92,7 @@ public class IocNamenTest extends BatchTest {
         Bestand.equals(
             Bestand.openInvoerBestand(getTemp() + File.separator
                                       + BST_JSON),
-            Bestand.openInvoerBestand(IocNamenTest.class.getClassLoader(),
-                                      BST_JSON)));
+            Bestand.openInvoerBestand(CLASSLOADER, BST_JSON)));
   }
 
   @Test

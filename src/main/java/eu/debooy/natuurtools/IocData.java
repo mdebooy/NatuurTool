@@ -49,7 +49,7 @@ import org.json.simple.parser.ParseException;
 /**
  * @author Marco de Booij
  */
-public class IocNamen extends Batchjob {
+public class IocData extends Batchjob {
   private static final  JSONObject      familie         = new JSONObject();
   private static final  JSONArray       families        = new JSONArray();
   private static final  JSONObject      geslacht        = new JSONObject();
@@ -81,7 +81,7 @@ public class IocNamen extends Batchjob {
   private static final  Set<String>         taal      = new TreeSet<>();
   private static final  Map<String, String> taalnaam  = new TreeMap<>();
 
-  protected IocNamen() {}
+  protected IocData() {}
 
   private static void addRang(String rang) {
     totalen.put(rang, totalen.get(rang)+1);
@@ -98,7 +98,7 @@ public class IocNamen extends Batchjob {
         new ParameterBundle.Builder()
                            .setArgs(args)
                            .setBanner(new DoosBanner())
-                           .setBaseName(NatuurTools.TOOL_IOCNAMEN)
+                           .setBaseName(NatuurTools.TOOL_IOCDATA)
                            .build());
 
     if (!paramBundle.isValid()) {

@@ -1,8 +1,8 @@
 {
   "_jar": "NatuurTools.jar",
   "_prefixlengte": 18,
-  "applicatie": "IocCheck",
-  "help": "Controleer of de latijnse namen nog in de IOC lijst voorkomen.",
+  "applicatie": "JsonCheck",
+  "help": "Controleer of de latijnse namen uit de database van de klasse nog in het JSON-bestand voorkomen en omgekeerd.",
   "banner": "Check latijnse namen",
   "parameters": [
     {

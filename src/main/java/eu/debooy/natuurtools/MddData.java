@@ -45,7 +45,7 @@ import org.json.simple.parser.ParseException;
 /**
  * @author Marco de Booij
  */
-public class AsmData extends Batchjob {
+public class MddData extends Batchjob {
   private static final  JSONObject      familie         = new JSONObject();
   private static final  JSONArray       families        = new JSONArray();
   private static final  JSONObject      geslacht        = new JSONObject();
@@ -70,9 +70,9 @@ public class AsmData extends Batchjob {
   private static  String    vorigeOrde    = "";
   private static  String    vorigGeslacht = "";
 
-  protected AsmData() {}
+  protected MddData() {}
 
-  static class AsmTaxon {
+  static class MddTaxon {
     private String  familie;
     private String  geslacht;
     private String  naam;
@@ -139,7 +139,7 @@ public class AsmData extends Batchjob {
         new ParameterBundle.Builder()
                            .setArgs(args)
                            .setBanner(new DoosBanner())
-                           .setBaseName(NatuurTools.TOOL_ASMDATA)
+                           .setBaseName(NatuurTools.TOOL_MDDDATA)
                            .build());
 
     if (!paramBundle.isValid()) {
@@ -211,7 +211,7 @@ public class AsmData extends Batchjob {
     }
   }
 
-  private static void nieuwGeslacht(AsmTaxon asmTaxon) throws ParseException {
+  private static void nieuwGeslacht(MddTaxon mddTaxon) throws ParseException {
     if (!geslacht.isEmpty()) {
       if (!soorten.isEmpty()) {
         geslacht.put(NatuurTools.KEY_SUBRANGEN,
@@ -222,23 +222,23 @@ public class AsmData extends Batchjob {
       geslacht.clear();
     }
 
-    if (!asmTaxon.getFamilie().equals(vorigeFamilie)) {
-      nieuweFamilie(asmTaxon);
+    if (!mddTaxon.getFamilie().equals(vorigeFamilie)) {
+      nieuweFamilie(mddTaxon);
     }
 
-    if (null == asmTaxon.getNaam()) {
+    if (null == mddTaxon.getNaam()) {
       return;
     }
 
     addRang(NatuurConstants.RANG_GESLACHT);
-    vorigGeslacht = asmTaxon.getGeslacht();
+    vorigGeslacht = mddTaxon.getGeslacht();
     geslacht.put(NatuurTools.KEY_SEQ,
                  getVolgnummer(NatuurConstants.RANG_GESLACHT));
     geslacht.put(NatuurTools.KEY_RANG, NatuurConstants.RANG_GESLACHT);
     geslacht.put(NatuurTools.KEY_LATIJN, vorigGeslacht);
   }
 
-  private static void nieuweFamilie(AsmTaxon asmTaxon) throws ParseException {
+  private static void nieuweFamilie(MddTaxon mddTaxon) throws ParseException {
     if (!familie.isEmpty()) {
       if (!geslachten.isEmpty()) {
         familie.put(NatuurTools.KEY_SUBRANGEN,
@@ -249,23 +249,23 @@ public class AsmData extends Batchjob {
       familie.clear();
     }
 
-    if (!asmTaxon.getOrde().equals(vorigeOrde)) {
-      nieuweOrde(asmTaxon);
+    if (!mddTaxon.getOrde().equals(vorigeOrde)) {
+      nieuweOrde(mddTaxon);
     }
 
-    if (null == asmTaxon.getNaam()) {
+    if (null == mddTaxon.getNaam()) {
       return;
     }
 
     addRang(NatuurConstants.RANG_FAMILIE);
-    vorigeFamilie = asmTaxon.getFamilie();
+    vorigeFamilie = mddTaxon.getFamilie();
     familie.put(NatuurTools.KEY_SEQ,
                 getVolgnummer(NatuurConstants.RANG_FAMILIE));
     familie.put(NatuurTools.KEY_RANG, NatuurConstants.RANG_FAMILIE);
     familie.put(NatuurTools.KEY_LATIJN, vorigeFamilie);
   }
 
-  private static void nieuweOrde(AsmTaxon asmTaxon) throws ParseException {
+  private static void nieuweOrde(MddTaxon mddTaxon) throws ParseException {
     if (!orde.isEmpty()) {
       if (!families.isEmpty()) {
         orde.put(NatuurTools.KEY_SUBRANGEN, parser.parse(families.toString()));
@@ -275,41 +275,41 @@ public class AsmData extends Batchjob {
       orde.clear();
     }
 
-    if (null == asmTaxon.getNaam()) {
+    if (null == mddTaxon.getNaam()) {
       return;
     }
 
     addRang(NatuurConstants.RANG_ORDE);
-    vorigeOrde    = asmTaxon.getOrde();
+    vorigeOrde    = mddTaxon.getOrde();
     orde.put(NatuurTools.KEY_SEQ, getVolgnummer(NatuurConstants.RANG_ORDE));
     orde.put(NatuurTools.KEY_RANG, NatuurConstants.RANG_ORDE);
     orde.put(NatuurTools.KEY_LATIJN, vorigeOrde);
   }
 
-  private static void nieuweSoort(AsmTaxon asmTaxon) throws ParseException {
+  private static void nieuweSoort(MddTaxon mddTaxon) throws ParseException {
     if (!soort.isEmpty()) {
       soorten.add(parser.parse(soort.toString()));
       soort.clear();
     }
 
-    if (!asmTaxon.getGeslacht().equals(vorigGeslacht)) {
-      nieuwGeslacht(asmTaxon);
+    if (!mddTaxon.getGeslacht().equals(vorigGeslacht)) {
+      nieuwGeslacht(mddTaxon);
     }
 
-    if (null == asmTaxon.getNaam()) {
+    if (null == mddTaxon.getNaam()) {
       return;
     }
 
-    var latijn  = String.format("%s %s", asmTaxon.getGeslacht(),
-                                         asmTaxon.getSoort());
+    var latijn  = String.format("%s %s", mddTaxon.getGeslacht(),
+                                         mddTaxon.getSoort());
 
     addRang(NatuurConstants.RANG_SOORT);
     soort.put(NatuurTools.KEY_SEQ, getVolgnummer(NatuurConstants.RANG_SOORT));
     soort.put(NatuurTools.KEY_RANG, NatuurConstants.RANG_SOORT);
     soort.put(NatuurTools.KEY_LATIJN, latijn);
-    soort.put(NatuurTools.KEY_UITGESTORVEN, asmTaxon.isUitgestorven());
+    soort.put(NatuurTools.KEY_UITGESTORVEN, mddTaxon.isUitgestorven());
     var namen = new JSONObject();
-    namen.put(asmtaal, asmTaxon.getNaam());
+    namen.put(asmtaal, mddTaxon.getNaam());
     soort.put(NatuurTools.KEY_NAMEN, namen);
   }
 
@@ -334,7 +334,7 @@ public class AsmData extends Batchjob {
 
       json.forEach(taxon -> verwerkTaxon((JSONObject) taxon));
 
-      nieuweSoort(new AsmTaxon());
+      nieuweSoort(new MddTaxon());
       taxa.put(NatuurTools.KEY_RANG, NatuurConstants.RANG_KLASSE);
       taxa.put(NatuurTools.KEY_LATIJN, NatuurConstants.LAT_ZOOGDIEREN);
       taxa.put(NatuurTools.KEY_SUBRANGEN, ordes);
@@ -346,21 +346,21 @@ public class AsmData extends Batchjob {
   }
 
   private static void verwerkTaxon(JSONObject taxon) {
-    var asmTaxon  = new AsmTaxon();
+    var mddTaxon  = new MddTaxon();
 
-    asmTaxon.setFamilie(taxon.get("family").toString());
-    asmTaxon.setGeslacht(taxon.get("genus").toString());
-    asmTaxon.setOrde(taxon.get("order").toString());
-    asmTaxon.setSoort(taxon.get("specificEpithet").toString());
-    asmTaxon.setNaam(taxon.get("mainCommonName").toString());
-    asmTaxon.setUitgestorven(taxon.get("extinct").equals("1"));
+    mddTaxon.setFamilie(taxon.get("family").toString());
+    mddTaxon.setGeslacht(taxon.get("genus").toString());
+    mddTaxon.setOrde(taxon.get("order").toString());
+    mddTaxon.setSoort(taxon.get("specificEpithet").toString());
+    mddTaxon.setNaam(taxon.get("mainCommonName").toString());
+    mddTaxon.setUitgestorven(taxon.get("extinct").equals("1"));
 
     try {
-      nieuweSoort(asmTaxon);
+      nieuweSoort(mddTaxon);
     } catch (ParseException e) {
       DoosUtils.foutNaarScherm(String.format("%s %s  - %s",
-                                             asmTaxon.getGeslacht(),
-                                             asmTaxon.getSoort(),
+                                             mddTaxon.getGeslacht(),
+                                             mddTaxon.getSoort(),
                                              e.getLocalizedMessage()));
     }
 
