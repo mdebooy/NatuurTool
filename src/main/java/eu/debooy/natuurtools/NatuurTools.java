@@ -78,6 +78,7 @@ public class NatuurTools extends Batchjob {
   protected static final  String  MSG_WIJZIGEN        = "msg.wijzigen";
   protected static final  String  MSG_WIJZIGING       = "msg.wijziging";
 
+  protected static final  String  PAR_ASMBESTAND        = "asmbestand";
   protected static final  String  PAR_AANMAAK           = "aanmaak";
   protected static final  String  PAR_AUTEUR            = "auteur";
   protected static final  String  PAR_BEHOUD            = "behoud";
@@ -103,13 +104,7 @@ public class NatuurTools extends Batchjob {
   protected static final  String  QRY_RANG  =
       "select r from RangDto r order by r.niveau";
 
-  protected static final  String  RANG_FAMILIE    = "fa";
-  protected static final  String  RANG_GESLACHT   = "ge";
-  protected static final  String  RANG_KLASSE     = "kl";
-  protected static final  String  RANG_ORDE       = "or";
-  protected static final  String  RANG_ONDERSOORT = "oso";
-  protected static final  String  RANG_SOORT      = "so";
-
+  protected static final  String  TOOL_ASMDATA      = "AsmData";
   protected static final  String  TOOL_DBNAARJSON   = "DbNaarJson";
   protected static final  String  TOOL_CSVNAARJSON  = "CsvNaarJson";
   protected static final  String  TOOL_IOCCHECK     = "IocCheck";
@@ -120,8 +115,9 @@ public class NatuurTools extends Batchjob {
   protected static final  String  TXT_BANNER  = "help.natuurtools";
 
   protected static final  List<String>  tools =
-      Arrays.asList(TOOL_DBNAARJSON, TOOL_CSVNAARJSON, TOOL_IOCCHECK,
-                    TOOL_IOCNAMEN, TOOL_TAXAIMPORT, TOOL_TAXONOMIE);
+      Arrays.asList(TOOL_ASMDATA, TOOL_DBNAARJSON, TOOL_CSVNAARJSON,
+                    TOOL_IOCCHECK, TOOL_IOCNAMEN, TOOL_TAXAIMPORT,
+                    TOOL_TAXONOMIE);
 
   protected NatuurTools() {}
 
@@ -161,6 +157,9 @@ public class NatuurTools extends Batchjob {
     System.arraycopy(args, 1, commandoArgs, 0, args.length-1);
 
     switch (commando.toLowerCase()) {
+      case "asmdata":
+        AsmData.execute(commandoArgs);
+        break;
       case "csvnaarjson":
         CsvNaarJson.execute(commandoArgs);
         break;

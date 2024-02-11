@@ -27,6 +27,7 @@ import eu.debooy.doosutils.components.Message;
 import eu.debooy.doosutils.errorhandling.exception.ObjectNotFoundException;
 import eu.debooy.doosutils.exception.BestandException;
 import eu.debooy.doosutils.percistence.DbConnection;
+import eu.debooy.natuur.NatuurConstants;
 import eu.debooy.natuur.domain.RangDto;
 import eu.debooy.natuur.domain.TaxonDto;
 import eu.debooy.natuur.domain.TaxonnaamDto;
@@ -186,7 +187,7 @@ public class TaxaImport extends Batchjob {
     }
 
     if (!metondersoorten
-        && taxon.getRang().equals(NatuurTools.RANG_ONDERSOORT)) {
+        && taxon.getRang().equals(NatuurConstants.RANG_ONDERSOORT)) {
       return;
     }
 
@@ -467,13 +468,11 @@ public class TaxaImport extends Batchjob {
                                                     BestandConstants.EXT_JSON))
                          .setCharset(paramBundle.getString(PAR_CHARSETIN))
                          .build()) {
-      latijnsenaam    = jsonBestand.read().get(NatuurTools.KEY_LATIJN)
-                                          .toString();
-      var   rang      = jsonBestand.read().get(NatuurTools.KEY_RANG)
-                                          .toString();
+      latijnsenaam    = jsonBestand.get(NatuurTools.KEY_LATIJN).toString();
+      var   rang      = jsonBestand.get(NatuurTools.KEY_RANG).toString();
       var   parentId  = getTaxon(latijnsenaam, 0L, 0L, rang).getTaxonId();
       for (Object taxa :
-              (JSONArray) jsonBestand.read().get(NatuurTools.KEY_SUBRANGEN)) {
+              (JSONArray) jsonBestand.get(NatuurTools.KEY_SUBRANGEN)) {
         verwerkRang(parentId, (JSONObject) taxa);
       }
     } catch (BestandException e) {

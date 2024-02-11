@@ -26,6 +26,7 @@ import eu.debooy.doosutils.access.CsvBestand;
 import eu.debooy.doosutils.exception.BestandException;
 import eu.debooy.doosutils.percistence.DbConnection;
 import eu.debooy.natuur.NatuurConstants;
+import eu.debooy.natuur.NatuurUtils;
 import eu.debooy.natuur.domain.TaxonDto;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -219,18 +220,12 @@ public class IocNamen extends Batchjob {
     }
   }
 
-  private static String setLatijnsenaam(String latijnsenaam) {
-    return (latijnsenaam.substring(0, 1).toUpperCase()
-            + latijnsenaam.substring(1).toLowerCase())
-                .replaceAll(NatuurConstants.UITGESTORVEN, "").trim();
-  }
-
   private static void setRangen() {
-    for (String rang : new String[] {NatuurTools.RANG_ORDE,
-                                     NatuurTools.RANG_FAMILIE,
-                                     NatuurTools.RANG_GESLACHT,
-                                     NatuurTools.RANG_SOORT,
-                                     NatuurTools.RANG_ONDERSOORT}) {
+    for (String rang : new String[] {NatuurConstants.RANG_ORDE,
+                                     NatuurConstants.RANG_FAMILIE,
+                                     NatuurConstants.RANG_GESLACHT,
+                                     NatuurConstants.RANG_SOORT,
+                                     NatuurConstants.RANG_ONDERSOORT}) {
       rangen.add(rang);
       totalen.put(rang, 0);
     }
@@ -309,7 +304,6 @@ public class IocNamen extends Batchjob {
         } else {
           taalUitDatabase(csvtaal, gebruikerstaal, taalnaamDto, i, em);
         }
-
       }
     } catch (Exception e) {
       DoosUtils.foutNaarScherm(e.getLocalizedMessage());
@@ -337,7 +331,7 @@ public class IocNamen extends Batchjob {
       var namen = new JSONObject();
       while(csvBestand.hasNext()) {
         var veld          = csvBestand.next();
-        var latijnsenaam  = setLatijnsenaam(veld[3]);
+        var latijnsenaam  = NatuurUtils.formatLatijnsenaam(veld[3]);
 
         namen.clear();
         for (var i = 0; i < taalkolom.length; i++) {
@@ -373,7 +367,7 @@ public class IocNamen extends Batchjob {
       }
 
       nieuweOrde();
-      taxa.put(NatuurTools.KEY_RANG, NatuurTools.RANG_KLASSE);
+      taxa.put(NatuurTools.KEY_RANG, NatuurConstants.RANG_KLASSE);
       taxa.put(NatuurTools.KEY_LATIJN, NatuurConstants.LAT_VOGELS);
       taxa.put(NatuurTools.KEY_SUBRANGEN, ordes);
     } catch (BestandException | ParseException e) {
@@ -390,19 +384,21 @@ public class IocNamen extends Batchjob {
     // Nieuwe Orde
     if (DoosUtils.isNotBlankOrNull(veld[0])) {
       nieuweOrde();
-      addRang(NatuurTools.RANG_ORDE);
-      orde.put(NatuurTools.KEY_SEQ, getVolgnummer(NatuurTools.RANG_ORDE));
-      orde.put(NatuurTools.KEY_RANG, NatuurTools.RANG_ORDE);
-      orde.put(NatuurTools.KEY_LATIJN, setLatijnsenaam(veld[0]));
+      addRang(NatuurConstants.RANG_ORDE);
+      orde.put(NatuurTools.KEY_SEQ, getVolgnummer(NatuurConstants.RANG_ORDE));
+      orde.put(NatuurTools.KEY_RANG, NatuurConstants.RANG_ORDE);
+      orde.put(NatuurTools.KEY_LATIJN, NatuurUtils.formatLatijnsenaam(veld[0]));
       orde.put(NatuurTools.KEY_UITGESTORVEN, isUitgestorven(veld[0]));
     }
     // Nieuwe familie
     if (DoosUtils.isNotBlankOrNull(veld[1])) {
       nieuweFamilie();
-      addRang(NatuurTools.RANG_FAMILIE);
-      familie.put(NatuurTools.KEY_SEQ, getVolgnummer(NatuurTools.RANG_FAMILIE));
-      familie.put(NatuurTools.KEY_RANG, NatuurTools.RANG_FAMILIE);
-      familie.put(NatuurTools.KEY_LATIJN, setLatijnsenaam(veld[1]));
+      addRang(NatuurConstants.RANG_FAMILIE);
+      familie.put(NatuurTools.KEY_SEQ,
+                  getVolgnummer(NatuurConstants.RANG_FAMILIE));
+      familie.put(NatuurTools.KEY_RANG, NatuurConstants.RANG_FAMILIE);
+      familie.put(NatuurTools.KEY_LATIJN,
+                  NatuurUtils.formatLatijnsenaam(veld[1]));
       familie.put(NatuurTools.KEY_UITGESTORVEN, isUitgestorven(veld[1]));
       if (DoosUtils.isNotBlankOrNull(veld[2])) {
         var namen = new JSONObject();
@@ -414,11 +410,11 @@ public class IocNamen extends Batchjob {
     // Nieuw geslacht
     if (DoosUtils.isNotBlankOrNull(veld[3])) {
       nieuwGeslacht();
-      addRang(NatuurTools.RANG_GESLACHT);
-      vorigGeslacht = setLatijnsenaam(veld[3]);
+      addRang(NatuurConstants.RANG_GESLACHT);
+      vorigGeslacht = NatuurUtils.formatLatijnsenaam(veld[3]);
       geslacht.put(NatuurTools.KEY_SEQ,
-                   getVolgnummer(NatuurTools.RANG_GESLACHT));
-      geslacht.put(NatuurTools.KEY_RANG, NatuurTools.RANG_GESLACHT);
+                   getVolgnummer(NatuurConstants.RANG_GESLACHT));
+      geslacht.put(NatuurTools.KEY_RANG, NatuurConstants.RANG_GESLACHT);
       geslacht.put(NatuurTools.KEY_LATIJN, vorigGeslacht);
       geslacht.put(NatuurTools.KEY_UITGESTORVEN, isUitgestorven(veld[3]));
     }
@@ -426,22 +422,24 @@ public class IocNamen extends Batchjob {
     // Nieuw soort
     if (DoosUtils.isNotBlankOrNull(veld[4])) {
       nieuweSoort();
-      addRang(NatuurTools.RANG_SOORT);
-      vorigeSoort = setLatijnsenaam(vorigGeslacht + " " + veld[4]);
-      soort.put(NatuurTools.KEY_SEQ, getVolgnummer(NatuurTools.RANG_SOORT));
-      soort.put(NatuurTools.KEY_RANG, NatuurTools.RANG_SOORT);
+      addRang(NatuurConstants.RANG_SOORT);
+      vorigeSoort = NatuurUtils.formatLatijnsenaam(vorigGeslacht + " "
+                                                    + veld[4]);
+      soort.put(NatuurTools.KEY_SEQ, getVolgnummer(NatuurConstants.RANG_SOORT));
+      soort.put(NatuurTools.KEY_RANG, NatuurConstants.RANG_SOORT);
       soort.put(NatuurTools.KEY_LATIJN, vorigeSoort);
       soort.put(NatuurTools.KEY_UITGESTORVEN, isUitgestorven(veld[4]));
     }
 
     if (DoosUtils.isNotBlankOrNull(veld[5])) {
       ondersoort.clear();
-      addRang(NatuurTools.RANG_ONDERSOORT);
+      addRang(NatuurConstants.RANG_ONDERSOORT);
       ondersoort.put(NatuurTools.KEY_SEQ,
-                     getVolgnummer(NatuurTools.RANG_ONDERSOORT));
-      ondersoort.put(NatuurTools.KEY_RANG, NatuurTools.RANG_ONDERSOORT);
+                     getVolgnummer(NatuurConstants.RANG_ONDERSOORT));
+      ondersoort.put(NatuurTools.KEY_RANG, NatuurConstants.RANG_ONDERSOORT);
       ondersoort.put(NatuurTools.KEY_LATIJN,
-                     setLatijnsenaam(vorigeSoort + " " + veld[5]));
+                     NatuurUtils.formatLatijnsenaam(vorigeSoort + " "
+                                                      + veld[5]));
       ondersoort.put(NatuurTools.KEY_UITGESTORVEN, isUitgestorven(veld[5]));
       ondersoorten.add(parser.parse(ondersoort.toString()));
     }

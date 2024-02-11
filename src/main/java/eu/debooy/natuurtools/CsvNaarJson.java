@@ -26,6 +26,7 @@ import eu.debooy.doosutils.access.CsvBestand;
 import eu.debooy.doosutils.components.Message;
 import eu.debooy.doosutils.exception.BestandException;
 import eu.debooy.doosutils.percistence.DbConnection;
+import eu.debooy.natuur.NatuurConstants;
 import eu.debooy.natuur.domain.RangDto;
 import eu.debooy.natuur.domain.TaxonDto;
 import java.text.MessageFormat;
@@ -64,14 +65,14 @@ public class CsvNaarJson extends Batchjob {
   private static void controleerHierarchie(String rang, String latijnsenaam)
       throws ParseException {
     // Genereer het geslacht als deze niet in het bestand staat.
-    if (rang.equals(NatuurTools.RANG_SOORT)) {
-      genereerRang(NatuurTools.RANG_GESLACHT, latijnsenaam.split(" ")[0]);
+    if (rang.equals(NatuurConstants.RANG_SOORT)) {
+      genereerRang(NatuurConstants.RANG_GESLACHT, latijnsenaam.split(" ")[0]);
     }
 
     // Genereer het soort als deze niet in het bestand staat.
-    if (rang.equals(NatuurTools.RANG_ONDERSOORT)) {
+    if (rang.equals(NatuurConstants.RANG_ONDERSOORT)) {
       String[]  woorden = latijnsenaam.split(" ");
-      genereerRang(NatuurTools.RANG_SOORT, woorden[0] + " " + woorden[1]);
+      genereerRang(NatuurConstants.RANG_SOORT, woorden[0] + " " + woorden[1]);
     }
 
     if (!rang.equals(vorigeRang)) {

@@ -25,6 +25,7 @@ import eu.debooy.doosutils.access.BestandConstants;
 import eu.debooy.doosutils.access.JsonBestand;
 import eu.debooy.doosutils.exception.BestandException;
 import eu.debooy.doosutils.percistence.DbConnection;
+import eu.debooy.natuur.NatuurConstants;
 import eu.debooy.natuur.domain.DetailDto;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -71,7 +72,7 @@ public class IocCheck extends Batchjob {
                                                    BestandConstants.EXT_JSON))
                          .build()) {
       for (Object taxa :
-              (JSONArray) jsonBestand.read().get(NatuurTools.KEY_SUBRANGEN)) {
+              (JSONArray) jsonBestand.get(NatuurTools.KEY_SUBRANGEN)) {
         zoekSoorten((JSONObject) taxa);
       }
     } catch (BestandException e) {
@@ -137,7 +138,7 @@ public class IocCheck extends Batchjob {
 
     if (boom.contains(NatuurTools.KEY_RANG)
         && tree.get(NatuurTools.KEY_RANG)
-               .toString().equals(NatuurTools.RANG_SOORT)) {
+               .toString().equals(NatuurConstants.RANG_SOORT)) {
       latijnsenamen.add(tree.get(NatuurTools.KEY_LATIJN).toString());
       return;
     }
