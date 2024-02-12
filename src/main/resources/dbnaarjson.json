@@ -2,7 +2,7 @@
   "_jar": "NatuurTools.jar",
   "_prefixlengte": 18,
   "applicatie": "DbNaarJson",
-  "help": "Haal een ''taxa-tak'' uit de database en zet die in een JSON-bestand.",
+  "help": "Haal een 'taxa-tak' uit de database en zet die in een JSON-bestand.",
   "banner": "Taxa vanuit de database naar JSON",
   "parameters": [
     {
@@ -28,7 +28,7 @@
       "extensie": "json",
       "kort": "j",
       "lang": "jsonbestand",
-      "help": "IOC Namen bestand in JSON-formaat.",
+      "help": "Taxonomie-bestand in JSON-formaat.",
       "type": "bestand",
       "verplicht": true
     },

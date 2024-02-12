@@ -45,7 +45,7 @@
     {
       "parameter": "talen",
       "lang": "talen",
-      "help": "Lijst, door komma''s gescheiden, met talen die in het overzicht mogen staan."
+      "help": "Lijst, door komma''s gescheiden, met talen (in ISO-639-2T) die in het overzicht mogen staan."
     },
     {
       "parameter": "taxaroot",

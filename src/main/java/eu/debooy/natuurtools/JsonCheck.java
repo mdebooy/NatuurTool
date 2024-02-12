@@ -16,7 +16,6 @@
  */
 package eu.debooy.natuurtools;
 
-import eu.debooy.doos.domain.TaalDto;
 import eu.debooy.doosutils.Batchjob;
 import eu.debooy.doosutils.DoosBanner;
 import eu.debooy.doosutils.DoosUtils;
@@ -28,10 +27,13 @@ import eu.debooy.doosutils.percistence.DbConnection;
 import eu.debooy.natuur.NatuurConstants;
 import eu.debooy.natuur.domain.DetailDto;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -43,15 +45,28 @@ public class JsonCheck extends Batchjob {
   private static final  ResourceBundle  resourceBundle  =
       ResourceBundle.getBundle("ApplicatieResources", Locale.getDefault());
 
-  private static final  String  PAR_KLASSE  = "klasse";
-
   private static final  String  QUERY =
       "select d from DetailDto d where d.parentLatijnsenaam='%s' "
-          + "and d.rang='so' order by d.volgnummer";
+          + "and d.rang='%s'";
 
-  protected static  List<String>  latijnsenamen = new ArrayList<>();
+  protected static  Map<String, String> db            = new TreeMap<>();
+  protected static  Map<String, String> json          = new TreeMap<>();
+  protected static  Set<String>         rangen        = new TreeSet<>();
+  protected static  String              rootLatijnsenaam;
+  protected static  String              rootNaam;
+  protected static  String              rootRang;
+  protected static  String              taal          =
+      NatuurConstants.DEF_TAAL;
 
   protected JsonCheck() {}
+
+  public static void main(String[] args) {
+    var params  = new String[] {"--dburl=maat.debooy.eu:5432/prda",
+                                "--dbuser=booymar",
+                                "--jsonbestand=/homes/booymar/Wetenschappen/Natuur/ASM/MultilingASM.json"};
+
+    execute(params);
+  }
 
   public static void execute(String[] args) {
     setParameterBundle(
@@ -65,22 +80,48 @@ public class JsonCheck extends Batchjob {
       return;
     }
 
-    try (var jsonBestand =
-          new JsonBestand.Builder()
-                         .setBestand(
-                            paramBundle.getBestand(NatuurTools.PAR_JSON,
-                                                   BestandConstants.EXT_JSON))
-                         .build()) {
-      for (Object taxa :
-              (JSONArray) jsonBestand.get(NatuurTools.KEY_SUBRANGEN)) {
-        zoekSoorten((JSONObject) taxa);
-      }
-    } catch (BestandException e) {
-      DoosUtils.foutNaarScherm(e.getLocalizedMessage());
-      return;
+    init();
+
+    laadJsonbestand();
+    laadDatabase();
+
+    var nieuw     = taxonNieuw();
+    var onbekend  = taxonOnbekend();
+
+    DoosUtils.naarScherm();
+    DoosUtils.naarScherm(
+        MessageFormat.format(
+            resourceBundle.getString(NatuurTools.MSG_AANTALNIEUW), nieuw));
+    DoosUtils.naarScherm(
+        MessageFormat.format(
+            resourceBundle.getString(NatuurTools.MSG_AANTALONBEKEND),
+            onbekend));
+    klaar();
+  }
+
+  private static String getNaam(Object namen) {
+    if (null == namen
+        || !(namen instanceof JSONObject)) {
+      return "";
     }
 
-    var onbekend  = 0;
+    if (((JSONObject) namen).containsKey(taal)) {
+      return ((JSONObject) namen).get(taal).toString();
+    }
+
+    return "";
+  }
+
+  private static void init() {
+    if (paramBundle.containsArgument(NatuurTools.PAR_RANGEN)) {
+      rangen.addAll(Arrays.asList(paramBundle.getString(NatuurTools.PAR_RANGEN)
+                                             .split(",")));
+    }
+
+    taal  = paramBundle.getString(PAR_TAAL);
+  }
+
+  private static void laadDatabase() {
     try (var dbConn =
         new DbConnection.Builder()
               .setDbUser(paramBundle.getString(NatuurTools.PAR_DBUSER))
@@ -90,62 +131,103 @@ public class JsonCheck extends Batchjob {
               .build()) {
       var em  = dbConn.getEntityManager();
 
-      var taal  = paramBundle.getString(PAR_TAAL);
-      if (taal.length() == 2) {
-        taal  = ((TaalDto)  em.createNamedQuery(TaalDto.QRY_TAAL_ISO6391)
-                              .setParameter(TaalDto.PAR_ISO6391,
-                                            paramBundle.getString(PAR_TAAL))
-                              .getSingleResult()).getIso6392t();
-      }
-
-      for (var detail : em.createQuery(String.format(
-                                          QUERY,
-                                          paramBundle.getString(PAR_KLASSE)))
-                          .getResultList()) {
-        var detailDto = (DetailDto) detail;
-        if (!latijnsenamen.contains(detailDto.getLatijnsenaam())) {
-          if (onbekend == 0) {
-            DoosUtils.naarScherm();
-            DoosUtils.naarScherm(MessageFormat.format(
-                resourceBundle.getString(NatuurTools.LBL_SOORTENONBEKEND),
-                paramBundle.getString(PAR_KLASSE)));
-          }
-          DoosUtils.naarScherm(String.format("%8d %s - %s",
-                                             detailDto.getVolgnummer(),
-                                             detailDto.getLatijnsenaam(),
-                                             detailDto.getNaam(taal)));
-          onbekend++;
+      for (var rang : rangen) {
+        for (var detail : em.createQuery(String.format(
+                                            QUERY,
+                                            rootLatijnsenaam, rang))
+                            .getResultList()) {
+          var detailDto = (DetailDto) detail;
+          db.put(detailDto.getLatijnsenaam(),
+                 String.format("%s,%s", detailDto.getRang(),
+                                        detailDto.getNaam(taal)));
         }
       }
     } catch (Exception e) {
       DoosUtils.foutNaarScherm(e.getLocalizedMessage());
     }
-
-    DoosUtils.naarScherm();
-    DoosUtils.naarScherm(
-        MessageFormat.format(
-            resourceBundle.getString(NatuurTools.MSG_AANTALONBEKEND),
-            onbekend));
-    DoosUtils.naarScherm(
-        MessageFormat.format(
-            resourceBundle.getString(NatuurTools.MSG_AANTALSOORTEN),
-            latijnsenamen.size()));
-    klaar();
   }
 
-  private static void zoekSoorten(JSONObject tree) {
-    var boom  = tree.keySet();
+  private static void laadJsonbestand() {
+    try (var jsonBestand =
+          new JsonBestand.Builder()
+                         .setBestand(
+                            paramBundle.getBestand(NatuurTools.PAR_JSON,
+                                                   BestandConstants.EXT_JSON))
+                         .build()) {
+      rootLatijnsenaam  = jsonBestand.get(NatuurTools.KEY_LATIJN).toString();
+      rootNaam          =
+          getNaam(jsonBestand.get(NatuurTools.KEY_NAMEN));
+      rootRang          = jsonBestand.get(NatuurTools.KEY_RANG).toString();
 
-    if (boom.contains(NatuurTools.KEY_RANG)
-        && tree.get(NatuurTools.KEY_RANG)
-               .toString().equals(NatuurConstants.RANG_SOORT)) {
-      latijnsenamen.add(tree.get(NatuurTools.KEY_LATIJN).toString());
-      return;
+      for (Object taxa :
+              (JSONArray) jsonBestand.get(NatuurTools.KEY_SUBRANGEN)) {
+        laadTree((JSONObject) taxa);
+      }
+    } catch (BestandException e) {
+      DoosUtils.foutNaarScherm(e.getLocalizedMessage());
+    }
+  }
+
+  private static void laadTree(JSONObject tree) {
+    var boom  = tree.keySet();
+    var rang  = tree.get(NatuurTools.KEY_RANG).toString();
+
+    if (!paramBundle.containsArgument(NatuurTools.PAR_RANGEN)
+        || rangen.contains(rang)) {
+      String  naam  = "";
+      if (tree.containsKey(NatuurTools.KEY_NAMEN)) {
+        naam  = getNaam((JSONObject) tree.get(NatuurTools.KEY_NAMEN));
+      }
+      json.put(tree.get(NatuurTools.KEY_LATIJN).toString(),
+               String.format("%s,%s", rang, naam));
+      if (!rangen.contains(rang)) {
+        rangen.add(rang);
+      }
     }
 
     if (boom.contains(NatuurTools.KEY_SUBRANGEN)) {
       ((JSONArray) tree.get(NatuurTools.KEY_SUBRANGEN)).forEach(tak ->
-          zoekSoorten((JSONObject) tak));
+          laadTree((JSONObject) tak));
     }
+  }
+
+  private static int taxonNieuw() {
+    var nieuw = 0;
+
+    DoosUtils.naarScherm();
+    DoosUtils.naarScherm(
+        resourceBundle.getString(NatuurTools.MSG_TAXANIEUW));
+
+    for (Map.Entry<String, String> entry : json.entrySet()) {
+      if (!db.containsKey(entry.getKey())) {
+        DoosUtils
+            .naarScherm(String.format("%s - %s", entry.getKey(),
+                                                 entry.getValue()
+                                                      .replace(",", " - ")));
+        nieuw++;
+      }
+    }
+
+    return nieuw;
+  }
+
+  private static int taxonOnbekend() {
+    var onbekend  = 0;
+
+    DoosUtils.naarScherm();
+    DoosUtils.naarScherm(
+        resourceBundle.getString(NatuurTools.MSG_TAXAONBEKEND));
+
+    for (Map.Entry<String, String> entry : db.entrySet()) {
+      if (!json.containsKey(entry.getKey())) {
+        DoosUtils
+            .naarScherm(String.format("%s - %s", entry.getKey(),
+                                                 entry.getValue()
+                                                      .replace(",", " - ")));
+        onbekend++;
+      }
+    }
+
+    return onbekend;
   }
 }

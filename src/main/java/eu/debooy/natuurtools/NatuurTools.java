@@ -63,8 +63,9 @@ public class NatuurTools extends Batchjob {
   protected static final  String  LBL_UPDATE          = "label.gewijzigd";
 
   protected static final  String  MSG_AANMAKEN        = "msg.aanmaken";
-  protected static final  String  MSG_AANTALSOORTEN   = "msg.aantalsoorten";
+  protected static final  String  MSG_AANTALNIEUW     = "msg.aantalnieuw";
   protected static final  String  MSG_AANTALONBEKEND  = "msg.aantalonbekend";
+  protected static final  String  MSG_AANTALSOORTEN   = "msg.aantalsoorten";
   protected static final  String  MSG_HERNUMMER       = "msg.hernummer";
   protected static final  String  MSG_HIERARCHIE      = "msg.hierarchie";
   protected static final  String  MSG_LIJNEN          = "msg.lijnen";
@@ -73,6 +74,8 @@ public class NatuurTools extends Batchjob {
   protected static final  String  MSG_ONBEKEND        = "msg.onbekend";
   protected static final  String  MSG_SKIPSTRUCTUUR   = "msg.skipstructuur";
   protected static final  String  MSG_TALEN           = "msg.talen";
+  protected static final  String  MSG_TAXANIEUW       = "msg.taxanieuw";
+  protected static final  String  MSG_TAXAONBEKEND    = "msg.taxaonbekend";
   protected static final  String  MSG_UITVOER         = "msg.uitvoer";
   protected static final  String  MSG_VERSCHIL        = "msg.verschil";
   protected static final  String  MSG_WIJZIGEN        = "msg.wijzigen";

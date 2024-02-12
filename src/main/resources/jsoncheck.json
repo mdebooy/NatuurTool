@@ -27,16 +27,16 @@
       "verplicht": true
     },
     {
-      "parameter": "klasse",
-      "lang": "klasse",
-      "help": "De latijnse naam van de klasse. De standaardklasse is {0}.",
-      "standaard": "Aves"
+      "parameter": "rangen",
+      "kort": "r",
+      "lang": "rangen",
+      "help": "Lijst, door komma''s gescheiden, met rangen die gecontroleerd moeten komen. Als de parameter niet wordt meegegeven dan worden alle rangen uit het <jsonbestand> gecontroleerd."
     },
     {
       "parameter": "taal",
       "lang": "taal",
-      "help": "Taal van de namen, die naast de latijnse naam staan, als die anders is dan de taal van het systeem ({0}).",
-      "type": "locale"
+      "help": "Taal (in ISO-639-2T) van de headers van het <iocbestand>. Standaardtaal is \"{0}\".",
+      "standaard": "eng"
     },
     {
       "parameter": "wachtwoord",

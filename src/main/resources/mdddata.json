@@ -38,7 +38,7 @@
       "extensie": "json",
       "kort": "j",
       "lang": "jsonbestand",
-      "help": "Bestand in JSON-formaat volgens dezelfde structuur als bij de uitvoer van  de IocNamen tool.",
+      "help": "Taxonomie-bestand in JSON-formaat.",
       "type": "bestand",
       "verplicht": true
     },

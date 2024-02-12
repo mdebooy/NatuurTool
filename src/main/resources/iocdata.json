@@ -38,7 +38,7 @@
       "extensie": "csv",
       "kort": "n",
       "lang": "iocnamen",
-      "help": "IOC Namen bestand in CSV-formaat.",
+      "help": "IOC-bestand ''Multilingual Version'' met de namen in CSV-formaat.",
       "type": "bestand",
       "verplicht": true
     },
@@ -47,7 +47,7 @@
       "extensie": "csv",
       "kort": "s",
       "lang": "iocstructuur",
-      "help": "IOC Namen bestand in CSV-formaat.",
+      "help": "IOC-bestand ''Master list'' met de structuur in CSV-formaat.",
       "type": "bestand",
       "verplicht": true
     },
@@ -56,7 +56,7 @@
       "extensie": "json",
       "kort": "j",
       "lang": "jsonbestand",
-      "help": "IOC Namen bestand in JSON-formaat. Als deze parameter afwezig is krijgt het bestand dezelfde naam als <iocnamen>.",
+      "help": "Taxonomie-bestand in JSON-formaat. Als deze parameter afwezig is krijgt het bestand dezelfde naam als <iocnamen>.",
       "standaard": "_@iocnamen@_",
       "type": "bestand"
     },

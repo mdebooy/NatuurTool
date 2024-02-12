@@ -44,7 +44,7 @@ import javax.persistence.Query;
 public class Taxonomie extends Batchjob {
   private static final  ClassLoader CLASSLOADER   =
       Taxonomie.class.getClassLoader();
-  private static final  String      DEF_TEMPLATE  = "Taxonomie.tex";
+  private static final  String      DEF_TEMPLATE  = "taxonomie.tex";
   private static final  String      QRY_ROOT      =
       "select t from TaxonDto t where t.parentId is null "
           + "order by t.rang, t.volgnummer";
