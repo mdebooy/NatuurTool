@@ -60,14 +60,6 @@ public class JsonCheck extends Batchjob {
 
   protected JsonCheck() {}
 
-  public static void main(String[] args) {
-    var params  = new String[] {"--dburl=maat.debooy.eu:5432/prda",
-                                "--dbuser=booymar",
-                                "--jsonbestand=/homes/booymar/Wetenschappen/Natuur/ASM/MultilingASM.json"};
-
-    execute(params);
-  }
-
   public static void execute(String[] args) {
     setParameterBundle(
         new ParameterBundle.Builder()
