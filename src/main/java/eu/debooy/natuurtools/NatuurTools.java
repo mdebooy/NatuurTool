@@ -66,6 +66,10 @@ public class NatuurTools extends Batchjob {
   protected static final  String  MSG_AANTALNIEUW     = "msg.aantalnieuw";
   protected static final  String  MSG_AANTALONBEKEND  = "msg.aantalonbekend";
   protected static final  String  MSG_AANTALSOORTEN   = "msg.aantalsoorten";
+  protected static final  String  MSG_BESTAANTAL      = "msg.bestaat.al";
+  protected static final  String  MSG_BESTAANTNIET    = "msg.bestaat.niet";
+  protected static final  String  MSG_GELEZEN         = "msg.gelezen";
+  protected static final  String  MSG_HERNOEM         = "msg.hernoem";
   protected static final  String  MSG_HERNUMMER       = "msg.hernummer";
   protected static final  String  MSG_HIERARCHIE      = "msg.hierarchie";
   protected static final  String  MSG_LIJNEN          = "msg.lijnen";
@@ -77,6 +81,7 @@ public class NatuurTools extends Batchjob {
   protected static final  String  MSG_TAXANIEUW       = "msg.taxanieuw";
   protected static final  String  MSG_TAXAONBEKEND    = "msg.taxaonbekend";
   protected static final  String  MSG_UITVOER         = "msg.uitvoer";
+  protected static final  String  MSG_UPDATED         = "msg.updated";
   protected static final  String  MSG_VERSCHIL        = "msg.verschil";
   protected static final  String  MSG_WIJZIGEN        = "msg.wijzigen";
   protected static final  String  MSG_WIJZIGING       = "msg.wijziging";
@@ -109,6 +114,7 @@ public class NatuurTools extends Batchjob {
 
   protected static final  String  TOOL_CSVNAARJSON  = "csvnaarjson";
   protected static final  String  TOOL_DBNAARJSON   = "dbnaarjson";
+  protected static final  String  TOOL_HERNOEM      = "hernoem";
   protected static final  String  TOOL_IOCDATA      = "iocdata";
   protected static final  String  TOOL_JSONCHECK    = "jsoncheck";
   protected static final  String  TOOL_MDDDATA      = "mdddata";
@@ -118,8 +124,8 @@ public class NatuurTools extends Batchjob {
   protected static final  String  TXT_BANNER  = "help.natuurtools";
 
   protected static final  List<String>  tools =
-      Arrays.asList(TOOL_CSVNAARJSON, TOOL_DBNAARJSON, TOOL_IOCDATA,
-                    TOOL_JSONCHECK, TOOL_MDDDATA, TOOL_TAXAIMPORT,
+      Arrays.asList(TOOL_CSVNAARJSON, TOOL_DBNAARJSON, TOOL_HERNOEM,
+                    TOOL_IOCDATA, TOOL_JSONCHECK, TOOL_MDDDATA, TOOL_TAXAIMPORT,
                     TOOL_TAXONOMIE);
 
   protected NatuurTools() {}
@@ -165,6 +171,9 @@ public class NatuurTools extends Batchjob {
         break;
       case TOOL_DBNAARJSON:
         DbNaarJson.execute(commandoArgs);
+        break;
+      case TOOL_HERNOEM:
+        Hernoem.execute(commandoArgs);
         break;
       case TOOL_IOCDATA:
         IocData.execute(commandoArgs);

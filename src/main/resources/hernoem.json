@@ -1,0 +1,48 @@
+{
+  "_jar": "NatuurTools.jar",
+  "_prefixlengte": 18,
+  "applicatie": "CsvNaarJson",
+  "help": "Verander de latijsenamen met een CSV bestand met hierin de huidige en nieuwe latijnsenaam.",
+  "banner": "Hernoem latijnsenamen",
+  "parameters": [
+    {
+      "parameter": "charsetin",
+      "lang": "charsetin",
+      "help": "De characterset van de invoer als deze niet {0} is.",
+      "type": "charset"
+    },
+    {
+      "parameter": "csvbestand",
+      "extensie": "csv",
+      "kort": "c",
+      "lang": "csvbestand",
+      "help": "Een namen bestand in CSV-formaat (huidige latijnsenaam,nieuwe latijnsenaam). ",
+      "type": "bestand",
+      "verplicht": true
+    },
+    {
+      "parameter": "dburl",
+      "lang": "dburl",
+      "help": "De URL voor de database connectie (localhost:5432/db).",
+      "verplicht": true
+    },
+    {
+      "parameter": "dbuser",
+      "lang": "dbuser",
+      "help": "De database gebruikersnaam.",
+      "verplicht": true
+    },
+    {
+      "parameter": "readonly",
+      "lang": "readonly",
+      "help": "Enkel lezen.",
+      "type": "boolean"
+    },
+    {
+      "parameter": "wachtwoord",
+      "kort": "w",
+      "lang": "wachtwoord",
+      "help": "Het wachtwoord van de database gebruiker."
+    }
+  ]
+}
