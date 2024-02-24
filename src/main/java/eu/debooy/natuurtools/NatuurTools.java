@@ -66,6 +66,7 @@ public class NatuurTools extends Batchjob {
   protected static final  String  MSG_AANTALNIEUW     = "msg.aantalnieuw";
   protected static final  String  MSG_AANTALONBEKEND  = "msg.aantalonbekend";
   protected static final  String  MSG_AANTALSOORTEN   = "msg.aantalsoorten";
+  protected static final  String  MSG_AFWEZIG         = "msg.afwezig";
   protected static final  String  MSG_BESTAANTAL      = "msg.bestaat.al";
   protected static final  String  MSG_BESTAANTNIET    = "msg.bestaat.niet";
   protected static final  String  MSG_GELEZEN         = "msg.gelezen";
@@ -99,10 +100,12 @@ public class NatuurTools extends Batchjob {
   protected static final  String  PAR_JSON              = "json";
   protected static final  String  PAR_KLASSEVOLGNUMMER  = "klassevolgnummer";
   protected static final  String  PAR_KLEUR             = "kleur";
+  protected static final  String  PAR_LOGGING           = "logging";
   protected static final  String  PAR_METONDERSOORT     = "metondersoort";
   protected static final  String  PAR_PERRANG           = "perrang";
   protected static final  String  PAR_RANGEN            = "rangen";
   protected static final  String  PAR_SUBTITEL          = "subtitel";
+  protected static final  String  PAR_STIL              = "stil";
   protected static final  String  PAR_TALEN             = "talen";
   protected static final  String  PAR_TAXAROOT          = "taxaroot";
   protected static final  String  PAR_TEMPLATE          = "template";

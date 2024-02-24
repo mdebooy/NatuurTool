@@ -23,6 +23,7 @@ import eu.debooy.doosutils.DoosUtils;
 import eu.debooy.doosutils.ParameterBundle;
 import eu.debooy.doosutils.access.BestandConstants;
 import eu.debooy.doosutils.access.JsonBestand;
+import eu.debooy.doosutils.access.TekstBestand;
 import eu.debooy.doosutils.components.Message;
 import eu.debooy.doosutils.errorhandling.exception.ObjectNotFoundException;
 import eu.debooy.doosutils.exception.BestandException;
@@ -31,6 +32,7 @@ import eu.debooy.natuur.NatuurConstants;
 import eu.debooy.natuur.domain.RangDto;
 import eu.debooy.natuur.domain.TaxonDto;
 import eu.debooy.natuur.domain.TaxonnaamDto;
+import eu.debooy.natuur.form.Taxon;
 import eu.debooy.natuur.validator.TaxonValidator;
 import eu.debooy.natuur.validator.TaxonnaamValidator;
 import java.text.MessageFormat;
@@ -55,11 +57,14 @@ public class TaxaImport extends Batchjob {
   private static final  ResourceBundle  resourceBundle  =
       ResourceBundle.getBundle("ApplicatieResources", Locale.getDefault());
 
-  protected static final  Long    ONBEKEND  = -1L;
-  protected static final  String  WORDT     = " -> ";
+  protected static final  Long    ONBEKEND      = -1L;
+  protected static final  String  ERR_STRUCTUUR = "error.structuur";
+  protected static final  String  WORDT         = " -> ";
 
   protected static final  String  QRY_TALEN =
       "select distinct t.taal from natuur.taxonnamen t";
+  protected static final  String  QRY_TAXON =
+      "select t from TaxonDto t where t.taxonId=%d";
 
   private static final  Map<String, Totalen>  namen     = new HashMap<>();
   private static final  Map<String, String>   prefix    = new HashMap<>();
@@ -68,15 +73,20 @@ public class TaxaImport extends Batchjob {
   private static final  Map<String, Totalen>  totalen   = new HashMap<>();
 
   private static  boolean       aanmaak         = false;
-  private static  boolean       behoud          = false;
   private static  EntityManager em;
   private static  boolean       hernummer       = false;
   private static  String        iso6392t;
+  private static  TekstBestand  log             = null;
   private static  boolean       metondersoorten = false;
+  private static  TaxonDto      onbekend= new TaxonDto();
   private static  boolean       readonly        = false;
+  private static  boolean       stil            = false;
   private static  boolean       talenParameter  = false;
 
-  protected TaxaImport() {}
+  protected TaxaImport() {
+    onbekend  = new TaxonDto();
+    onbekend.setParentId(ONBEKEND);
+  }
 
   public static void execute(String[] args) {
     setParameterBundle(
@@ -98,6 +108,20 @@ public class TaxaImport extends Batchjob {
 
     String  latijnsenaam;
 
+    if (paramBundle.containsArgument(NatuurTools.PAR_LOGGING)) {
+      try {
+        log =  new TekstBestand.Builder()
+                .setBestand(
+                        paramBundle.getBestand(NatuurTools.PAR_LOGGING))
+                .setCharset(paramBundle.getString(PAR_CHARSETIN))
+                .setLezen(false)
+                .build();
+      } catch (BestandException e) {
+        DoosUtils.foutNaarScherm(e.getLocalizedMessage());
+        return;
+      }
+    }
+
     try (var dbConn =
         new DbConnection.Builder()
               .setDbUser(paramBundle.getString(NatuurTools.PAR_DBUSER))
@@ -106,7 +130,6 @@ public class TaxaImport extends Batchjob {
               .setPersistenceUnitName(NatuurTools.EM_UNITNAME)
               .build()) {
       em  = dbConn.getEntityManager();
-
 
       iso6392t  =
           ((TaalDto)  em.createNamedQuery(TaalDto.QRY_TAAL_ISO6391)
@@ -122,6 +145,14 @@ public class TaxaImport extends Batchjob {
     } catch (Exception e) {
       DoosUtils.foutNaarScherm(e.getLocalizedMessage());
       return;
+    }
+
+    if (null != log) {
+      try {
+        log.close();
+      } catch (BestandException e) {
+        DoosUtils.foutNaarScherm(e.getLocalizedMessage());
+      }
     }
 
     Collections.sort(talen);
@@ -220,20 +251,50 @@ public class TaxaImport extends Batchjob {
     }
   }
 
-  private static void controleerHierarchie(TaxonDto taxon, Long parentId,
-                                           Long volgnummer,
-                                           Boolean uitgestorven) {
+  private static void controleerHierarchie(TaxonDto taxon, TaxonDto parent,
+                                           StringBuilder verandering) {
+    if (null == taxon.getParentId()
+        || taxon.getParentId().equals(parent.getTaxonId())
+        || ONBEKEND.equals(taxon.getParentId())) {
+      return;
+    }
+
+    var hierarchie  = getParent(taxon, parent.getRang());
+
+    if (null == hierarchie.getTaxonId()) {
+      printFout(MessageFormat.format(
+                  resourceBundle.getString(ERR_STRUCTUUR),
+                  prefix.get(taxon.getRang()) + "    ", parent.getRang()));
+
+      return;
+    }
+
+    if (!parent.getRang().equals(hierarchie.getRang())) {
+      return;
+    }
+
+    if (readonly) {
+      printFout(MessageFormat.format(
+                   resourceBundle.getString(ERR_STRUCTUUR),
+                   prefix.get(taxon.getRang()) + "    ", parent.getRang()));
+    } else {
+      verandering.append(" parentId: ").append(taxon.getParentId())
+                 .append(WORDT).append(parent.getTaxonId()).append(" ");
+      taxon.setParentId(parent.getTaxonId());
+    }
+  }
+
+  private static void controleerTaxon(TaxonDto taxon, Long volgnummer,
+                                      TaxonDto parent, Boolean uitgestorven) {
+    var verandering = new StringBuilder();
+
+    controleerHierarchie(taxon, parent, verandering);
+
     if (readonly) {
       return;
     }
 
-    var verandering = new StringBuilder();
-    if (!behoud && !parentId.equals(taxon.getParentId())) {
-      verandering.append(" parentId: ").append(taxon.getParentId())
-                 .append(WORDT).append(parentId).append(" ");
-      taxon.setParentId(parentId);
-    }
-    if (!volgnummer.equals(taxon.getVolgnummer()) && hernummer) {
+    if (hernummer && !volgnummer.equals(taxon.getVolgnummer())) {
       verandering.append(" volgnummer: ").append(taxon.getVolgnummer())
                  .append(WORDT).append(volgnummer);
       taxon.setVolgnummer(volgnummer);
@@ -243,7 +304,8 @@ public class TaxaImport extends Batchjob {
                  .append(WORDT).append(uitgestorven);
       taxon.setUitgestorven(uitgestorven);
     }
-    if (verandering.length() > 0) {
+
+    if (!verandering.isEmpty()) {
       setTaxon(taxon, verandering);
     }
   }
@@ -259,17 +321,15 @@ public class TaxaImport extends Batchjob {
           taxonnaamDto  = taxon.getTaxonnaam(taal);
           if (!taxonnaamDto.getNaam()
                            .equals(taxonnamen.get(taal))) {
-            DoosUtils.naarScherm(
-                MessageFormat.format(
-                    resourceBundle.getString(NatuurTools.MSG_VERSCHIL),
-                    prefix.get(taxon.getRang()) + "    ", taal,
-                    taxonnamen.get(taal), taxonnaamDto.getNaam()));
+            print(MessageFormat.format(
+                      resourceBundle.getString(NatuurTools.MSG_VERSCHIL),
+                      prefix.get(taxon.getRang()) + "    ", taal,
+                      taxonnamen.get(taal), taxonnaamDto.getNaam()));
             taxonnaamDto.setNaam(taxonnamen.get(taal).toString());
             setTaxonnaam(taxonnaamDto);
           }
         } else {
-          DoosUtils.naarScherm(
-                MessageFormat.format(
+          print(MessageFormat.format(
                     resourceBundle.getString(NatuurTools.MSG_NIEUW),
                     prefix.get(taxon.getRang()) + "    ", taal,
                     taxonnamen.get(taal)));
@@ -300,6 +360,20 @@ public class TaxaImport extends Batchjob {
       .forEach(aanwezigetaal -> talen.add((String) aanwezigetaal));
   }
 
+  private static TaxonDto getParent(TaxonDto taxon, String parentRang) {
+    var taxonRang = DoosUtils.nullToEmpty(taxon.getRang());
+
+    if (rangen.indexOf(taxonRang) < rangen.indexOf(parentRang)) {
+      return onbekend;
+    }
+
+    if (rangen.indexOf(taxonRang) == rangen.indexOf(parentRang)) {
+      return taxon;
+    }
+
+    return getParent(getTaxon(taxon.getParentId()), parentRang);
+  }
+
   private static void getRangen() {
     var           taal      = paramBundle.getString(PAR_TAAL);
     List<RangDto> ranglijst =
@@ -323,8 +397,18 @@ public class TaxaImport extends Batchjob {
     }
   }
 
+  private static TaxonDto getTaxon(Long taxonId) {
+    try {
+      return (TaxonDto) em.createQuery(String.format(QRY_TAXON, taxonId))
+                          .getSingleResult();
+    } catch (NoResultException e) {
+      return onbekend;
+    }
+  }
+
   private static TaxonDto getTaxon(String latijnsenaam, Long parentId,
-                                   Long volgnummer, String rang) {
+                                   Long volgnummer, String rang,
+                                   Boolean uitgestorven) {
     var query = em.createNamedQuery(TaxonDto.QRY_LATIJNSENAAM);
     query.setParameter(TaxonDto.PAR_LATIJNSENAAM, latijnsenaam);
     TaxonDto  resultaat;
@@ -336,6 +420,7 @@ public class TaxaImport extends Batchjob {
       resultaat = new TaxonDto();
       resultaat.setLatijnsenaam(latijnsenaam);
       resultaat.setRang(rang);
+      resultaat.setUitgestorven(uitgestorven);
       resultaat.setVolgnummer(volgnummer);
       if (aanmaak) {
         resultaat.setParentId(parentId);
@@ -344,6 +429,11 @@ public class TaxaImport extends Batchjob {
         printTaxon(rang, latijnsenaam);
       } else {
         resultaat.setParentId(ONBEKEND);
+        printFout(
+          MessageFormat.format(
+              resourceBundle.getString(
+                NatuurTools.MSG_AFWEZIG), prefix.get(rang),
+                DoosUtils.stringMetLengte(rang, 3, " "), latijnsenaam));
       }
     }
 
@@ -375,33 +465,57 @@ public class TaxaImport extends Batchjob {
     return !talenParameter || talen.contains(taal);
   }
 
+  protected static void print(String regel) {
+    if (null != log) {
+      try {
+        log.write(regel);
+      } catch (BestandException e) {
+        // Jammer maar helaas :-)
+      }
+    }
+
+    if (!stil) {
+      DoosUtils.naarScherm(regel);
+    }
+  }
+
+  protected static void printFout(String regel) {
+    if (null != log) {
+      try {
+        log.write(regel);
+      } catch (BestandException e) {
+        // Jammer maar helaas :-)
+      }
+    }
+
+    if (!stil) {
+      DoosUtils.foutNaarScherm(regel);
+    }
+  }
+
   protected static void printMessages(List<Message> fouten) {
     fouten.forEach(fout ->
       DoosUtils.foutNaarScherm(getMelding(LBL_FOUT, fout.toString())));
   }
 
   protected static void printTaxon(String rang, String latijnsenaam) {
-    DoosUtils.naarScherm(String.format("%s%-3s %s",
-                                       prefix.get(rang), rang, latijnsenaam));
+    print(String.format("%s%-3s %s",  prefix.get(rang), rang, latijnsenaam));
   }
 
   private static void setSwitches() {
+    stil            = paramBundle.getBoolean(NatuurTools.PAR_STIL);
+
     if (Boolean.TRUE.equals(paramBundle.getBoolean(PAR_READONLY))) {
-      readonly  = true;
+      readonly      = true;
       return;
     }
 
     aanmaak         = paramBundle.getBoolean(NatuurTools.PAR_AANMAAK);
-    behoud          = paramBundle.getBoolean(NatuurTools.PAR_BEHOUD);
     hernummer       = paramBundle.getBoolean(NatuurTools.PAR_HERNUMMER);
     metondersoorten = paramBundle.getBoolean(NatuurTools.PAR_METONDERSOORT);
 
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(resourceBundle.getString(NatuurTools.MSG_WIJZIGEN));
-    if (!behoud) {
-      DoosUtils.naarScherm(resourceBundle
-                              .getString(NatuurTools.MSG_SKIPSTRUCTUUR));
-    }
     if (aanmaak) {
       DoosUtils.naarScherm(resourceBundle
                               .getString(NatuurTools.MSG_AANMAKEN));
@@ -418,18 +532,28 @@ public class TaxaImport extends Batchjob {
   }
 
   private static void setTaxon(TaxonDto taxon, StringBuilder verandering) {
-    if (readonly || taxon.getParentId() == -1) {
+    if (readonly || taxon.getParentId().equals(ONBEKEND)) {
       return;
     }
 
-    List<Message>  fouten  = TaxonValidator.valideer(taxon);
+    var form  = new Taxon(taxon);
+    if (null == taxon.getParent()) {
+      var latijnsenaam  = taxon.getLatijnsenaam();
+      var einde         = latijnsenaam.contains(" ")
+                              ? latijnsenaam.lastIndexOf(" ") :
+                                latijnsenaam.length();
+
+      form.setParentLatijnsenaam(latijnsenaam.substring(0, einde));
+    }
+
+    List<Message>  fouten  = TaxonValidator.valideer(form);
 
     if (fouten.isEmpty()) {
       em.getTransaction().begin();
       TaxonDto  updated = em.merge(taxon);
       em.persist(updated);
       em.getTransaction().commit();
-      DoosUtils.naarScherm(MessageFormat.format(
+      print(MessageFormat.format(
                     resourceBundle.getString(NatuurTools.MSG_WIJZIGING),
                     prefix.get(taxon.getRang()) + "    ",
                     resourceBundle.getString(NatuurTools.MSG_HIERARCHIE),
@@ -470,10 +594,14 @@ public class TaxaImport extends Batchjob {
                          .build()) {
       latijnsenaam    = jsonBestand.get(NatuurTools.KEY_LATIJN).toString();
       var   rang      = jsonBestand.get(NatuurTools.KEY_RANG).toString();
-      var   parentId  = getTaxon(latijnsenaam, 0L, 0L, rang).getTaxonId();
+      var   parent    = getTaxon(latijnsenaam, 0L, 0L, rang, false);
+      if (null == parent.getTaxonId()) {
+        return latijnsenaam;
+      }
+
       for (Object taxa :
               (JSONArray) jsonBestand.get(NatuurTools.KEY_SUBRANGEN)) {
-        verwerkRang(parentId, (JSONObject) taxa);
+        verwerkRang(parent, (JSONObject) taxa);
       }
     } catch (BestandException e) {
       DoosUtils.foutNaarScherm(e.getLocalizedMessage());
@@ -482,12 +610,12 @@ public class TaxaImport extends Batchjob {
     return latijnsenaam;
   }
 
-  private static void verwerkRang(Long parentId, JSONObject json) {
+  private static void verwerkRang(TaxonDto parent, JSONObject json) {
     Boolean uitgestorven;
 
     var latijnsenaam  = json.get(NatuurTools.KEY_LATIJN).toString();
     var rang          = json.get(NatuurTools.KEY_RANG).toString();
-    var seq           =
+    var volgnummer    =
         Long.valueOf(json.get(NatuurTools.KEY_SEQ).toString());
     if (json.containsKey(NatuurTools.KEY_UITGESTORVEN)) {
       uitgestorven    = (Boolean) json.get(NatuurTools.KEY_UITGESTORVEN);
@@ -495,8 +623,9 @@ public class TaxaImport extends Batchjob {
       uitgestorven    = Boolean.FALSE;
     }
 
-    TaxonDto  taxon = getTaxon(latijnsenaam, parentId, seq, rang);
-    controleerHierarchie(taxon, parentId, seq, uitgestorven);
+    TaxonDto  taxon   = getTaxon(latijnsenaam, parent.getTaxonId(),
+                                 volgnummer, rang, uitgestorven);
+    controleerTaxon(taxon, volgnummer, parent, uitgestorven);
 
     if (null == taxon.getTaxonId()) {
       return;
@@ -507,7 +636,7 @@ public class TaxaImport extends Batchjob {
     }
     if (json.containsKey(NatuurTools.KEY_SUBRANGEN)) {
       for (var subrang : (JSONArray) json.get(NatuurTools.KEY_SUBRANGEN)) {
-        verwerkRang(taxon.getTaxonId(), (JSONObject) subrang);
+        verwerkRang(taxon, (JSONObject) subrang);
       }
     }
   }

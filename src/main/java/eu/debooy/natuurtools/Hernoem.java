@@ -49,11 +49,11 @@ public class Hernoem extends Batchjob {
   private static final  ResourceBundle  resourceBundle  =
       ResourceBundle.getBundle("ApplicatieResources", Locale.getDefault());
 
-  private static  EntityManager       em;
-  private static  Integer             gewijzigd = 0;
-  private static  Map<String, String> hernoem   = new TreeMap<>();
-  private static  Integer             nieuwe    = 0;
-  private static  boolean             readonly  = false;
+  private static final  Map<String, String> hernoem   = new TreeMap<>();
+
+  private static  EntityManager em;
+  private static  Integer       gewijzigd = 0;
+  private static  Integer       nieuwe    = 0;
 
   protected Hernoem() {}
 
@@ -67,10 +67,6 @@ public class Hernoem extends Batchjob {
 
     if (!paramBundle.isValid()) {
       return;
-    }
-
-    if (Boolean.TRUE.equals(paramBundle.getBoolean(PAR_READONLY))) {
-      readonly  = true;
     }
 
     try (var dbConn =
@@ -196,6 +192,17 @@ public class Hernoem extends Batchjob {
       return;
     }
 
+    var check = getTaxon(nieuw);
+
+    if (null != check.getTaxonId()) {
+      DoosUtils.foutNaarScherm(
+          MessageFormat.format(
+              resourceBundle.getString(NatuurTools.MSG_BESTAANTAL),
+              nieuw));
+
+      return;
+    }
+
     taxon.setLatijnsenaam(nieuw);
     hernoemKinderen(huidig, nieuw, taxon.getTaxonId());
     if (taxon.getRang().equals(NatuurConstants.RANG_SOORT)
@@ -228,18 +235,14 @@ public class Hernoem extends Batchjob {
   }
 
   private static TaxonDto setTaxon(TaxonDto taxon) {
-    if (readonly || null == taxon.getParentId()) {
-      System.out.println(taxon.toString());
-      return taxon;
-    }
-
     em.getTransaction().begin();
     TaxonDto  updated;
     if (null == taxon.getTaxonId()) {
       updated = em.merge(taxon);
     } else {
-      updated = taxon;
+    updated = taxon;
     }
+
     em.persist(updated);
     em.getTransaction().commit();
 

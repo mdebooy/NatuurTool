@@ -12,12 +12,6 @@
       "type": "boolean"
     },
     {
-      "parameter": "behoud",
-      "lang": "behoudstructuur",
-      "help": "Veranderen van de parenttaxon. PAS OP dit kan tussenrangen ''uitschakelen''.",
-      "type": "boolean"
-    },
-    {
       "parameter": "charsetin",
       "lang": "charsetin",
       "help": "De characterset van de invoer als deze niet {0} is.",
@@ -51,6 +45,14 @@
       "verplicht": true
     },
     {
+      "parameter": "logging",
+      "extensie": "log",
+      "kort": "l",
+      "lang": "logbestand",
+      "help": "Bestand met de verwerkte taxa uit het <jsonbestand>.",
+      "type": "bestand"
+    },
+    {
       "parameter": "metondersoort",
       "lang": "metondersoort",
       "help": "Ook de ontbrekende ondersoorten toevoegen.",
@@ -60,6 +62,12 @@
       "parameter": "readonly",
       "lang": "readonly",
       "help": "Enkel lezen. Nu worden <aanmaken>, <hernummer> en <skipstructuur> genegeerd.",
+      "type": "boolean"
+    },
+    {
+      "parameter": "stil",
+      "lang": "stil",
+      "help": "Minimale uitvoer op het scherm.",
       "type": "boolean"
     },
     {

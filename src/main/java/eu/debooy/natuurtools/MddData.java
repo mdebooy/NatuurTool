@@ -338,6 +338,8 @@ public class MddData extends Batchjob {
       taxa.put(NatuurTools.KEY_RANG, NatuurConstants.RANG_KLASSE);
       taxa.put(NatuurTools.KEY_LATIJN, NatuurConstants.LAT_ZOOGDIEREN);
       taxa.put(NatuurTools.KEY_SUBRANGEN, ordes);
+      taxa.put(NatuurTools.KEY_SEQ,
+               paramBundle.getInteger(NatuurTools.PAR_KLASSEVOLGNUMMER));
     } catch (BestandException | ParseException e) {
       DoosUtils.foutNaarScherm(String.format("%s: %s",
               paramBundle.getBestand(NatuurTools.PAR_IOCNAMEN),
