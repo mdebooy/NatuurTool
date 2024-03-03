@@ -146,7 +146,7 @@ public class MddData extends Batchjob {
       return;
     }
 
-    asmtaal     = paramBundle.getString(NatuurTools.PAR_TAAL);
+    asmtaal     = paramBundle.getString(PAR_TAAL);
     perRang     = paramBundle.getBoolean(NatuurTools.PAR_PERRANG);
 
     setRangen();

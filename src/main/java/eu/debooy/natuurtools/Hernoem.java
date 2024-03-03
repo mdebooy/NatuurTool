@@ -18,8 +18,6 @@
 package eu.debooy.natuurtools;
 
 import eu.debooy.doosutils.Batchjob;
-import static eu.debooy.doosutils.Batchjob.PAR_CHARSETIN;
-import static eu.debooy.doosutils.Batchjob.PAR_CSVBESTAND;
 import eu.debooy.doosutils.ComponentsConstants;
 import eu.debooy.doosutils.DoosBanner;
 import eu.debooy.doosutils.DoosUtils;
@@ -49,7 +47,7 @@ public class Hernoem extends Batchjob {
   private static final  ResourceBundle  resourceBundle  =
       ResourceBundle.getBundle("ApplicatieResources", Locale.getDefault());
 
-  private static final  Map<String, String> hernoem   = new TreeMap<>();
+  private static final  Map<String, String> taxa  = new TreeMap<>();
 
   private static  EntityManager em;
   private static  Integer       gewijzigd = 0;
@@ -69,6 +67,8 @@ public class Hernoem extends Batchjob {
       return;
     }
 
+    laadCsv();
+
     try (var dbConn =
         new DbConnection.Builder()
               .setDbUser(paramBundle.getString(NatuurTools.PAR_DBUSER))
@@ -78,8 +78,7 @@ public class Hernoem extends Batchjob {
               .build()) {
       em  = dbConn.getEntityManager();
 
-      laadCsv();
-      hernoem();
+      taxa.forEach(Hernoem::hernoemTaxon);
     } catch (Exception e) {
       DoosUtils.foutNaarScherm(e.getLocalizedMessage());
     }
@@ -87,7 +86,7 @@ public class Hernoem extends Batchjob {
     DoosUtils.naarScherm();
     DoosUtils.naarScherm(
         MessageFormat.format(resourceBundle.getString(NatuurTools.MSG_GELEZEN),
-                             String.format("%,6d", hernoem.size())));
+                             String.format("%,6d", taxa.size())));
     DoosUtils.naarScherm(
         MessageFormat.format(resourceBundle.getString(NatuurTools.MSG_UPDATED),
                              String.format("%,6d", gewijzigd)));
@@ -136,11 +135,7 @@ public class Hernoem extends Batchjob {
     }
   }
 
-  private static void hernoem() {
-    hernoem.forEach((huidig, nieuw) -> hernoemTaxon(huidig, nieuw));
-  }
-
-  private static void hernoemKinderen(String huidig, String nieuw,
+  private static void taxaKinderen(String huidig, String nieuw,
                                       Long parentId) {
     var query = em.createNamedQuery(TaxonDto.QRY_KINDEREN);
     query.setParameter(TaxonDto.PAR_OUDER, parentId);
@@ -170,7 +165,7 @@ public class Hernoem extends Batchjob {
                             e.getLocalizedMessage()));
         }
 
-        hernoemKinderen(huidig, nieuw, taxon.getTaxonId());
+        taxaKinderen(huidig, nieuw, taxon.getTaxonId());
       }
     }
   }
@@ -204,7 +199,7 @@ public class Hernoem extends Batchjob {
     }
 
     taxon.setLatijnsenaam(nieuw);
-    hernoemKinderen(huidig, nieuw, taxon.getTaxonId());
+    taxaKinderen(huidig, nieuw, taxon.getTaxonId());
     if (taxon.getRang().equals(NatuurConstants.RANG_SOORT)
         || taxon.getRang().equals(NatuurConstants.RANG_ONDERSOORT)) {
       var parent  = getParent(huidig, nieuw);
@@ -227,7 +222,7 @@ public class Hernoem extends Batchjob {
                         .build()) {
       while (csvBestand.hasNext()) {
         var veld    = csvBestand.next();
-        hernoem.put(veld[0], veld[1]);
+        taxa.put(veld[0], veld[1]);
       }
     } catch (BestandException e) {
       DoosUtils.foutNaarScherm(e.getLocalizedMessage());

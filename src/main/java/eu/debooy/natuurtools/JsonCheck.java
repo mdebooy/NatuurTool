@@ -92,8 +92,7 @@ public class JsonCheck extends Batchjob {
   }
 
   private static String getNaam(Object namen) {
-    if (null == namen
-        || !(namen instanceof JSONObject)) {
+    if (!(namen instanceof JSONObject)) {
       return "";
     }
 
@@ -168,7 +167,7 @@ public class JsonCheck extends Batchjob {
         || rangen.contains(rang)) {
       String  naam  = "";
       if (tree.containsKey(NatuurTools.KEY_NAMEN)) {
-        naam  = getNaam((JSONObject) tree.get(NatuurTools.KEY_NAMEN));
+        naam  = getNaam(tree.get(NatuurTools.KEY_NAMEN));
       }
       json.put(tree.get(NatuurTools.KEY_LATIJN).toString(),
                String.format("%s,%s", rang, naam));

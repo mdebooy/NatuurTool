@@ -78,15 +78,11 @@ public class TaxaImport extends Batchjob {
   private static  String        iso6392t;
   private static  TekstBestand  log             = null;
   private static  boolean       metondersoorten = false;
-  private static  TaxonDto      onbekend= new TaxonDto();
   private static  boolean       readonly        = false;
   private static  boolean       stil            = false;
   private static  boolean       talenParameter  = false;
 
-  protected TaxaImport() {
-    onbekend  = new TaxonDto();
-    onbekend.setParentId(ONBEKEND);
-  }
+  protected TaxaImport() {}
 
   public static void execute(String[] args) {
     setParameterBundle(
@@ -360,11 +356,19 @@ public class TaxaImport extends Batchjob {
       .forEach(aanwezigetaal -> talen.add((String) aanwezigetaal));
   }
 
+  private static TaxonDto getOnbekendeTaxon() {
+    var taxon = new TaxonDto();
+
+    taxon.setParentId(ONBEKEND);
+
+    return taxon;
+  }
+
   private static TaxonDto getParent(TaxonDto taxon, String parentRang) {
     var taxonRang = DoosUtils.nullToEmpty(taxon.getRang());
 
     if (rangen.indexOf(taxonRang) < rangen.indexOf(parentRang)) {
-      return onbekend;
+      return getOnbekendeTaxon();
     }
 
     if (rangen.indexOf(taxonRang) == rangen.indexOf(parentRang)) {
@@ -402,7 +406,7 @@ public class TaxaImport extends Batchjob {
       return (TaxonDto) em.createQuery(String.format(QRY_TAXON, taxonId))
                           .getSingleResult();
     } catch (NoResultException e) {
-      return onbekend;
+      return getOnbekendeTaxon();
     }
   }
 
