@@ -18,8 +18,6 @@
 package eu.debooy.natuurtools;
 
 import eu.debooy.doosutils.Batchjob;
-import static eu.debooy.doosutils.Batchjob.PAR_CHARSETIN;
-import static eu.debooy.doosutils.Batchjob.PAR_CHARSETUIT;
 import eu.debooy.doosutils.DoosBanner;
 import eu.debooy.doosutils.DoosUtils;
 import eu.debooy.doosutils.ParameterBundle;
