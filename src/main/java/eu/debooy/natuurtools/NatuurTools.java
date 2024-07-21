@@ -87,7 +87,6 @@ public class NatuurTools extends Batchjob {
   protected static final  String  MSG_WIJZIGEN        = "msg.wijzigen";
   protected static final  String  MSG_WIJZIGING       = "msg.wijziging";
 
-  protected static final  String  PAR_ASMBESTAND        = "asmbestand";
   protected static final  String  PAR_AANMAAK           = "aanmaak";
   protected static final  String  PAR_AUTEUR            = "auteur";
   protected static final  String  PAR_BEHOUD            = "behoud";
@@ -101,6 +100,7 @@ public class NatuurTools extends Batchjob {
   protected static final  String  PAR_KLASSEVOLGNUMMER  = "klassevolgnummer";
   protected static final  String  PAR_KLEUR             = "kleur";
   protected static final  String  PAR_LOGGING           = "logging";
+  protected static final  String  PAR_MDDBESTAND        = "mddbestand";
   protected static final  String  PAR_METONDERSOORT     = "metondersoort";
   protected static final  String  PAR_PERRANG           = "perrang";
   protected static final  String  PAR_RANGEN            = "rangen";

@@ -21,7 +21,7 @@ import eu.debooy.doosutils.Batchjob;
 import eu.debooy.doosutils.DoosBanner;
 import eu.debooy.doosutils.DoosUtils;
 import eu.debooy.doosutils.ParameterBundle;
-import eu.debooy.doosutils.access.JsonBestand;
+import eu.debooy.doosutils.access.CsvBestand;
 import eu.debooy.doosutils.exception.BestandException;
 import eu.debooy.doosutils.percistence.DbConnection;
 import eu.debooy.natuur.NatuurConstants;
@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import org.apache.commons.lang3.ArrayUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -44,6 +45,8 @@ import org.json.simple.parser.ParseException;
  * @author Marco de Booij
  */
 public class MddData extends Batchjob {
+  protected static final  String  ERR_KOLOM = "error.geen.kolom";
+
   private static final  JSONObject      familie         = new JSONObject();
   private static final  JSONArray       families        = new JSONArray();
   private static final  JSONObject      geslacht        = new JSONObject();
@@ -58,8 +61,12 @@ public class MddData extends Batchjob {
   private static final  JSONArray       soorten         = new JSONArray();
   private static final  Map<String, Integer>
                                         totalen         = new HashMap<>();
+  private static final  String[]        velden          =
+      new String[] {"family", "genus", "order", "specificEpithet",
+                    "mainCommonName", "extinct"};
 
   private static  Integer   factor        = NatuurConstants.VOLGNUMMERFACTOR;
+  private static  int       kolommen[];
   private static  Integer   lijnen        = 0;
   private static  boolean   perRang       = false;
   private static  Integer   sequence      = 0;
@@ -125,6 +132,13 @@ public class MddData extends Batchjob {
     public void setUitgestorven(boolean uitgestorven) {
       this.uitgestorven = uitgestorven;
     }
+
+    @Override
+    public String toString() {
+      return String.format("%s - %s - %s - %s - %s - %s",
+                            getOrde(), getFamilie(), getGeslacht(), getSoort(),
+                            isUitgestorven(), getNaam());
+    }
   }
 
   private static void addRang(String rang) {
@@ -155,7 +169,7 @@ public class MddData extends Batchjob {
 
     init();
     var taxa    = new JSONObject();
-    verwerkAsmbestand(taxa);
+    verwerkMddbestand(taxa);
 
     NatuurTools.writeJson(paramBundle.getBestand(NatuurTools.PAR_JSON),
                           taxa, paramBundle.getString(PAR_CHARSETUIT));
@@ -321,16 +335,32 @@ public class MddData extends Batchjob {
     }
   }
 
-  private static void verwerkAsmbestand(JSONObject taxa) {
-    try (var jsonBestand  =
-          new JsonBestand.Builder()
-                         .setBestand(
-                            paramBundle.getBestand(NatuurTools.PAR_ASMBESTAND))
-                         .setCharset(paramBundle.getString(PAR_CHARSETIN))
-                         .build()) {
-      var json  = (JSONArray) jsonBestand.read();
+  private static void verwerkHeader(String[] header) throws BestandException {
+    kolommen  = new int[velden.length];
 
-      json.forEach(taxon -> verwerkTaxon((JSONObject) taxon));
+    for (var i = 0; i < velden.length; i++) {
+      kolommen[i] = ArrayUtils.indexOf(header, velden[i]);
+      if (kolommen[i] == -1) {
+        throw new BestandException(MessageFormat.format(
+                  resourceBundle.getString(ERR_KOLOM),
+                  velden[i]));
+      }
+    }
+  }
+
+  private static void verwerkMddbestand(JSONObject taxa) {
+    try (var csvBestand  =
+          new CsvBestand.Builder()
+                        .setBestand(
+                            paramBundle.getBestand(NatuurTools.PAR_MDDBESTAND))
+                        .setCharset(paramBundle.getString(PAR_CHARSETIN))
+                        .setHeader(true)
+                        .build()) {
+      verwerkHeader(csvBestand.getKolomNamen());
+
+      while (csvBestand.hasNext()) {
+        verwerkTaxon(csvBestand.next());
+      }
 
       nieuweSoort(new MddTaxon());
       taxa.put(NatuurTools.KEY_RANG, NatuurConstants.RANG_KLASSE);
@@ -345,15 +375,15 @@ public class MddData extends Batchjob {
     }
   }
 
-  private static void verwerkTaxon(JSONObject taxon) {
+  private static void verwerkTaxon(String[] taxon) {
     var mddTaxon  = new MddTaxon();
 
-    mddTaxon.setFamilie(taxon.get("family").toString());
-    mddTaxon.setGeslacht(taxon.get("genus").toString());
-    mddTaxon.setOrde(taxon.get("order").toString());
-    mddTaxon.setSoort(taxon.get("specificEpithet").toString());
-    mddTaxon.setNaam(taxon.get("mainCommonName").toString());
-    mddTaxon.setUitgestorven(taxon.get("extinct").equals("1"));
+    mddTaxon.setFamilie(taxon[kolommen[0]]);
+    mddTaxon.setGeslacht(taxon[kolommen[1]]);
+    mddTaxon.setOrde(taxon[kolommen[2]]);
+    mddTaxon.setSoort(taxon[kolommen[3]]);
+    mddTaxon.setNaam(taxon[kolommen[4]]);
+    mddTaxon.setUitgestorven(taxon[kolommen[5]].equals("1"));
 
     try {
       nieuweSoort(mddTaxon);

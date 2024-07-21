@@ -51,10 +51,10 @@
     },
     {
       "parameter": "mddbestand",
-      "extensie": "json",
-      "kort": "a",
+      "extensie": "csv",
+      "kort": "m",
       "lang": "mddbestand",
-      "help": "MDD-bestand in JSON-formaat.",
+      "help": "MDD-bestand in CSV-formaat.",
       "type": "bestand",
       "verplicht": true
     },
