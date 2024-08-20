@@ -1,7 +1,7 @@
 {
   "_jar": "NatuurTools.jar",
   "_prefixlengte": 18,
-  "applicatie": "CsvNaarJson",
+  "applicatie": "Hernoem",
   "help": "Verander de latijsenamen met een CSV bestand met hierin de huidige en nieuwe latijnsenaam.",
   "banner": "Hernoem latijnsenamen",
   "parameters": [
